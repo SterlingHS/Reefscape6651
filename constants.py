@@ -58,7 +58,6 @@ class DriveConstants:
 
     shuffleMotor = 0
 
-
     # Assumes the encoders are directly mounted on the wheel shafts
     kEncoderDistancePerPulse = (kWheelDiameterInches * math.pi) / kEncoderCPR
 

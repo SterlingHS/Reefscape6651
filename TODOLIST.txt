@@ -1,0 +1,8 @@
+1. SwerveModule System
+Check method getAbsoluteEncoderRad(self):
+Verify input from encoder
+Check return value in radians
+
+2. SwerveModule System
+Check method getAbsoluteEncoderData(self):
+Verify input from encoder

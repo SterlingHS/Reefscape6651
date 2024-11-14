@@ -1,33 +1,53 @@
-from wpimath.geometry import Rotation2d
-import wpilib
-import rev
+########################################################################
+# Class: SwerveModule
+# Purpose: This class is used to control a single swerve module
+########################################################################
 
+# Imports
+import wpilib
 import math
+
 from constants import ModuleConstants, DriveConstants
+
 from wpimath.kinematics import SwerveModuleState
 from wpimath.controller import PIDController
 from wpimath.controller import SimpleMotorFeedforwardMeters
+from wpimath.geometry import Rotation2d
+import wpimath.kinematics
+
 import phoenix6.hardware
 import phoenix6
+import rev
 
-import wpimath.kinematics
+# Class: SwerveModule
 class SwerveModule:
 
     def __init__(self, driveMotorID, turningMotorID, driveMotorReversed, turningMotorReversed,
         absoluteEncoderID, absoluteEncoderOffset, absoluteEncoderReversed, drivePIDk):
             self.absoluteEncoderOffsetRad = absoluteEncoderOffset
             self.absoluteEncoderReversed = absoluteEncoderReversed
-            self.absoluteEncoder = wpilib.AnalogInput(absoluteEncoderID)
+            
+            # Init of Absolute Encoder (CANCoder)
+            self.absoluteEncoder = phoenix6.hardware.CANcoder(absoluteEncoderID, "AbsoluteEncoder"+str(absoluteEncoderID))
 
+            # Init of Drive Motor (TalonFX) for Kraken X.60
             self.driveMotor = phoenix6.hardware.TalonFX(driveMotorID)
+            
+            # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = rev.CANSparkMax(turningMotorID, rev.CANSparkLowLevel.MotorType.kBrushless)
-
             self.turningMotor.setInverted(turningMotorReversed)
 
+            # Init of Encoder to rotate wheel (on the NEO)
             self.turningEncoder = self.turningMotor.getEncoder()
+
+            # START FROM HERE
+            # CHECK CONVERSION FACTORS
+            
             self.turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad)
             self.turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec)
             
+
+
             self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kDTurning, 0)
             self.turningPIDController.enableContinuousInput(-math.pi, math.pi)
 
@@ -49,14 +69,21 @@ class SwerveModule:
         return self.turningEncoder.getVelocity()
 
     def getAbsoluteEncoderRad(self):
-        angle = self.absoluteEncoder.getVoltage()/5.0 #/RobotController.getVoltage5V()
+        ##########################################################
+        #### CHECK VALUE FROM ENCODER
+        #### CHECK WHAT SHOULD BE RETURNED
+
+        # angle = self.absoluteEncoder.getVoltage()/5.0 #/RobotController.getVoltage5V()
+        angle = self.absoluteEncoder.get_absolute_position()
         angle*=2*math.pi
         angle-=self.absoluteEncoderOffsetRad
         direction = -1.0 if self.absoluteEncoderReversed else 1.0
         return angle*direction
 
     def getAbsoluteEncoderData(self):
-        return self.absoluteEncoder.getValue()
+        ##########################################################
+        #### CHECK VALUE FROM ENCODER
+        return self.absoluteEncoder.get_absolute_position()
 
     def resetEncoders(self):
         self.driveMotor.set_position(0)
