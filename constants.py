@@ -105,14 +105,16 @@ class DriveConstants:
 
 
 class ModuleConstants:
-    #Figure all this out
-    kWheelDiameterMeters = 0.1016
-    kDriveMotorGearRatio = 1/6.75
+    # Checked
+    kWheelDiameterMeters = 0.1016 # 4 inches into meters
+    kDriveMotorGearRatio = 1/6.12 # L3 gearbox
     kTurningMotorGearRatio = 1/12.8
     kDriveEncoderRot2Meter = kDriveMotorGearRatio*math.pi*kWheelDiameterMeters
     kTurningEncoderRot2Rad = kTurningMotorGearRatio*2*math.pi
     kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter/60
     kTurningEncoderRPM2RadPerSec = kTurningEncoderRot2Rad/60
+    
+    # Do be checked
     kPTurning = 0.4
     kDTurning = 0.1
     #maxSpeed = 0.6

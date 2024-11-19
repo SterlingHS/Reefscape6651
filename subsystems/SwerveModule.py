@@ -39,15 +39,14 @@ class SwerveModule:
 
             # Init of Encoder to rotate wheel (on the NEO)
             self.turningEncoder = self.turningMotor.getEncoder()
-
-            # START FROM HERE
-            # CHECK CONVERSION FACTORS
             
             self.turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad)
             self.turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec)
             
+            # Encoder Kraken X.60
+            # Encoder is included in TalonFX so no need to initialize it
 
-
+            # PID Controllers for turning and driving
             self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kDTurning, 0)
             self.turningPIDController.enableContinuousInput(-math.pi, math.pi)
 
