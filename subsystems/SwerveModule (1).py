@@ -47,31 +47,29 @@ class SwerveModule:
             # Encoder is included in TalonFX so no need to initialize it
 
             # PID Controllers for turning and driving
-            self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kDTurning, 0) # Why is D instead of I?
-            self.turningPIDController.enableContinuousInput(-math.pi, math.pi)
+            ################ CHECK PID VALUES, kD and kI are swapped
+            self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kDTurning, 0)
+            self.turningPIDController.enableContinuousInput(-math.pi, math.pi) # keep values between pi and -pi
 
-            self.drivePIDController = PIDController(drivePIDk[0], drivePIDk[1], drivePIDk[2]) # Why do we have 2 PID controllers?
+            self.drivePIDController = PIDController(drivePIDk[0], drivePIDk[1], drivePIDk[2])
+            ############### CHECK WHY WE ARE USING A 2nd PID TO DRIVE FORWARD
             self.driveFeedbackForward = SimpleMotorFeedforwardMeters(drivePIDk[3], drivePIDk[4], drivePIDk[5])
 
+            # Reset Encoders
             self.resetEncoders()
 
-    # Returns the position of the drive motor in meters
     def getDrivePosition(self):
-        return ModuleConstants.kDriveEncoderRot2Meter * self.driveMotor.get_position().value
+        return ModuleConstants.kDriveEncoderRot2Meter*self.driveMotor.get_position().value
     
-    # Returns the position of the turning motor in radians
     def getTurningPosition(self):
         return self.turningEncoder.getPosition()
-    
-    # Returns the velocity of the drive motor in meters per second
+
     def getDriveVelocity(self):
-        return ModuleConstants.kDriveEncoderRPM2MeterPerSec * self.driveMotor.get_velocity().value
+        return ModuleConstants.kDriveEncoderRPM2MeterPerSec*self.driveMotor.get_velocity().value
     
-    # Returns the velocity of the turning motor in radians per second
     def getTurningVelocity(self):
         return self.turningEncoder.getVelocity()
 
-    # Returns the absolute position of the turning motor in radians (0-2pi)
     def getAbsoluteEncoderRad(self):
         ##########################################################
         #### CHECK VALUE FROM ENCODER
@@ -84,19 +82,17 @@ class SwerveModule:
         direction = -1.0 if self.absoluteEncoderReversed else 1.0
         return angle*direction
 
-    # Returns the absolute position of the turning motor in degrees (0-360)
     def getAbsoluteEncoderData(self):
         ##########################################################
         #### CHECK VALUE FROM ENCODER
         return self.absoluteEncoder.get_absolute_position()
 
-    # Resets all encoders when init
+    # Resets encoders and sets the turning encoder to the current absolute encoder value
     def resetEncoders(self):
         self.driveMotor.set_position(0)
         self.turningEncoder.setPosition(self.getAbsoluteEncoderRad())
         #self.turningEncoder.setPosition(0)
 
-    # Return the STATE of the Swerve Module
     def getState(self):
         return SwerveModuleState(self.getDriveVelocity(), Rotation2d(self.getTurningPosition()))
 
@@ -110,7 +106,6 @@ class SwerveModule:
     def setDesiredState(self, state):
         if (abs(state.speed)<0.001):
             self.stop()
-        
         
         state = SwerveModuleState.optimize(state, self.getState().angle)
         wpilib.SmartDashboard.putNumber("Module Speed", state.speed)

@@ -6,3 +6,9 @@ Check return value in radians
 2. SwerveModule System
 Check method getAbsoluteEncoderData(self):
 Verify input from encoder
+
+3. Verify values from distance travelled, velocity and angular data (rotation of wheel)
+    getDrivePosition()
+    getTurningPosition()
+    getDriveVelocity()
+    getTurningVelocity()
