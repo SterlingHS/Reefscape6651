@@ -17,38 +17,38 @@ import wpimath.trajectory
 
 class DriveConstants:
     absoulteEncoderCountsPerRev = 4096
-    kFrontLeftDriveMotorPort = 23
-    kFrontLeftTurningMotorPort = 26
+    kFrontLeftDriveMotorPort = 12
+    kFrontLeftTurningMotorPort = 11
     kFrontLeftDriveMotorReversed = False
     kFrontLeftTurningMotorReversed = False
-    kFrontLeftAbsoluteEncoderPort = 2
+    kFrontLeftAbsoluteEncoderPort = 13
     kFrontLeftAbsoluteEncoderOffsetRad = (2906/absoulteEncoderCountsPerRev)*(2*math.pi)#
     kFrontLeftAbsoluteEncoderReversed = False
     kFrontLeftForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
 
-    kFrontRightDriveMotorPort = 21
-    kFrontRightTurningMotorPort = 22
+    kFrontRightDriveMotorPort = 22
+    kFrontRightTurningMotorPort = 21
     kFrontRightDriveMotorReversed = True
     kFrontRightTurningMotorReversed = False
-    kFrontRightAbsoluteEncoderPort = 0
+    kFrontRightAbsoluteEncoderPort = 23
     kFrontRightAbsoluteEncoderOffsetRad = (87/absoulteEncoderCountsPerRev)*(2*math.pi)
     kFrontRightAbsoluteEncoderReversed = False
     kFrontRightForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
 
-    kBackLeftDriveMotorPort = 13
-    kBackLeftTurningMotorPort = 14
+    kBackLeftDriveMotorPort = 32
+    kBackLeftTurningMotorPort = 31
     kBackLeftDriveMotorReversed = True
     kBackLeftTurningMotorReversed = False
-    kBackLeftAbsoluteEncoderPort = 3
+    kBackLeftAbsoluteEncoderPort = 33
     kBackLeftAbsoluteEncoderOffsetRad = (201/absoulteEncoderCountsPerRev)*(2*math.pi)
     kBackLeftAbsoluteEncoderReversed = False
     kBackLeftForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
 
-    kBackRightDriveMotorPort = 11
-    kBackRightTurningMotorPort = 12
+    kBackRightDriveMotorPort = 42
+    kBackRightTurningMotorPort = 41
     kBackRightDriveMotorReversed = False
     kBackRightTurningMotorReversed = False
-    kBackRightAbsoluteEncoderPort = 1
+    kBackRightAbsoluteEncoderPort = 43
     kBackRightAbsoluteEncoderOffsetRad = (2851/absoulteEncoderCountsPerRev)*(2*math.pi)
     kBackRightAbsoluteEncoderReversed = False
     kBackRightForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]

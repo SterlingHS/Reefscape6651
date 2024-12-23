@@ -32,7 +32,8 @@ class SwerveModule:
 
             # Init of Drive Motor (TalonFX) for Kraken X.60
             self.driveMotor = phoenix6.hardware.TalonFX(driveMotorID)
-            
+            # INVERTER NEEDS TO BE DONE MANUALLY USING TUNER
+
             # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = rev.CANSparkMax(turningMotorID, rev.CANSparkLowLevel.MotorType.kBrushless)
             self.turningMotor.setInverted(turningMotorReversed)
@@ -45,6 +46,8 @@ class SwerveModule:
             
             # Encoder Kraken X.60
             # Encoder is included in TalonFX so no need to initialize it
+            # set position conversion factor for driver motor encoder???
+            
 
             # PID Controllers for turning and driving
             self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kDTurning, 0) # Why is D instead of I?
@@ -78,8 +81,8 @@ class SwerveModule:
         #### CHECK WHAT SHOULD BE RETURNED
 
         # angle = self.absoluteEncoder.getVoltage()/5.0 #/RobotController.getVoltage5V()
-        angle = self.absoluteEncoder.get_absolute_position()
-        angle*=2*math.pi
+        angle = self.absoluteEncoder.get_absolute_position().value
+        angle = angle * 2*math.pi
         angle-=self.absoluteEncoderOffsetRad
         direction = -1.0 if self.absoluteEncoderReversed else 1.0
         return angle*direction
