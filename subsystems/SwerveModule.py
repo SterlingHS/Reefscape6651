@@ -83,6 +83,17 @@ class SwerveModule:
             self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kDTurning, 0) # Why is D instead of I?
             self.turningPIDController.enableContinuousInput(-math.pi, math.pi)
 
+            # Same PID but executed by SparkMax instead of Roborio
+            # Let's try both and see which one works better
+            self.RevController = self.turningMotor.getPIDController()
+            self.RevController.setP(ModuleConstants.kPTurning)
+            self.RevController.setI(0)
+            self.RevController.setD(ModuleConstants.kDTurning)   
+            self.RevController.setPositionPIDWrappingMinInput(-math.pi) # Wrapping is the same as Conhtinuous Input
+            self.RevController.setPositionPIDWrappingMaxInput(math.pi)
+            self.RevController.setPositionPIDWrappingEnabled(True)
+
+
             self.drivePIDController = PIDController(drivePIDk[0], drivePIDk[1], drivePIDk[2]) # Why do we have 2 PID controllers?
             self.driveFeedbackForward = SimpleMotorFeedforwardMeters(drivePIDk[3], drivePIDk[4], drivePIDk[5])
 
