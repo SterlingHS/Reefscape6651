@@ -28,7 +28,8 @@ class SwerveModule:
             self.absoluteEncoderReversed = absoluteEncoderReversed
             
             # Init of Absolute Encoder (CANCoder)
-            self.absoluteEncoder = phoenix6.hardware.CANcoder(absoluteEncoderID, "AbsoluteEncoder"+str(absoluteEncoderID))
+            self.absoluteEncoder = phoenix6.hardware.CANcoder(absoluteEncoderID) # , "AbsoluteEncoder"+str(absoluteEncoderID)) THIS EXTRA VALUE IS NOT NEEDED. REMOVE IT...
+            # It stops the program from finding the absolute encoder...
 
             # Init of Drive Motor (TalonFX) for Kraken X.60
             self.driveMotor = phoenix6.hardware.TalonFX(driveMotorID)
@@ -44,10 +45,38 @@ class SwerveModule:
             self.turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad)
             self.turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec)
             
+            ##############################################################################################################
             # Encoder Kraken X.60
             # Encoder is included in TalonFX so no need to initialize it
-            # set position conversion factor for driver motor encoder???
-            
+            # set position conversion factor for driver motor encoder
+            # Configure drive motor
+
+            drive_config = self.driveMotor.configurator
+            driveMotorConfig = phoenix6.configs.MotorOutputConfigs()
+            driveMotorConfig.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
+            driveMotorConfig.inverted = (
+                phoenix6.signals.InvertedValue.CLOCKWISE_POSITIVE 
+                if driveMotorReversed 
+                else phoenix6.signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
+            )
+            drive_gear_ratio_config = phoenix6.configs.FeedbackConfigs().with_sensor_to_mechanism_ratio(ModuleConstants.kDriveEncoderRot2Meter)
+
+            # Reduce CAN status frame rates before configuring
+            info = self.driveMotor.get_fault_field().get_applied_update_frequency()
+            print("Before change of frame rate - Drive Motor CAN status frame rates: ", info)
+            self.driveMotor.get_fault_field().set_update_frequency(frequency_hz=4, timeout_seconds=0.01)
+            info = self.driveMotor.get_fault_field().get_applied_update_frequency()
+            print("After change of frame rate - Drive Motor CAN status frame rates: ", info)
+
+            # Apply the configurations to the drive motor controllers
+            drive_config.apply(driveMotorConfig)
+            drive_config.apply(drive_gear_ratio_config)
+
+            self.driveMotor.get_fault_field().set_update_frequency(info)
+            info = self.driveMotor.get_fault_field().get_applied_update_frequency()
+            print("After update - Drive Motor CAN status frame rates: ", info)
+
+            ##############################################################################################################
 
             # PID Controllers for turning and driving
             self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kDTurning, 0) # Why is D instead of I?
@@ -59,16 +88,16 @@ class SwerveModule:
             self.resetEncoders()
 
     # Returns the position of the drive motor in meters
-    def getDrivePosition(self):
-        return ModuleConstants.kDriveEncoderRot2Meter * self.driveMotor.get_position().value
+    def getDrivePosition(self): # CHECK IF IT RETURNS THE RIGHT VALUE
+        return self.driveMotor.get_position().value # * ModuleConstants.kDriveEncoderRot2Meter
     
     # Returns the position of the turning motor in radians
     def getTurningPosition(self):
         return self.turningEncoder.getPosition()
     
     # Returns the velocity of the drive motor in meters per second
-    def getDriveVelocity(self):
-        return ModuleConstants.kDriveEncoderRPM2MeterPerSec * self.driveMotor.get_velocity().value
+    def getDriveVelocity(self): # CHECK IF IT RETURNS THE RIGHT VALUE
+        return self.driveMotor.get_velocity().value # * ModuleConstants.kDriveEncoderRPM2MeterPerSec
     
     # Returns the velocity of the turning motor in radians per second
     def getTurningVelocity(self):
@@ -81,10 +110,14 @@ class SwerveModule:
         #### CHECK WHAT SHOULD BE RETURNED
 
         # angle = self.absoluteEncoder.getVoltage()/5.0 #/RobotController.getVoltage5V()
-        angle = self.absoluteEncoder.get_absolute_position().value
-        angle = angle * 2*math.pi
-        angle-=self.absoluteEncoderOffsetRad
-        direction = -1.0 if self.absoluteEncoderReversed else 1.0
+        angle = self.absoluteEncoder.get_absolute_position().value # Output is from -0.5 to 0.5
+        angle = angle * 2*math.pi # Output is from -pi to pi
+        angle-=self.absoluteEncoderOffsetRad # Offset
+        if angle > math.pi: # Makes the output be between -pi and pi
+            angle -= 2*math.pi
+        if angle < -math.pi:
+            angle += 2*math.pi  
+        direction = -1.0 if self.absoluteEncoderReversed else 1.0 # Reverses the output if needed
         return angle*direction
 
     # Returns the absolute position of the turning motor in degrees (0-360)

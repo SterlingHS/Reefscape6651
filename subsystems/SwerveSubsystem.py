@@ -2,15 +2,11 @@ from subsystems.SwerveModule import SwerveModule
 from wpimath.geometry import Rotation2d
 import wpimath.kinematics
 import wpimath
-from wpimath.units import volts
 import navx
 from commands2 import Subsystem
 from constants import DriveConstants
 import wpilib
-from wpilib import RobotController
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
-from wpilib.sysid import SysIdRoutineLog
-from commands2.sysid import SysIdRoutine
 
 import phoenix6
 
@@ -58,7 +54,7 @@ class SwerveSubsystem(Subsystem):
             DriveConstants.kBackRightForwardPIDk
         )
 
-        #self.gyro = AHRS(navx.SPI.Port.kMXP)s
+        #self.gyro = navx.AHRS(navx.SPI.Port.kMXP)
         swerveModulePositions = (wpimath.kinematics.SwerveModulePosition(self.frontLeft.getDrivePosition(), Rotation2d(self.frontLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.frontRight.getDrivePosition(), Rotation2d(self.frontRight.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backLeft.getDrivePosition(), Rotation2d(self.backLeft.getTurningPosition())),
@@ -66,24 +62,9 @@ class SwerveSubsystem(Subsystem):
                                 )
         self.gyro = navx.AHRS.create_spi()
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)
-        self.distanceSensor = wpilib.AnalogInput(DriveConstants.kDistanceSensorID)
         #Code example uses a more sophisticated method to control
         #the timing of the zeroHeading() 
         self.zeroHeading()
-
-        # Tell SysId how to plumb the driving voltage to the motors.
-        def sysidDrive(voltage: volts) -> None:
-            m = -.03
-            self.frontLeft.driveMotor.set_control(phoenix6.controls.DutyCycleOut(-m*voltage))
-            self.frontRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(m*voltage))
-            self.backLeft.driveMotor.set_control(phoenix6.controls.DutyCycleOut(-m*voltage))
-            self.backRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(m*voltage))
-
-        # Tell SysId to make generated commands require this subsystem, suffix test state in
-        # WPILog with this subsystem's name ("drive")
-        self.sys_id_routine = SysIdRoutine(
-            SysIdRoutine.Config(),
-            SysIdRoutine.Mechanism(sysidDrive, self.log, self, "Swerve Drive"),)
 
     def zeroHeading(self):
         self.gyro.reset()
@@ -107,21 +88,59 @@ class SwerveSubsystem(Subsystem):
         states = [self.frontLeft.getState(), self.frontRight.getState(),self.backLeft.getState(),self.backRight.getState()]
         return states
 
-    def getDistanceSensorPos(self):
-        #return self.distanceSensor.getPosition()
-        return self.distanceSensor.getValue()
-
     def resetOdometer(self, pose):
         self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
 
     def resetEncoder(self):
+        ''' Resets all the encoders - 
+        Forward encoders to 0, rotation encoder to output of Absolute Encoder. '''
         self.frontLeft.resetEncoders()
         self.frontRight.resetEncoders()
         self.backLeft.resetEncoders()
         self.backRight.resetEncoders()
 
+    def readAbsEncoders(self):
+        ''' Reads all absolute encoders - Returns list of values [FL, FR, BL, BR] '''
+        FL = self.frontLeft.getAbsoluteEncoderRad()
+        FR = self.frontRight.getAbsoluteEncoderRad()
+        BL = self.backLeft.getAbsoluteEncoderRad()
+        BR = self.backRight.getAbsoluteEncoderRad()
+        return [FL,FR,BL,BR]
+    
+    def readTurnEncoders(self):
+        ''' Reads all turning encoders - Returns list of values [FL, FR, BL, BR] '''
+        FL = self.frontLeft.getTurningPosition()
+        FR = self.frontRight.getTurningPosition()
+        BL = self.backLeft.getTurningPosition()
+        BR = self.backRight.getTurningPosition()
+        return [FL,FR,BL,BR]
+    
+    def readForwardEncoders(self):
+        ''' Reads all Forward encoders - Returns list of values [FL, FR, BL, BR] '''
+        FL = self.frontLeft.getDrivePosition()
+        FR = self.frontRight.getDrivePosition()
+        BL = self.backLeft.getDrivePosition()
+        BR = self.backRight.getDrivePosition()
+        return [FL,FR,BL,BR]
+
     def periodic(self):
         self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
+        absoluteEncoder = self.readAbsEncoders()
+        wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
+        wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
+        wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
+        wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
+        turnings = self.readTurnEncoders()
+        wpilib.SmartDashboard.putNumber("Turning FL", turnings[0])
+        wpilib.SmartDashboard.putNumber("Turning FR", turnings[1])
+        wpilib.SmartDashboard.putNumber("Turning BL", turnings[2])
+        wpilib.SmartDashboard.putNumber("Turning BR", turnings[3])
+        forwards = self.readForwardEncoders()
+        wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
+        wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
+        wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
+        wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
+        
 
     def stopModules(self):
         self.frontLeft.stop()
@@ -150,55 +169,27 @@ class SwerveSubsystem(Subsystem):
         self.backRight.setDesiredState(desiredStates[3])
 
 
+    # TEST MOTORS INDEPENDENTLY
     def moveFLTMotor(self):
         self.frontLeft.turningMotor.set(0.6)
+
     def moveFLDMotor(self):
         self.frontLeft.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
+
     def moveFRTMotor(self):
         self.frontRight.turningMotor.set(0.6)
+
     def moveFRDMotor(self):
         self.frontRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
+
     def moveBLTMotor(self):
         self.backLeft.turningMotor.set(0.6)
+
     def moveBLDMotor(self):
         self.backLeft.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
+
     def moveBRTMotor(self):
         self.backRight.turningMotor.set(0.6)
+
     def moveBRDMotor(self):
         self.backRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
-
-    # Tell SysId how to record a frame of data for each motor on the mechanism being
-    # characterized.
-    def log(self, sys_id_routine: SysIdRoutineLog) -> None:
-        # Record a frame for the left motors.  Since these share an encoder, we consider
-        # the entire group to be one motor.
-        sys_id_routine.motor("drive-front-left").voltage(
-            self.frontLeft.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
-        ).position(self.frontLeft.getDrivePosition()).velocity(
-            self.frontLeft.getDriveVelocity()
-        )
-        
-        sys_id_routine.motor("drive-front-right").voltage(
-            self.frontRight.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
-        ).position(self.frontRight.getDrivePosition()).velocity(
-            self.frontRight.getDriveVelocity()
-        )
-
-        sys_id_routine.motor("drive-back-left").voltage(
-            self.backLeft.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
-        ).position(self.backLeft.getDrivePosition()).velocity(
-            self.backLeft.getDriveVelocity()
-        )
-
-        sys_id_routine.motor("drive-back-right").voltage(
-            self.backRight.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
-        ).position(self.backRight.getDrivePosition()).velocity(
-            self.backRight.getDriveVelocity()
-        )
-
-
-    def sysIdQuasistatic(self, direction: SysIdRoutine.Direction): 
-        return self.sys_id_routine.quasistatic(direction)
-
-    def sysIdDynamic(self, direction: SysIdRoutine.Direction):
-        return self.sys_id_routine.dynamic(direction)

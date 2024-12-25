@@ -22,7 +22,7 @@ class DriveConstants:
     kFrontLeftDriveMotorReversed = False
     kFrontLeftTurningMotorReversed = False
     kFrontLeftAbsoluteEncoderPort = 13
-    kFrontLeftAbsoluteEncoderOffsetRad = (2906/absoulteEncoderCountsPerRev)*(2*math.pi)#
+    kFrontLeftAbsoluteEncoderOffsetRad = 0
     kFrontLeftAbsoluteEncoderReversed = False
     kFrontLeftForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
 
@@ -31,7 +31,7 @@ class DriveConstants:
     kFrontRightDriveMotorReversed = True
     kFrontRightTurningMotorReversed = False
     kFrontRightAbsoluteEncoderPort = 23
-    kFrontRightAbsoluteEncoderOffsetRad = (87/absoulteEncoderCountsPerRev)*(2*math.pi)
+    kFrontRightAbsoluteEncoderOffsetRad = 0
     kFrontRightAbsoluteEncoderReversed = False
     kFrontRightForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
 
@@ -40,7 +40,7 @@ class DriveConstants:
     kBackLeftDriveMotorReversed = True
     kBackLeftTurningMotorReversed = False
     kBackLeftAbsoluteEncoderPort = 33
-    kBackLeftAbsoluteEncoderOffsetRad = (201/absoulteEncoderCountsPerRev)*(2*math.pi)
+    kBackLeftAbsoluteEncoderOffsetRad = 0
     kBackLeftAbsoluteEncoderReversed = False
     kBackLeftForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
 
@@ -49,7 +49,7 @@ class DriveConstants:
     kBackRightDriveMotorReversed = False
     kBackRightTurningMotorReversed = False
     kBackRightAbsoluteEncoderPort = 43
-    kBackRightAbsoluteEncoderOffsetRad = (2851/absoulteEncoderCountsPerRev)*(2*math.pi)
+    kBackRightAbsoluteEncoderOffsetRad = 0
     kBackRightAbsoluteEncoderReversed = False
     kBackRightForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
 
@@ -106,15 +106,18 @@ class DriveConstants:
 
 class ModuleConstants:
     # Checked
+    TurningEncoderTicksPerRev = 42 # 42 ticks per rev for the NEO motor
+    DriveEncoderTicksPerRev = 2048 # 2048 ticks per rev for the Kraken x60 motor
+
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
     kDriveMotorGearRatio = 1/6.12 # L3 gearbox
-    kTurningMotorGearRatio = 1/12.8
-    kDriveEncoderRot2Meter = kDriveMotorGearRatio*math.pi*kWheelDiameterMeters
+    kTurningMotorGearRatio = 1/(150/7) # 150:7 gear ratio
+    kDriveEncoderRot2Meter = kDriveMotorGearRatio * math.pi * kWheelDiameterMeters
     kTurningEncoderRot2Rad = kTurningMotorGearRatio*2*math.pi
     kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter/60
     kTurningEncoderRPM2RadPerSec = kTurningEncoderRot2Rad/60
     
-    # Do be checked
+    # To be checked
     kPTurning = 0.4
     kDTurning = 0.1
     #maxSpeed = 0.6

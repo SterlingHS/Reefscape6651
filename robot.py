@@ -12,6 +12,7 @@ import commands2
 import commands2.cmd
 import robotcontainer
 from wpilib.cameraserver import CameraServer
+from NetworkTables import NetworkTables
 
 """
 The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -34,12 +35,13 @@ class MyRobot(commands2.TimedCommandRobot):
         initialization code.
         """
         self.autonomousCommand: typing.Optional[commands2.Command] = None
-        self.cameraServer = CameraServer()
-        self.cameraServer.launch()
+        # self.cameraServer = CameraServer()
+        # self.cameraServer.launch()
 
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.
         self.container = robotcontainer.RobotContainer()
+        self.shuffleboardinfo = NetworkTables(self.container)
 
     def robotPeriodic(self) -> None:
         self.shuffleboardinfo.updateShuffleboard()
@@ -78,7 +80,7 @@ class MyRobot(commands2.TimedCommandRobot):
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
         self.shuffleboardinfo.updateShuffleboard()
-        self.container.blinkinSubsystem.updatePWM()
+        #self.container.blinkinSubsystem.updatePWM()
 
 
     def testInit(self) -> None:
@@ -87,7 +89,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def testPeriodic(self) -> None:
         self.shuffleboardinfo.updateShuffleboard()
-
         return super().testPeriodic()
 
 

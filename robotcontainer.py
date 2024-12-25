@@ -6,16 +6,10 @@ import wpilib
 
 import commands2
 import commands2.button
-from commands2.sysid import SysIdRoutine
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
-from subsystems.Blinkin import Blinkin
-
-import constants
-from constants import OIConstants, DriveConstants, AutoConstants
-
-from math import pi
+from constants import OIConstants
 
 class RobotContainer:
     """
@@ -29,7 +23,6 @@ class RobotContainer:
     def __init__(self):
 
         self.swerveSubsystem = SwerveSubsystem()
-        self.blinkinSubsystem = Blinkin()
 
         """The container for the robot. Contains subsystems, OI devices, and commands."""
         # The driver's controller
