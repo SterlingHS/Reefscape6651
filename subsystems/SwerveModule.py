@@ -34,6 +34,7 @@ class SwerveModule:
             # Init of Drive Motor (TalonFX) for Kraken X.60
             self.driveMotor = phoenix6.hardware.TalonFX(driveMotorID)
             # INVERTER NEEDS TO BE DONE MANUALLY USING TUNER
+            # NOT anymore... check config down there....
 
             # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = rev.CANSparkMax(turningMotorID, rev.CANSparkLowLevel.MotorType.kBrushless)
@@ -63,7 +64,7 @@ class SwerveModule:
 
             # Reduce CAN status frame rates before configuring
             info = self.driveMotor.get_fault_field().get_applied_update_frequency()
-            print("Before change of frame rate - Drive Motor CAN status frame rates: ", info)
+            print("Before change of frame rate - Drive Motor CAN status frame rates: ", info)                  # It does not print!!! Why?
             self.driveMotor.get_fault_field().set_update_frequency(frequency_hz=4, timeout_seconds=0.01)
             info = self.driveMotor.get_fault_field().get_applied_update_frequency()
             print("After change of frame rate - Drive Motor CAN status frame rates: ", info)
