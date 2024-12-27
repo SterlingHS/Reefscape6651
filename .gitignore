@@ -167,3 +167,9 @@ Icon?
 Icon*
 Icon\r
 Icon\r\r
+
+# Desktop.ini file which Windows operating systems place to specify custom icons, folder settings, etc.
+Desktop.ini
+
+# pyenv environment forlder
+%USERPROFILE%/*

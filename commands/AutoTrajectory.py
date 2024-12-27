@@ -9,7 +9,6 @@ import json
 
 #Accepts current swerveSubsytem and file path of the trajectory to be followed
 def AutoTrajectory(swerveSubsystem: SwerveSubsystem,file: str):
-        
         swerveSubsystem = swerveSubsystem
         with open(file, 'r') as f:
             data = json.load(f)

@@ -55,7 +55,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def autonomousInit(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        self.container.swerveSubsystem.resetEncoder()
+        # self.container.swerveSubsystem.resetEncoder()
         self.autonomousCommand = self.container.getAutonomousCommand()
 
         # schedule the autonomous command (example)

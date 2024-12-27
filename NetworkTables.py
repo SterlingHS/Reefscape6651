@@ -27,9 +27,10 @@ class NetworkTables:
         # Σ = "sigma grindset".capitalize()
 
         # Reads all absolute encoders and push values to Smart Dashboard
-        absoluteEncoder = self.container.swerveSubsystem.readAbsEncoders()
-        wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
-        wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
-        wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
-        wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
+        # absoluteEncoder = self.container.swerveSubsystem.readAbsEncoders()
+        # wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
+        # wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
+        # wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
+        # wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
+        pass
 

@@ -1,18 +1,23 @@
 from subsystems.SwerveModule import SwerveModule
+
+import wpimath
 from wpimath.geometry import Rotation2d
 import wpimath.kinematics
-import wpimath
-import navx
-from commands2 import Subsystem
-from constants import DriveConstants
-import wpilib
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 
+import wpilib
+from commands2 import Subsystem
+from constants import DriveConstants
+
+import navx
 import phoenix6
+
+from time import sleep
 
 class SwerveSubsystem(Subsystem):
     def __init__(self):
         Subsystem.__init__(self)
+
         self.frontLeft = SwerveModule(
             DriveConstants.kFrontLeftDriveMotorPort,
             DriveConstants.kFrontLeftTurningMotorPort,
@@ -54,41 +59,46 @@ class SwerveSubsystem(Subsystem):
             DriveConstants.kBackRightForwardPIDk
         )
 
-        #self.gyro = navx.AHRS(navx.SPI.Port.kMXP)
         swerveModulePositions = (wpimath.kinematics.SwerveModulePosition(self.frontLeft.getDrivePosition(), Rotation2d(self.frontLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.frontRight.getDrivePosition(), Rotation2d(self.frontRight.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backLeft.getDrivePosition(), Rotation2d(self.backLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backRight.getDrivePosition(), Rotation2d(self.backRight.getTurningPosition())),
                                 )
+        # self.gyro = navx.AHRS(navx.SPI.Port.kMXP)
         self.gyro = navx.AHRS.create_spi()
-        self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)
-        #Code example uses a more sophisticated method to control
-        #the timing of the zeroHeading() 
         self.zeroHeading()
+        sleep(1) # Wait for gyro to calibrate... NOT MORE THAN 2 SEC!! or get error.
+        self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)       
 
     def zeroHeading(self):
         self.gyro.reset()
 
-    def getCompass(self)->float:
+    def getCompass(self)->float: 
         return self.gyro.getFusedHeading()
 
     def getHeading(self):
+        ''' Return heading in degrees for values between 0 and 360 '''
         return -1*self.gyro.getAngle() % 360
 
     def getContinuousHeading(self):
+        ''' Return heading in degrees '''
         return -1*self.gyro.getAngle()
 
     def getRotation2d(self):
+        ''' Returns heading in Rotation2d format '''
         return Rotation2d.fromDegrees(self.getHeading())
 
     def getPose(self):
+        ''' Returns the pose of the robot '''
         return self.odometer.getPose()
 
     def getModuleStates(self):
+        ''' Returns the states of the swerve modules '''
         states = [self.frontLeft.getState(), self.frontRight.getState(),self.backLeft.getState(),self.backRight.getState()]
         return states
 
     def resetOdometer(self, pose):
+        ''' Resets the odometer to a specific pose '''
         self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
 
     def resetEncoder(self):
@@ -123,31 +133,43 @@ class SwerveSubsystem(Subsystem):
         BR = self.backRight.getDrivePosition()
         return [FL,FR,BL,BR]
 
+    # Periodic is called every cycle (20ms)
     def periodic(self):
+        # Reads Odometer (location of robot (x,y))
         self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
+        
+        # Reads Absolute Encoders and sends them to Dashboard
         absoluteEncoder = self.readAbsEncoders()
         wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
         wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
         wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
         wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
+        
+        # Reads Encoders and sends them to Dashboard
         turnings = self.readTurnEncoders()
         wpilib.SmartDashboard.putNumber("Turning FL", turnings[0])
         wpilib.SmartDashboard.putNumber("Turning FR", turnings[1])
         wpilib.SmartDashboard.putNumber("Turning BL", turnings[2])
         wpilib.SmartDashboard.putNumber("Turning BR", turnings[3])
+
+        # Reads Distance Travelled and sends them to Dashboard
         forwards = self.readForwardEncoders()
         wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
         wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
         wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
         wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
-        
 
+        # wpilib.SmartDashboard.putNumber("Heading", self.getHeading())
+        # wpilib.SmartDashboard.putNumber("Continuous Heading", self.getContinuousHeading())
+        
+    # Stops all motors
     def stopModules(self):
         self.frontLeft.stop()
         self.frontRight.stop()
         self.backLeft.stop()
         self.backRight.stop()
 
+    # Moves all motors straight forward at a certain speed
     def moveStraight(self, speed):
         straightState = SwerveModuleState(speed, Rotation2d(0))
         self.frontLeft.setDesiredState(straightState)
@@ -155,18 +177,21 @@ class SwerveSubsystem(Subsystem):
         self.backLeft.setDesiredState(straightState)
         self.backRight.setDesiredState(straightState)
 
+    # Moves all motors straight forward at a certain speed (In field oriented mode)
     def moveStraightField(self, speed):
         self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 speed, 0, 0, self.getRotation2d())
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
         self.setModuleStates(moduleStates)
 
+    # Sets swerve system to go in a specific direction and speed
     def setModuleStates(self,desiredStates):
         desiredStates = wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond)
         self.frontLeft.setDesiredState(desiredStates[0])
         self.frontRight.setDesiredState(desiredStates[1])
         self.backLeft.setDesiredState(desiredStates[2])
         self.backRight.setDesiredState(desiredStates[3])
+
 
 
     # TEST MOTORS INDEPENDENTLY

@@ -9,14 +9,16 @@ changes.
 """
 
 import math
+import unit_conversions as conv
+import wpilib
+import wpimath.trajectory
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpimath.geometry import Translation2d
 import wpimath
-import wpilib
-import wpimath.trajectory
 
 class DriveConstants:
-    absoulteEncoderCountsPerRev = 4096
+    # absoulteEncoderCountsPerRev = 4096
+
     kFrontLeftDriveMotorPort = 12
     kFrontLeftTurningMotorPort = 11
     kFrontLeftDriveMotorReversed = False
@@ -53,26 +55,26 @@ class DriveConstants:
     kBackRightAbsoluteEncoderReversed = False
     kBackRightForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
 
-    kEncoderCPR = 1024
-    kWheelDiameterInches = 4
+    # kEncoderCPR = 1024
+    # kWheelDiameterInches = 4
 
-    shuffleMotor = 0
+    # shuffleMotor = 0
 
     # Assumes the encoders are directly mounted on the wheel shafts
-    kEncoderDistancePerPulse = (kWheelDiameterInches * math.pi) / kEncoderCPR
+    # kEncoderDistancePerPulse = (kWheelDiameterInches * math.pi) / kEncoderCPR
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
     kPhysicalMaxSpeedMetersPerSecond = 9 #9 MPS is about 20 miles per hour 
 
-    kGyroReversed = False
+    # kGyroReversed = False
 
-    kStabilizationP = 1
-    kStabilizationI = 0.5
-    kStabilizationD = 0
+    # kStabilizationP = 1
+    # kStabilizationI = 0.5
+    # kStabilizationD = 0
 
-    kTurnP = 1
-    kTurnI = 0
-    kTurnD = 0
+    # kTurnP = 1
+    # kTurnI = 0
+    # kTurnD = 0
 
     kMaxTurnRateDegPerS = 300 # was 100
     kMaxTurnAccelerationDegPerSSquared = 100 # was 300
@@ -80,11 +82,12 @@ class DriveConstants:
     kMaxTurnRateRadPerS = math.radians(kMaxTurnRateDegPerS)
     kMaxTurnAccelerationRadPerSSquared = math.radians(kMaxTurnAccelerationDegPerSSquared)
 
-    kTurnToleranceDeg = 5
-    kTurnRateToleranceDegPerS = 5  # degrees per second, was 10
+    # kTurnToleranceDeg = 5
+    # kTurnRateToleranceDegPerS = 5  # degrees per second, was 10
 
-    kTrackWidth = 0.60  #meters
-    kWheelBase = 0.59 #meters
+    kTrackWidth = conv.inches_meters(22+5/8)  # 22 5/8 inches into meters
+    kWheelBase = kTrackWidth # Square robot
+
     kDriveKinematics = SwerveDrive4Kinematics(
         Translation2d(kWheelBase/2, kTrackWidth/2),  #LF
         Translation2d(kWheelBase/2, -kTrackWidth/2), #RF
@@ -96,19 +99,14 @@ class DriveConstants:
     kTeleDriveMaxAngularRadiansPerSecond = 12 #(14.5*12)*0.3048/2 #Transformed 14.5 feet into radians per sec
 
     kTeleDriveMaxAccelerationUnitsPerSeconds = kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
-
     kTeleDriveMaxAngularAccelerationUnitsPerSeconds = 0.8 #2*12*0.3048/2 #Transformed from MaxAcceleration
 
-    kTeleDriveMaxDeccelrationUnitsPerSecond = kTeleDriveMaxSpeedMetersPerSecond
+    # kTeleDriveMaxDeccelrationUnitsPerSecond = kTeleDriveMaxSpeedMetersPerSecond
 
-    kDistanceSensorID = 7
+    # kDistanceSensorID = 7
 
 
 class ModuleConstants:
-    # Checked
-    TurningEncoderTicksPerRev = 42 # 42 ticks per rev for the NEO motor
-    DriveEncoderTicksPerRev = 2048 # 2048 ticks per rev for the Kraken x60 motor
-
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
     kDriveMotorGearRatio = 1/6.12 # L3 gearbox
     kTurningMotorGearRatio = 1/(150/7) # 150:7 gear ratio
@@ -120,7 +118,7 @@ class ModuleConstants:
     # To be checked
     kPTurning = 0.4
     kDTurning = 0.1
-    #maxSpeed = 0.6
+    # maxSpeed = 0.6
 
 
 class OIConstants:
@@ -132,8 +130,6 @@ class OIConstants:
     kDriverRotAxis = 4
     kDriverFieldOrientedButtonIdx = 3
 
-class BlinkinConstants:
-    kBlinkinPort = 0 #PWM Controller
 
 class AutoConstants:
     from constants import DriveConstants
