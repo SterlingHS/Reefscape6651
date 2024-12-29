@@ -12,23 +12,21 @@ from subsystems.SwerveSubsystem import SwerveSubsystem
 from constants import OIConstants
 
 class RobotContainer:
-    """
+    '''
     This class is where the bulk of the robot should be declared. Since Command-based is a
     "declarative" paradigm, very little robot logic should actually be handled in the :class:`.Robot`
     periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
     subsystems, commands, and button mappings) should be declared here.
-
-    """
+    '''
 
     def __init__(self):
-
+        '''The container for the robot. Contains subsystems, OI devices, and commands.'''
         self.swerveSubsystem = SwerveSubsystem()
 
-        """The container for the robot. Contains subsystems, OI devices, and commands."""
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
         # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
-
+        # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
         self.swerveSubsystem.setDefaultCommand(
            SwerveJoystickCmd(
                self.swerveSubsystem,

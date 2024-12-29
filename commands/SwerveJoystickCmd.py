@@ -1,26 +1,34 @@
+####################################################################################################
+# SwerveJoystickCmd.py
+# This file contains the SwerveJoystickCmd class, which is a
+# command that allows the driver to control the swerve drive
+# using a joystick.
+####################################################################################################
+
 from commands2 import Command
 from wpimath.filter import SlewRateLimiter
 from constants import DriveConstants,OIConstants
 from wpimath.kinematics import ChassisSpeeds
+from subsystems import SwerveSubsystem
 
 signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number (Used?)
 
 class SwerveJoystickCmd(Command):
-    def __init__(self, swerveSubsystem, xSpeedFunction, ySpeedFunction, turningSpeedFunction):
+    def __init__(self, swerveSub, xSpeedFunc, ySpeedFunc, turningSpeedFunc):
         Command.__init__(self)
 
-        self.swerveSubsystem = swerveSubsystem
-        self.xSpeedFunction = xSpeedFunction
-        self.ySpeedFunction = ySpeedFunction
-        self.turningSpeedFunction = turningSpeedFunction
-        
+        self.swerveSubsystem = swerveSub
+        self.xSpeedFunction = xSpeedFunc
+        self.ySpeedFunction = ySpeedFunc
+        self.turningSpeedFunction = turningSpeedFunc
+
         # the limiters are giving us lag. They don't allow us to slow down quick enough. When we dampen the modules this lag slows down. We need to allow 0 to bypass all of this and stop the modules
         self.XLimiter = SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSeconds)
         self.YLimiter = SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSeconds)
 
         self.x_direction_states = [0,0,0]
         self.y_direction_states = [0,0,0]
-        self.addRequirements(swerveSubsystem)
+        self.addRequirements(swerveSub)
 
     def initialize(self) -> None:
         return super().initialize()
@@ -82,6 +90,7 @@ class SwerveJoystickCmd(Command):
 
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
         self.swerveSubsystem.setModuleStates(moduleStates)
+
         return super().execute()
 
     def end(self, interrupted: bool) -> None:

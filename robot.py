@@ -76,12 +76,10 @@ class MyRobot(commands2.TimedCommandRobot):
         if self.autonomousCommand is not None:
             self.autonomousCommand.cancel()
 
-
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
         self.shuffleboardinfo.updateShuffleboard()
         #self.container.blinkinSubsystem.updatePWM()
-
 
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
