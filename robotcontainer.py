@@ -11,6 +11,8 @@ from commands.SwerveJoystickCmd import SwerveJoystickCmd
 from subsystems.SwerveSubsystem import SwerveSubsystem
 from constants import OIConstants
 
+from pathplannerlib.auto import PathPlannerAuto
+
 class RobotContainer:
     '''
     This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,7 +28,7 @@ class RobotContainer:
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
         # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
-        # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
+        
         self.swerveSubsystem.setDefaultCommand(
            SwerveJoystickCmd(
                self.swerveSubsystem,
@@ -45,9 +47,9 @@ class RobotContainer:
         # autocommands4 = commands2.WaitCommand(8).andThen(autocommands3)
                
         self.sendableChooser = wpilib.SendableChooser()
-        # self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
+        #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
-        
+        #self.sendableChooser.setDefaultOption("Test", PathPlannerAuto("AutoTest"))
 
         # Configure the button bindings
         self.configureButtonBindings()

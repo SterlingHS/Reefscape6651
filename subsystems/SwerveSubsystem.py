@@ -80,17 +80,17 @@ class SwerveSubsystem(Subsystem):
         sleep(1) # Wait for gyro to calibrate... NOT MORE THAN 2 SEC!! or get error.
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)       
 
-        # config = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
-        #             PIDConstants(   AutoConstants.autoTranslationP, 
-        #                             AutoConstants.autoTranslationI, 
-        #                             AutoConstants.autoTranslationD),    # Translation PID constants
-        #             PIDConstants(   AutoConstants.autoRotationP, 
-        #                             AutoConstants.autoRotationI,
-        #                             AutoConstants.autoTRotationD),      # Rotation PID constants
-        #             AutoConstants.kMaxSpeedMetersPerSecond,             # Max module speed, in m/s
-        #             DriveConstants.kDriveBaseRadius,                    # Drive base radius in meters. Distance from robot center to furthest module.
-        #             ReplanningConfig()                                  # Default path replanning config. See the API for the options here
-        #     )
+        config = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
+                    PIDConstants(   AutoConstants.autoTranslationP, 
+                                    AutoConstants.autoTranslationI, 
+                                    AutoConstants.autoTranslationD),    # Translation PID constants
+                    PIDConstants(   AutoConstants.autoRotationP, 
+                                    AutoConstants.autoRotationI,
+                                    AutoConstants.autoTRotationD),      # Rotation PID constants
+                    AutoConstants.kMaxSpeedMetersPerSecond,             # Max module speed, in m/s
+                    DriveConstants.kDriveBaseRadius,                    # Drive base radius in meters. Distance from robot center to furthest module.
+                    ReplanningConfig()                                  # Default path replanning config. See the API for the options here
+            )
 
         # For Autonomous Pathplanner
         # AutoBuilder.configureHolonomic(
@@ -284,3 +284,40 @@ class SwerveSubsystem(Subsystem):
 
     def moveBRDMotor(self):
         self.backRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
+
+    ################################################################################
+    # PID Control for steering robot
+    # Used to tune up the PID Turn Constants
+    # P=    I=   D=
+
+    def setTurningPID(self, P, I, D):
+        # Change PID Constants for Turning modules
+        self.frontLeft.setTurningPID(P,I,D)
+        self.frontRight.setTurningPID(P,I,D)
+        self.backLeft.setTurningPID(P,I,D)
+        self.backRight.setTurningPID(P,I,D)
+    
+    def getTurningPID(self):
+        # Returns PID Constants for Turning modules
+        return self.frontLeft.getTurningPID()
+    
+    def setSetTurningPoint(self, angle):
+        # Sets the the setPoint of the turning PID to a specific angle - Used to tune up PID
+        self.frontLeft.setSetTurningPosition(angle)
+
+    def turningPIDtuneUP(self, angle):
+        ''' Tune up PID for turning '''
+        # Reads P, I, D from Shuffleboard
+        P = wpilib.SmartDashboard.getNumber("P", 0)
+        I = wpilib.SmartDashboard.getNumber("I", 0)
+        D = wpilib.SmartDashboard.getNumber("D", 0)
+
+        # get PID Constants for Turning modules
+        (Pc, Ic, Dc) = self.getTurningPID()
+        
+        # Send P, I, D to controllers if values have changed
+        if Pc != P or Ic != I or Dc != D:
+            self.setTurningPID(P,I,D)
+
+        # Send angle to controllers
+        self.setSetTurningPoint(angle)

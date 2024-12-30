@@ -184,3 +184,17 @@ class SwerveModule:
         outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())
         self.turningMotor.set(outputTurn)
         
+    def setTurningPID(self, P, I, D):
+        ''' Sets the PID values for the turning motor '''
+        self.turningPIDController.setP(P)
+        self.turningPIDController.setI(I)
+        self.turningPIDController.setD(D)
+
+    def getTurningPID(self):
+        ''' Returns the PID values for the turning motor '''
+        return (self.turningPIDController.getP(), self.turningPIDController.getI(), self.turningPIDController.getD())
+    
+    def setSetTurningPosition(self, angle):
+        ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''
+        outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
+        self.turningMotor.set(outputTurn)
