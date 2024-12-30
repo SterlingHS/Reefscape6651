@@ -24,36 +24,36 @@ class DriveConstants:
     kFrontLeftDriveMotorReversed = False
     kFrontLeftTurningMotorReversed = True
     kFrontLeftAbsoluteEncoderPort = 13
-    kFrontLeftAbsoluteEncoderOffsetRad = 1.885262370109558
+    kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
     kFrontLeftAbsoluteEncoderReversed = False
-    kFrontLeftForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.11] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.11 - Use SysID for kS
+    kFrontLeftForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.06] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kFrontRightDriveMotorPort = 22
     kFrontRightTurningMotorPort = 21
     kFrontRightDriveMotorReversed = True
     kFrontRightTurningMotorReversed = True
     kFrontRightAbsoluteEncoderPort = 23
-    kFrontRightAbsoluteEncoderOffsetRad = -1.512505054473877
+    kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
     kFrontRightAbsoluteEncoderReversed = False
-    kFrontRightForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.11] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.11 - Use SysID for kS
+    kFrontRightForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.06] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kBackLeftDriveMotorPort = 32
     kBackLeftTurningMotorPort = 31
     kBackLeftDriveMotorReversed = False
     kBackLeftTurningMotorReversed = True
     kBackLeftAbsoluteEncoderPort = 33
-    kBackLeftAbsoluteEncoderOffsetRad = 2.797980785369873
+    kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
     kBackLeftAbsoluteEncoderReversed = False
-    kBackLeftForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.11] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.11 - Use SysID for kS
+    kBackLeftForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.06] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kBackRightDriveMotorPort = 42
     kBackRightTurningMotorPort = 41
     kBackRightDriveMotorReversed = True
     kBackRightTurningMotorReversed = True
     kBackRightAbsoluteEncoderPort = 43
-    kBackRightAbsoluteEncoderOffsetRad = 0.3773592710495+math.pi
+    kBackRightAbsoluteEncoderOffsetRad = 0.409157827
     kBackRightAbsoluteEncoderReversed = False
-    kBackRightForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.11] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.11 - Use SysID for kS
+    kBackRightForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.06] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
     kPhysicalMaxSpeedMetersPerSecond = 9 #9 MPS is about 20 miles per hour 
@@ -93,8 +93,9 @@ class ModuleConstants:
     kTurningEncoderRPM2RadPerSec = kTurningEncoderRot2Rad/60
     
     # To be checked
-    kPTurning = 0.4
-    kDTurning = 0.1
+    kPTurning = 0.5
+    kITurning = 0.1
+    kDTurning = 0.00
 
 class OIConstants:
     kDriverControllerPort = 0
@@ -102,7 +103,7 @@ class OIConstants:
     kDeadband = 0.05
     kDriverYAxis = 1
     kDriverXAxis = 0
-    kDriverRotAxis = 2
+    kDriverRotAxis = 4
     kDriverFieldOrientedButtonIdx = 3
 
 

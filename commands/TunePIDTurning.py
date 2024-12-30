@@ -6,14 +6,10 @@
 ####################################################################################################
 
 from commands2 import Command
-from wpimath.filter import SlewRateLimiter
-from constants import DriveConstants,OIConstants
-from wpimath.kinematics import ChassisSpeeds
-from subsystems import SwerveSubsystem
+from constants import OIConstants
 import math
-import unit_conversions as conv
+import wpilib
 
-signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number (Used?)
 
 class TunePIDTurning(Command):
     def __init__(self, swerveSub, xSpeedFunc, ySpeedFunc, turningSpeedFunc):
@@ -40,7 +36,10 @@ class TunePIDTurning(Command):
         self.ySpeed = y if abs(y) > OIConstants.kDeadband else 0.0
 
         angle = math.atan2(self.ySpeed, self.xSpeed)
-        self.swerveSubsystem.tuneturningPIDtuneUP(angle)
+        # display angle to shuffleboard
+        wpilib.SmartDashboard.putNumber("Angle Joystick", angle)
+
+        self.swerveSubsystem.turningPIDtuneUP(angle)
 
         return super().execute()
 

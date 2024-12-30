@@ -84,8 +84,9 @@ class SwerveModule:
             ##############################################################################################################
 
             # PID Controllers for turning and driving on Roborio
-            self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kDTurning, 0) # Why is D instead of I?
+            self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kITurning, ModuleConstants.kDTurning)
             self.turningPIDController.enableContinuousInput(-pi, pi)
+            self.turningPIDController.setTolerance(0.0001, 0.01)
 
             # Same PID but executed by SparkMax instead of Roborio
             # Let's try both and see which one works better
@@ -120,6 +121,8 @@ class SwerveModule:
         ''' Returns the position of the turning motor in radians between -pi and pi '''
         angle = self.getTurningPosition()
         angle = angle % (2*pi)
+        if angle > pi:
+            angle = angle - 2*pi
         return angle
     
     def getDriveVelocity(self): # CHECK IF IT RETURNS THE RIGHT VALUE
@@ -170,28 +173,24 @@ class SwerveModule:
         # Optimize the state to turn at the most 90 degrees
         state = SwerveModuleState.optimize(state, self.getState().angle)
         
-        # Calculate the drive output using the PID controller and the feedforward
-        driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
-        driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
-        #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
-        self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
+        #Calculate the drive output using the PID controller and the feedforward
+        # driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
+        # driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
+        # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
+        # self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
 
         # Calculate the turning output using the PID controller
-        ######### Clean up the code
-        # self.turningPIDController.setP(ModuleConstants.kPTurning)
-        # self.turningPIDController.setD(ModuleConstants.kDTurning)
-        # self.turningMotor.set(0)
         outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())
         self.turningMotor.set(outputTurn)
         
     def setTurningPID(self, P, I, D):
-        ''' Sets the PID values for the turning motor '''
+        ''' Sets the PID values for the turning motor - for tuning purposes'''
         self.turningPIDController.setP(P)
         self.turningPIDController.setI(I)
         self.turningPIDController.setD(D)
 
     def getTurningPID(self):
-        ''' Returns the PID values for the turning motor '''
+        ''' Returns the PID values for the turning motor - for tuning purposes '''
         return (self.turningPIDController.getP(), self.turningPIDController.getI(), self.turningPIDController.getD())
     
     def setSetTurningPosition(self, angle):

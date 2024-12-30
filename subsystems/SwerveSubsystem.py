@@ -103,6 +103,10 @@ class SwerveSubsystem(Subsystem):
         #     self                            # Reference to this subsystem to set requirements
         # )
 
+        wpilib.SmartDashboard.putNumber("P", 0)
+        wpilib.SmartDashboard.putNumber("I", 0)
+        wpilib.SmartDashboard.putNumber("D", 0)
+
     def zeroHeading(self):
         self.gyro.reset()
 
@@ -157,10 +161,10 @@ class SwerveSubsystem(Subsystem):
     
     def readTurnEncoders(self):
         ''' Reads all turning encoders - Returns list of values [FL, FR, BL, BR] '''
-        FL = self.frontLeft.getTurningPosition()
-        FR = self.frontRight.getTurningPosition()
-        BL = self.backLeft.getTurningPosition()
-        BR = self.backRight.getTurningPosition()
+        FL = self.frontLeft.getTurningPositionClose()
+        FR = self.frontRight.getTurningPositionClose()
+        BL = self.backLeft.getTurningPositionClose()
+        BR = self.backRight.getTurningPositionClose()
         return [FL,FR,BL,BR]
     
     def readForwardEncoders(self):
@@ -288,33 +292,38 @@ class SwerveSubsystem(Subsystem):
     ################################################################################
     # PID Control for steering robot
     # Used to tune up the PID Turn Constants
-    # P=    I=   D=
+    # P=0.6    I=0.1   D=0.02
 
     def setTurningPID(self, P, I, D):
         # Change PID Constants for Turning modules
         self.frontLeft.setTurningPID(P,I,D)
-        self.frontRight.setTurningPID(P,I,D)
-        self.backLeft.setTurningPID(P,I,D)
-        self.backRight.setTurningPID(P,I,D)
     
     def getTurningPID(self):
         # Returns PID Constants for Turning modules
         return self.frontLeft.getTurningPID()
     
     def setSetTurningPoint(self, angle):
-        # Sets the the setPoint of the turning PID to a specific angle - Used to tune up PID
+        ''' Sets the the setPoint of the turning PID to a specific angle - Used to tune up PID '''
         self.frontLeft.setSetTurningPosition(angle)
+
+    def turningPIDerror(self, angle):
+        ''' Returns the error from PID turning - Used to tune up PID'''
+        encoder_value = self.frontLeft.getTurningPositionClose()
+        return encoder_value-angle
 
     def turningPIDtuneUP(self, angle):
         ''' Tune up PID for turning '''
         # Reads P, I, D from Shuffleboard
-        P = wpilib.SmartDashboard.getNumber("P", 0)
-        I = wpilib.SmartDashboard.getNumber("I", 0)
-        D = wpilib.SmartDashboard.getNumber("D", 0)
+        P = wpilib.SmartDashboard.getNumber("P", 0.6)
+        I = wpilib.SmartDashboard.getNumber("I", 0.1)
+        D = wpilib.SmartDashboard.getNumber("D", 0.02)
+
+        # Prints the error
+        wpilib.SmartDashboard.putNumber("PID Error", self.turningPIDerror(angle))
 
         # get PID Constants for Turning modules
         (Pc, Ic, Dc) = self.getTurningPID()
-        
+
         # Send P, I, D to controllers if values have changed
         if Pc != P or Ic != I or Dc != D:
             self.setTurningPID(P,I,D)
