@@ -14,6 +14,9 @@ from constants import OIConstants
 
 from pathplannerlib.auto import PathPlannerAuto
 
+# Import the sysid routine
+from commands2.sysid import SysIdRoutine
+
 class RobotContainer:
     '''
     This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -78,6 +81,15 @@ class RobotContainer:
         
         ''' commands2.button.POVButton(
             self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) '''
+
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kA).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kB).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kX).whileTrue(SwerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kY).whileTrue(SwerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
 
         pass
 
