@@ -16,6 +16,7 @@ from pathplannerlib.auto import PathPlannerAuto
 
 # Import the sysid routine
 from commands2.sysid import SysIdRoutine
+import phoenix6
 
 class RobotContainer:
     '''
@@ -82,6 +83,10 @@ class RobotContainer:
         ''' commands2.button.POVButton(
             self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) '''
 
+        commands2.button.JoystickButton(
+                self.driverController, wpilib.XboxController.Button.kLeftBumper(commands2.runcommand(phoenix6.SignalLogger.start)))
+        commands2.button.JoystickButton(
+                self.driverController, wpilib.XboxController.Button.kLeftBumper(commands2.runcommand(phoenix6.SignalLogger.stop)))
         # commands2.button.JoystickButton(
         #     self.driverController, wpilib.XboxController.Button.kA).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
         # commands2.button.JoystickButton(
