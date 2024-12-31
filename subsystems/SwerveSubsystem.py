@@ -7,8 +7,7 @@ from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 
 import wpilib
 from commands2 import Subsystem
-from constants import DriveConstants, AutoConstants
-from pathplannerlib.config import HolonomicPathFollowerConfig, PIDConstants, ReplanningConfig
+from constants import DriveConstants, ModuleConstants
 
 import navx
 import phoenix6
@@ -72,9 +71,9 @@ class SwerveSubsystem(Subsystem):
         sleep(1) # Wait for gyro to calibrate... NOT MORE THAN 2 SEC!! or get error.
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)       
 
-        wpilib.SmartDashboard.putNumber("P", 0)
-        wpilib.SmartDashboard.putNumber("I", 0)
-        wpilib.SmartDashboard.putNumber("D", 0)
+        wpilib.SmartDashboard.putNumber("P", ModuleConstants.kPTurning)
+        wpilib.SmartDashboard.putNumber("I", ModuleConstants.kITurning)
+        wpilib.SmartDashboard.putNumber("D", ModuleConstants.kDTurning)
 
     def zeroHeading(self):
         self.gyro.reset()
@@ -174,12 +173,6 @@ class SwerveSubsystem(Subsystem):
         self.backLeft.setDesiredState(desiredStates[2])
         self.backRight.setDesiredState(desiredStates[3])
 
-
-        ''' Used for Autonomoud mode (PathPlanner) - Boolean supplier that controls when the path will be mirrored for the red alliance.
-        This will flip the path being followed to the red side of the field.
-        THE ORIGIN WILL REMAIN ON THE BLUE SIDE '''
-        return DriverStation.getAlliance() == DriverStation.Alliance.kBlue
-
     # Periodic is called every cycle (20ms)
     def periodic(self):
         # Reads Odometer (location of robot (x,y))
@@ -268,9 +261,9 @@ class SwerveSubsystem(Subsystem):
     def turningPIDtuneUP(self, angle):
         ''' Tune up PID for turning '''
         # Reads P, I, D from Shuffleboard
-        P = wpilib.SmartDashboard.getNumber("P", 0.6)
-        I = wpilib.SmartDashboard.getNumber("I", 0.1)
-        D = wpilib.SmartDashboard.getNumber("D", 0.02)
+        P = wpilib.SmartDashboard.getNumber("P", ModuleConstants.kPTurning)
+        I = wpilib.SmartDashboard.getNumber("I", ModuleConstants.kITurning)
+        D = wpilib.SmartDashboard.getNumber("D", ModuleConstants.kDTurning)
 
         # Prints the error
         errors = self.turningPIDerror(angle)
