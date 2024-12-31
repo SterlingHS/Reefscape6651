@@ -242,19 +242,28 @@ class SwerveSubsystem(Subsystem):
     def setTurningPID(self, P, I, D):
         # Change PID Constants for Turning modules
         self.frontLeft.setTurningPID(P,I,D)
+        self.frontRight.setTurningPID(P,I,D)
+        self.backLeft.setTurningPID(P,I,D)
+        self.backRight.setTurningPID(P,I,D)
     
     def getTurningPID(self):
         # Returns PID Constants for Turning modules
-        return self.frontLeft.getTurningPID()
+        return (self.frontLeft.getTurningPID(), self.frontRight.getTurningPID(), self.backLeft.getTurningPID(), self.backRight.getTurningPID())
     
     def setSetTurningPoint(self, angle):
         ''' Sets the the setPoint of the turning PID to a specific angle - Used to tune up PID '''
         self.frontLeft.setSetTurningPosition(angle)
+        self.frontRight.setSetTurningPosition(angle)
+        self.backLeft.setSetTurningPosition(angle)
+        self.backRight.setSetTurningPosition(angle)
 
     def turningPIDerror(self, angle):
         ''' Returns the error from PID turning - Used to tune up PID'''
-        encoder_value = self.frontLeft.getTurningPositionClose()
-        return encoder_value-angle
+        encoder_value_fl = self.frontLeft.getTurningPositionClose()
+        encoder_value_fr = self.frontRight.getTurningPositionClose()
+        encoder_value_bl = self.backLeft.getTurningPositionClose()
+        encoder_value_br = self.backRight.getTurningPositionClose() 
+        return (encoder_value_fl-angle, encoder_value_fr-angle, encoder_value_bl-angle, encoder_value_br-angle)
 
     def turningPIDtuneUP(self, angle):
         ''' Tune up PID for turning '''
@@ -264,10 +273,14 @@ class SwerveSubsystem(Subsystem):
         D = wpilib.SmartDashboard.getNumber("D", 0.02)
 
         # Prints the error
-        wpilib.SmartDashboard.putNumber("PID Error", self.turningPIDerror(angle))
+        errors = self.turningPIDerror(angle)
+        wpilib.SmartDashboard.putNumber("Error FL", errors[0])
+        wpilib.SmartDashboard.putNumber("Error FR", errors[1])
+        wpilib.SmartDashboard.putNumber("Error BL", errors[2])
+        wpilib.SmartDashboard.putNumber("Error BR", errors[3])
 
         # get PID Constants for Turning modules
-        (Pc, Ic, Dc) = self.getTurningPID()
+        (Pc, Ic, Dc) = self.getTurningPID()[0]
 
         # Send P, I, D to controllers if values have changed
         if Pc != P or Ic != I or Dc != D:
