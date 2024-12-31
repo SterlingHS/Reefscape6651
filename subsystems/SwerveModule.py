@@ -4,10 +4,9 @@
 ########################################################################
 
 # Imports
-import wpilib
 from math import pi
 
-from constants import ModuleConstants, DriveConstants
+from constants import ModuleConstants
 
 from wpimath.kinematics import SwerveModuleState
 from wpimath.controller import PIDController
