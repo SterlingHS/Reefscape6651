@@ -11,35 +11,15 @@ import wpilib
 import commands2
 import commands2.cmd
 import robotcontainer
-from wpilib.cameraserver import CameraServer
 from NetworkTables import NetworkTables
-
-"""
-The VM is configured to automatically run this class, and to call the functions corresponding to
-each mode, as described in the TimedRobot documentation. If you change the name of this class or
-the package after creating this project, you must also update the build.gradle file in the
-project.
-"""
 
 
 class MyRobot(commands2.TimedCommandRobot):
-    """
-    Our default robot class, pass it to wpilib.run
-    Command v2 robots are encouraged to inherit from TimedCommandRobot, which
-    has an implementation of robotPeriodic which runs the scheduler for you
-    """
 
     def robotInit(self) -> None:
-        """
-        This function is run when the robot is first started up and should be used for any
-        initialization code.
-        """
-        self.autonomousCommand: typing.Optional[commands2.Command] = None
-        # self.cameraServer = CameraServer()
-        # self.cameraServer.launch()
 
-        # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-        # autonomous chooser on the dashboard.
+        self.autonomousCommand: typing.Optional[commands2.Command] = None
+
         self.container = robotcontainer.RobotContainer()
         self.shuffleboardinfo = NetworkTables(self.container)
 
@@ -55,7 +35,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def autonomousInit(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        # self.container.swerveSubsystem.resetEncoder()
         self.autonomousCommand = self.container.getAutonomousCommand()
 
         # schedule the autonomous command (example)
@@ -66,7 +45,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def autonomousPeriodic(self) -> None:
         """This function is called periodically during autonomous"""
-        self.shuffleboardinfo.updateShuffleboard()
 
     def teleopInit(self) -> None:
         # This makes sure that the autonomous stops running when
@@ -79,10 +57,8 @@ class MyRobot(commands2.TimedCommandRobot):
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
         self.shuffleboardinfo.updateShuffleboard()
-        #self.container.blinkinSubsystem.updatePWM()
 
     def testInit(self) -> None:
-        # Cancels all running commands at the start of test mode
         commands2.CommandScheduler.getInstance().cancelAll()
 
     def testPeriodic(self) -> None:

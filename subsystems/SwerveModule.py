@@ -4,10 +4,9 @@
 ########################################################################
 
 # Imports
-import wpilib
 from math import pi
 
-from constants import ModuleConstants, DriveConstants
+from constants import ModuleConstants
 
 from wpimath.kinematics import SwerveModuleState
 from wpimath.controller import PIDController
@@ -173,7 +172,7 @@ class SwerveModule:
         # Optimize the state to turn at the most 90 degrees
         state = SwerveModuleState.optimize(state, self.getState().angle)
         
-        #Calculate the drive output using the PID controller and the feedforward
+        # Calculate the drive output using the PID controller and the feedforward
         # driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
         # driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
         # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))

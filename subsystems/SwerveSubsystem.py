@@ -13,10 +13,6 @@ from pathplannerlib.config import HolonomicPathFollowerConfig, PIDConstants, Rep
 import navx
 import phoenix6
 
-# Autonomous Pathplanner
-from pathplannerlib.auto import AutoBuilder
-from wpilib import DriverStation
-
 # For NavX to calibrate
 from time import sleep
 
@@ -64,44 +60,17 @@ class SwerveSubsystem(Subsystem):
             DriveConstants.kBackRightAbsoluteEncoderReversed,
             DriveConstants.kBackRightForwardPIDk
         )
-        
-        self.xvelocity = 0
-        self.yvelocity = 0
-        self.turningvelocity = 0
 
         swerveModulePositions = (wpimath.kinematics.SwerveModulePosition(self.frontLeft.getDrivePosition(), Rotation2d(self.frontLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.frontRight.getDrivePosition(), Rotation2d(self.frontRight.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backLeft.getDrivePosition(), Rotation2d(self.backLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backRight.getDrivePosition(), Rotation2d(self.backRight.getTurningPosition())),
                                 )
-        # self.gyro = navx.AHRS(navx.SPI.Port.kMXP)
+        
         self.gyro = navx.AHRS.create_spi()
         self.zeroHeading()
         sleep(1) # Wait for gyro to calibrate... NOT MORE THAN 2 SEC!! or get error.
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)       
-
-        config = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    PIDConstants(   AutoConstants.autoTranslationP, 
-                                    AutoConstants.autoTranslationI, 
-                                    AutoConstants.autoTranslationD),    # Translation PID constants
-                    PIDConstants(   AutoConstants.autoRotationP, 
-                                    AutoConstants.autoRotationI,
-                                    AutoConstants.autoTRotationD),      # Rotation PID constants
-                    AutoConstants.kMaxSpeedMetersPerSecond,             # Max module speed, in m/s
-                    DriveConstants.kDriveBaseRadius,                    # Drive base radius in meters. Distance from robot center to furthest module.
-                    ReplanningConfig()                                  # Default path replanning config. See the API for the options here
-            )
-
-        # For Autonomous Pathplanner
-        # AutoBuilder.configureHolonomic(
-        #     self.getPose,                   # Robot pose supplier (x,y,heading) of robot
-        #     self.resetOdometer,             # Reset the robot Odometry (will be called if your auto has a starting pose)
-        #     self.getChassisSpeed,           # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        #     self.setChassisSpeeds,          # Method that will drive the robotgiven ROBOT RELATIVE ChassisSpeeds
-        #     config,
-        #     self.shouldFlipPath,            # Supplier to control path flipping based on alliance color
-        #     self                            # Reference to this subsystem to set requirements
-        # )
 
         wpilib.SmartDashboard.putNumber("P", 0)
         wpilib.SmartDashboard.putNumber("I", 0)
@@ -205,35 +174,11 @@ class SwerveSubsystem(Subsystem):
         self.backLeft.setDesiredState(desiredStates[2])
         self.backRight.setDesiredState(desiredStates[3])
 
-    def setChassisSpeeds(self, chassisSpeeds:ChassisSpeeds):
-        ''' Sets the chassis speeds of the robot in Autonomous mode (PathPlanner)'''
-        self.xvelocity = chassisSpeeds.vx
-        self.yvelocity = chassisSpeeds.vy
-        self.turningvelocity = chassisSpeeds.omega
-        moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds)
-        self.setModuleStates(moduleStates)
 
-    def getChassisSpeed(self):
-        ''' Returns the chassis speeds of the robot in Autonomous mode (PathPlanner)'''
-        return ChassisSpeeds(self.getXVelocity(), self.getYVelocity(), self.getAngularVelocity())
-    
-    def shouldFlipPath(self):
         ''' Used for Autonomoud mode (PathPlanner) - Boolean supplier that controls when the path will be mirrored for the red alliance.
         This will flip the path being followed to the red side of the field.
         THE ORIGIN WILL REMAIN ON THE BLUE SIDE '''
         return DriverStation.getAlliance() == DriverStation.Alliance.kBlue
-
-    def getXVelocity(self):
-        ''' Returns the X velocity of the robot '''
-        return self.xvelocity
-
-    def getYVelocity(self):
-        ''' Returns the Y velocity of the robot '''
-        return self.yvelocity
-    
-    def getAngularVelocity(self):
-        ''' Returns the angular velocity of the robot '''
-        return self.turningvelocity
 
     # Periodic is called every cycle (20ms)
     def periodic(self):
