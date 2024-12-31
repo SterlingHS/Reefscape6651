@@ -86,7 +86,7 @@ class RobotContainer:
         commands2.button.JoystickButton(
                 self.driverController, wpilib.XboxController.Button.kLeftBumper(commands2.runcommand(phoenix6.SignalLogger.start)))
         commands2.button.JoystickButton(
-                self.driverController, wpilib.XboxController.Button.kLeftBumper(commands2.runcommand(phoenix6.SignalLogger.stop)))
+                self.driverController, wpilib.XboxController.Button.kRightBumper(commands2.runcommand(phoenix6.SignalLogger.stop)))
         # commands2.button.JoystickButton(
         #     self.driverController, wpilib.XboxController.Button.kA).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
         # commands2.button.JoystickButton(
