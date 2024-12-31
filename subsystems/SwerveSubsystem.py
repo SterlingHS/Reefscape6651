@@ -93,19 +93,15 @@ class SwerveSubsystem(Subsystem):
             )
 
         # For Autonomous Pathplanner
-        # AutoBuilder.configureHolonomic(
-        #     self.getPose,                   # Robot pose supplier (x,y,heading) of robot
-        #     self.resetOdometer,             # Reset the robot Odometry (will be called if your auto has a starting pose)
-        #     self.getChassisSpeed,           # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        #     self.setChassisSpeeds,          # Method that will drive the robotgiven ROBOT RELATIVE ChassisSpeeds
-        #     config,
-        #     self.shouldFlipPath,            # Supplier to control path flipping based on alliance color
-        #     self                            # Reference to this subsystem to set requirements
-        # )
-
-        wpilib.SmartDashboard.putNumber("P", 0)
-        wpilib.SmartDashboard.putNumber("I", 0)
-        wpilib.SmartDashboard.putNumber("D", 0)
+        AutoBuilder.configureHolonomic(
+            self.getPose,                   # Robot pose supplier (x,y,heading) of robot
+            self.resetOdometer,             # Reset the robot Odometry (will be called if your auto has a starting pose)
+            self.getChassisSpeed,           # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            self.setChassisSpeeds,          # Method that will drive the robotgiven ROBOT RELATIVE ChassisSpeeds
+            config,
+            self.shouldFlipPath,            # Supplier to control path flipping based on alliance color
+            self                            # Reference to this subsystem to set requirements
+        )
 
     def zeroHeading(self):
         self.gyro.reset()
@@ -288,45 +284,3 @@ class SwerveSubsystem(Subsystem):
 
     def moveBRDMotor(self):
         self.backRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
-
-    ################################################################################
-    # PID Control for steering robot
-    # Used to tune up the PID Turn Constants
-    # P=0.6    I=0.1   D=0.02
-
-    def setTurningPID(self, P, I, D):
-        # Change PID Constants for Turning modules
-        self.frontLeft.setTurningPID(P,I,D)
-    
-    def getTurningPID(self):
-        # Returns PID Constants for Turning modules
-        return self.frontLeft.getTurningPID()
-    
-    def setSetTurningPoint(self, angle):
-        ''' Sets the the setPoint of the turning PID to a specific angle - Used to tune up PID '''
-        self.frontLeft.setSetTurningPosition(angle)
-
-    def turningPIDerror(self, angle):
-        ''' Returns the error from PID turning - Used to tune up PID'''
-        encoder_value = self.frontLeft.getTurningPositionClose()
-        return encoder_value-angle
-
-    def turningPIDtuneUP(self, angle):
-        ''' Tune up PID for turning '''
-        # Reads P, I, D from Shuffleboard
-        P = wpilib.SmartDashboard.getNumber("P", 0.6)
-        I = wpilib.SmartDashboard.getNumber("I", 0.1)
-        D = wpilib.SmartDashboard.getNumber("D", 0.02)
-
-        # Prints the error
-        wpilib.SmartDashboard.putNumber("PID Error", self.turningPIDerror(angle))
-
-        # get PID Constants for Turning modules
-        (Pc, Ic, Dc) = self.getTurningPID()
-
-        # Send P, I, D to controllers if values have changed
-        if Pc != P or Ic != I or Dc != D:
-            self.setTurningPID(P,I,D)
-
-        # Send angle to controllers
-        self.setSetTurningPoint(angle)
