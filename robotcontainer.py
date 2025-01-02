@@ -6,7 +6,6 @@ import wpilib
 
 import commands2
 import commands2.button
-from commands.TunePIDTurning import TunePIDTurning
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
@@ -40,15 +39,6 @@ class RobotContainer:
            )
         )
 
-        # Tune UP PID for turning
-        # self.swerveSubsystem.setDefaultCommand(
-        #    TunePIDTurning(
-        #        self.swerveSubsystem,
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverYAxis),
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverRotAxis)
-        #    )
-        # )
         autocommand0: commands2.cmd.Command = None
 
         # autocommand1 = commands.MoveSpeedAndTime.MoveSpeedAndTime(self.swerveSubsystem, -3, 0.5).andThen(
@@ -61,7 +51,10 @@ class RobotContainer:
         self.sendableChooser = wpilib.SendableChooser()
         #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
-        #self.sendableChooser.setDefaultOption("Test", PathPlannerAuto("AutoTest"))
+        try:
+            self.sendableChooser.addOption("Test", PathPlannerAuto("AutoTest"))
+        except:
+            print("AutoTest not found")
 
         # Configure the button bindings
         self.configureButtonBindings()

@@ -80,7 +80,8 @@ class SwerveSubsystem(Subsystem):
         sleep(1) # Wait for gyro to calibrate... NOT MORE THAN 2 SEC!! or get error.
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)       
 
-        config = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
+        # Pathplanner Configuration
+        PPconfig = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
                     PIDConstants(   AutoConstants.autoTranslationP, 
                                     AutoConstants.autoTranslationI, 
                                     AutoConstants.autoTranslationD),    # Translation PID constants
@@ -98,15 +99,17 @@ class SwerveSubsystem(Subsystem):
             self.resetOdometer,             # Reset the robot Odometry (will be called if your auto has a starting pose)
             self.getChassisSpeed,           # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             self.setChassisSpeeds,          # Method that will drive the robotgiven ROBOT RELATIVE ChassisSpeeds
-            config,
+            PPconfig,
             self.shouldFlipPath,            # Supplier to control path flipping based on alliance color
             self                            # Reference to this subsystem to set requirements
         )
 
     def zeroHeading(self):
+        ''' Zero the gyro heading '''
         self.gyro.reset()
 
     def getCompass(self)->float: 
+        ''' Return heading in degrees for values between 0 and 360 '''
         return self.gyro.getFusedHeading()
 
     def getHeading(self):
@@ -233,6 +236,7 @@ class SwerveSubsystem(Subsystem):
 
     # Periodic is called every cycle (20ms)
     def periodic(self):
+        ''' The code that runs periodically '''
         # Reads Odometer (location of robot (x,y))
         self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
         
