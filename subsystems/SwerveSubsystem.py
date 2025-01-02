@@ -1,14 +1,9 @@
 import wpilib.shuffleboard
 from subsystems.SwerveModule import SwerveModule
 
-import wpimath
-from wpimath.geometry import Rotation2d
-import wpimath.kinematics
-from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
-
 import wpilib
 from commands2 import Subsystem
-from constants import DriveConstants, AutoConstants
+from constants import DriveConstants
 import phoenix6
 
 # SysID Code
@@ -78,7 +73,8 @@ class SwerveSubsystem(Subsystem):
         SysMechanism = SysIdRoutine.Mechanism(
             sysidDrive, 
             self.log, 
-            self)
+            self
+        )
 
         self.sys_id_routine = SysIdRoutine(
             SysConfig,

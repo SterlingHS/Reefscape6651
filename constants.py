@@ -26,7 +26,7 @@ class DriveConstants:
     kFrontLeftAbsoluteEncoderPort = 13
     kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
     kFrontLeftAbsoluteEncoderReversed = False
-    kFrontLeftForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.06] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kFrontLeftForwardPIDk = [0.10596, 0, 0, 1.1305, 27.038, 0.28701] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kFrontRightDriveMotorPort = 22
     kFrontRightTurningMotorPort = 21
@@ -35,7 +35,7 @@ class DriveConstants:
     kFrontRightAbsoluteEncoderPort = 23
     kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
     kFrontRightAbsoluteEncoderReversed = False
-    kFrontRightForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.06] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kFrontRightForwardPIDk = [2.2686, 0, 0, 1.8428, 26.325, 0.6888] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kBackLeftDriveMotorPort = 32
     kBackLeftTurningMotorPort = 31
@@ -44,7 +44,7 @@ class DriveConstants:
     kBackLeftAbsoluteEncoderPort = 33
     kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
     kBackLeftAbsoluteEncoderReversed = False
-    kBackLeftForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.06] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kBackLeftForwardPIDk = [1.0614, 0, 0, 1.5087, 27.273, 0.53754] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kBackRightDriveMotorPort = 42
     kBackRightTurningMotorPort = 41
