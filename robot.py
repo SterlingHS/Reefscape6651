@@ -21,6 +21,13 @@ class MyRobot(commands2.TimedCommandRobot):
 
         self.container = robotcontainer.RobotContainer()
 
+        # Timer for prints
+        self.printTimer = wpilib.Timer()
+        self.printTimer.start()
+        # Put this where you want to print
+        # if self.printTimer.hasPeriodPassed(1):    
+        #     self.logger.info("Something happened")
+
     def robotPeriodic(self) -> None:
         return super().robotPeriodic()
 

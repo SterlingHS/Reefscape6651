@@ -24,7 +24,6 @@ class SwerveModule:
     def __init__(self, driveMotorID, turningMotorID, driveMotorReversed, turningMotorReversed,
         absoluteEncoderID, absoluteEncoderOffset, absoluteEncoderReversed, drivePIDk):
             ''' Constructor for SwerveModule '''
-
             self.absoluteEncoderOffsetRad = absoluteEncoderOffset
             self.absoluteEncoderReversed = absoluteEncoderReversed
             
@@ -37,6 +36,7 @@ class SwerveModule:
             # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = rev.CANSparkMax(turningMotorID, rev.CANSparkLowLevel.MotorType.kBrushless)
             self.turningMotor.setInverted(turningMotorReversed)
+            self.turningMotor.setIdleMode(rev.CANSparkMax.IdleMode.kBrake)
 
             # Init of Encoder to rotate wheel (on the NEO)
             self.turningEncoder = self.turningMotor.getEncoder()

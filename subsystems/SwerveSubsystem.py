@@ -1,3 +1,4 @@
+import wpilib.shuffleboard
 from subsystems.SwerveModule import SwerveModule
 
 import wpimath
@@ -8,10 +9,7 @@ from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 import wpilib
 from commands2 import Subsystem
 from constants import DriveConstants, AutoConstants
-from pathplannerlib.config import HolonomicPathFollowerConfig, PIDConstants, ReplanningConfig
-
 import phoenix6
-
 
 # SysID Code
 from wpilib import RobotController
@@ -66,19 +64,37 @@ class SwerveSubsystem(Subsystem):
 
         def sysidDrive(voltage: volts) -> None:
             ''' Drive to tune up drive system with SysId '''
-            self.setSetTurningPoint(0)
             self.frontLeft.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
             self.frontRight.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
             self.backLeft.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
             self.backRight.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
 
+        phoenix6.SignalLogger.set_path("sysid")
+        SysConfig = SysIdRoutine.Config(
+            # This is the function that will be called to set the mechanism to a given state
+            # recordState = lambda state: phoenix6.SignalLogger.write_string("state", SysIdRoutineLog.stateEnumToString(state)),
+        )
+
+        SysMechanism = SysIdRoutine.Mechanism(
+            sysidDrive, 
+            self.log, 
+            self)
+
         self.sys_id_routine = SysIdRoutine(
-            SysIdRoutine.Config(recordState = lambda state: phoenix6.SignalLogger.write_string("state", SysIdRoutineLog.stateEnumToString(state))),
-            SysIdRoutine.Mechanism(sysidDrive, self.log, self),
+            SysConfig,
+            SysMechanism
         )
 
     # Periodic is called every cycle (20ms)
     def periodic(self):
+        
+        # Drivee straight at 0 degrees
+        self.setSetTurningPoint(0)
+
+        wpilib.SmartDashboard.putNumber("Turning FL", self.frontLeft.getTurningPosition())
+        wpilib.SmartDashboard.putNumber("Turning FR", self.frontRight.getTurningPosition())
+        wpilib.SmartDashboard.putNumber("Turning BL", self.backLeft.getTurningPosition())
+        wpilib.SmartDashboard.putNumber("Turning BR", self.backRight.getTurningPosition())
         pass
 
     def setSetTurningPoint(self, angle):
@@ -97,33 +113,32 @@ class SwerveSubsystem(Subsystem):
     def log(self, sys_id_routine: SysIdRoutineLog) -> None:
         # Record a frame for the left motors.  Since these share an encoder, we consider
         # the entire group to be one motor.
-        sys_id_routine.motor("drive-front-left").voltage(
-            self.frontLeft.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
-        ).position(self.frontLeft.getDrivePosition()).velocity(
-            self.frontLeft.getDriveVelocity()
-        )
+
+        sys_id_routine.motor("drive-front-left"
+            ).voltage(self.frontLeft.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
+            ).position(self.frontLeft.getDrivePosition()
+            ).velocity(self.frontLeft.getDriveVelocity())
         
-        sys_id_routine.motor("drive-front-right").voltage(
-            self.frontRight.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
-        ).position(self.frontRight.getDrivePosition()).velocity(
-            self.frontRight.getDriveVelocity()
-        )
+        sys_id_routine.motor("drive-front-right"
+            ).voltage(self.frontRight.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
+            ).position(self.frontRight.getDrivePosition()
+            ).velocity(self.frontRight.getDriveVelocity())
 
-        sys_id_routine.motor("drive-back-left").voltage(
-            self.backLeft.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
-        ).position(self.backLeft.getDrivePosition()).velocity(
-            self.backLeft.getDriveVelocity()
-        )
+        sys_id_routine.motor("drive-back-left"
+            ).voltage(self.backLeft.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
+            ).position(self.backLeft.getDrivePosition()
+            ).velocity(self.backLeft.getDriveVelocity())
 
-        sys_id_routine.motor("drive-back-right").voltage(
-            self.backRight.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
-        ).position(self.backRight.getDrivePosition()).velocity(
-            self.backRight.getDriveVelocity()
-        )
+        sys_id_routine.motor("drive-back-right"
+            ).voltage(self.backRight.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
+            ).position(self.backRight.getDrivePosition()
+            ).velocity(self.backRight.getDriveVelocity())
         pass
 
-    def sysIdQuasistatic(self, direction: SysIdRoutine.Direction): 
+    def sysIdQuasistatic(self, direction: SysIdRoutine.Direction):
+        ''' Run the SysId routine in quasistatic mode ''' 
         return self.sys_id_routine.quasistatic(direction)
 
     def sysIdDynamic(self, direction: SysIdRoutine.Direction):
+        ''' Run the SysId routine in dynamic mode '''
         return self.sys_id_routine.dynamic(direction)
