@@ -71,9 +71,9 @@ class SwerveSubsystem(Subsystem):
         sleep(1) # Wait for gyro to calibrate... NOT MORE THAN 2 SEC!! or get error.
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)       
 
-        wpilib.SmartDashboard.putNumber("P", ModuleConstants.kPTurning)
-        wpilib.SmartDashboard.putNumber("I", ModuleConstants.kITurning)
-        wpilib.SmartDashboard.putNumber("D", ModuleConstants.kDTurning)
+        wpilib.SmartDashboard.putNumber("P", 0)
+        wpilib.SmartDashboard.putNumber("I", 0)
+        wpilib.SmartDashboard.putNumber("D", 0)
 
     def zeroHeading(self):
         self.gyro.reset()
@@ -261,9 +261,9 @@ class SwerveSubsystem(Subsystem):
     def turningPIDtuneUP(self, angle):
         ''' Tune up PID for turning '''
         # Reads P, I, D from Shuffleboard
-        P = wpilib.SmartDashboard.getNumber("P", ModuleConstants.kPTurning)
-        I = wpilib.SmartDashboard.getNumber("I", ModuleConstants.kITurning)
-        D = wpilib.SmartDashboard.getNumber("D", ModuleConstants.kDTurning)
+        # P = wpilib.SmartDashboard.getNumber("P", .6)
+        # I = wpilib.SmartDashboard.getNumber("I", .1)
+        # D = wpilib.SmartDashboard.getNumber("D", .02)
 
         # Prints the error
         errors = self.turningPIDerror(angle)
@@ -273,11 +273,11 @@ class SwerveSubsystem(Subsystem):
         wpilib.SmartDashboard.putNumber("Error BR", errors[3])
 
         # get PID Constants for Turning modules
-        (Pc, Ic, Dc) = self.getTurningPID()[0]
+        # (Pc, Ic, Dc) = self.getTurningPID()[0]
 
         # Send P, I, D to controllers if values have changed
-        if Pc != P or Ic != I or Dc != D:
-            self.setTurningPID(P,I,D)
+        # if Pc != P or Ic != I or Dc != D:
+        #     self.setTurningPID(P,I,D)
 
         # Send angle to controllers
         self.setSetTurningPoint(angle)
