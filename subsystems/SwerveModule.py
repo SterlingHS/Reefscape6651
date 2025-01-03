@@ -174,10 +174,10 @@ class SwerveModule:
         state = SwerveModuleState.optimize(state, self.getState().angle)
         
         #Calculate the drive output using the PID controller and the feedforward
-        # driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
-        # driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
-        # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
-        # self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
+        driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
+        driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
+        #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
+        self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
 
         # Calculate the turning output using the PID controller
         outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())

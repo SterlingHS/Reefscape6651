@@ -240,30 +240,6 @@ class SwerveSubsystem(Subsystem):
         # Reads Odometer (location of robot (x,y))
         self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
         
-        # Reads Absolute Encoders and sends them to Dashboard
-        absoluteEncoder = self.readAbsEncoders()
-        wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
-        wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
-        wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
-        wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
-        
-        # Reads Encoders and sends them to Dashboard
-        turnings = self.readTurnEncoders()
-        wpilib.SmartDashboard.putNumber("Turning FL", turnings[0])
-        wpilib.SmartDashboard.putNumber("Turning FR", turnings[1])
-        wpilib.SmartDashboard.putNumber("Turning BL", turnings[2])
-        wpilib.SmartDashboard.putNumber("Turning BR", turnings[3])
-
-        # Reads Distance Travelled and sends them to Dashboard
-        forwards = self.readForwardEncoders()
-        wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
-        wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
-        wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
-        wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
-
-        # wpilib.SmartDashboard.putNumber("Heading", self.getHeading())
-        # wpilib.SmartDashboard.putNumber("Continuous Heading", self.getContinuousHeading())
-        
     # TEST MOTORS INDEPENDENTLY
     def moveFLTMotor(self):
         self.frontLeft.turningMotor.set(0.6)
