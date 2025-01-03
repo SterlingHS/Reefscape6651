@@ -36,10 +36,10 @@ class RobotContainer:
         
     def configureButtonBindings(self):
 
-        # commands2.button.JoystickButton(
-        #         self.driverController, wpilib.XboxController.Button.kLeftBumper).onTrue(commands2.cmd.runOnce(phoenix6.SignalLogger.start))
-        # commands2.button.JoystickButton(
-        #         self.driverController, wpilib.XboxController.Button.kRightBumper).onTrue(commands2.cmd.runOnce(phoenix6.SignalLogger.stop))
+        commands2.button.JoystickButton(
+                self.driverController, wpilib.XboxController.Button.kLeftBumper).onTrue(commands2.cmd.runOnce(phoenix6.SignalLogger.start))
+        commands2.button.JoystickButton(
+                self.driverController, wpilib.XboxController.Button.kRightBumper).onTrue(commands2.cmd.runOnce(phoenix6.SignalLogger.stop))
         commands2.button.JoystickButton(
             self.driverController, wpilib.XboxController.Button.kA).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
         commands2.button.JoystickButton(

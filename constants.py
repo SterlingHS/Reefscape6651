@@ -26,7 +26,7 @@ class DriveConstants:
     kFrontLeftAbsoluteEncoderPort = 13
     kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
     kFrontLeftAbsoluteEncoderReversed = False
-    kFrontLeftForwardPIDk = [0.10596, 0, 0, 1.1305, 27.038, 0.28701] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kFrontLeftForwardPIDk = [0.62076, 0, 0, 1.7689, 26.784, 0.63868] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kFrontRightDriveMotorPort = 22
     kFrontRightTurningMotorPort = 21
@@ -35,7 +35,7 @@ class DriveConstants:
     kFrontRightAbsoluteEncoderPort = 23
     kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
     kFrontRightAbsoluteEncoderReversed = False
-    kFrontRightForwardPIDk = [2.2686, 0, 0, 1.8428, 26.325, 0.6888] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kFrontRightForwardPIDk = [0.62076, 0, 0, 2.5005, 26.287, 0.63868] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kBackLeftDriveMotorPort = 32
     kBackLeftTurningMotorPort = 31
@@ -44,7 +44,7 @@ class DriveConstants:
     kBackLeftAbsoluteEncoderPort = 33
     kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
     kBackLeftAbsoluteEncoderReversed = False
-    kBackLeftForwardPIDk = [1.0614, 0, 0, 1.5087, 27.273, 0.53754] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kBackLeftForwardPIDk = [0.62076, 0, 0, 1.529, 27.04, 0.63868] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     kBackRightDriveMotorPort = 42
     kBackRightTurningMotorPort = 41
@@ -53,7 +53,7 @@ class DriveConstants:
     kBackRightAbsoluteEncoderPort = 43
     kBackRightAbsoluteEncoderOffsetRad = 0.409157827
     kBackRightAbsoluteEncoderReversed = False
-    kBackRightForwardPIDk = [0.1, 0, 0, 0.1, 2.3, 0.06] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kBackRightForwardPIDk = [0.62076, 0, 0, 2.0876, 26.634, 0.63868] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
     kPhysicalMaxSpeedMetersPerSecond = 9 #9 MPS is about 20 miles per hour 
