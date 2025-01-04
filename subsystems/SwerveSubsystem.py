@@ -1,5 +1,7 @@
 from subsystems.SwerveModule import SwerveModule
 
+from math import cos, sin
+
 import wpimath
 from wpimath.geometry import Rotation2d
 import wpimath.kinematics
@@ -230,6 +232,28 @@ class SwerveSubsystem(Subsystem):
         ''' Returns the Y velocity of the robot '''
         return self.yvelocity
     
+    def getDesiredVelocity(self):
+        ''' Returns the velocity of the robot '''
+        return (self.getXVelocity()**2 + self.getYVelocity()**2)**0.5
+    
+    def getVelocity(self):
+        ''' Returns the desired velocity of the robot '''
+        # Reads the velocity of each module and averages them
+        # for the x axis and the y axis
+        # then finds the hypothenuse of the two
+        # to get the velocity of the robot
+        FLx = self.frontLeft.getDriveVelocity()*cos(self.frontLeft.getTurningPosition())
+        FRx = self.frontRight.getDriveVelocity()*cos(self.frontRight.getTurningPosition())
+        BLx = self.backLeft.getDriveVelocity()*cos(self.backLeft.getTurningPosition())
+        BRx = self.backRight.getDriveVelocity()*cos(self.backRight.getTurningPosition())
+        xvelocity = (FLx+FRx+BLx+BRx)/4
+        FLy = self.frontLeft.getDriveVelocity()*sin(self.frontLeft.getTurningPosition())
+        FRy = self.frontRight.getDriveVelocity()*sin(self.frontRight.getTurningPosition())
+        BLy = self.backLeft.getDriveVelocity()*sin(self.backLeft.getTurningPosition())
+        BRy = self.backRight.getDriveVelocity()*sin(self.backRight.getTurningPosition())
+        yvelocity = (FLy+FRy+BLy+BRy)/4
+        return (xvelocity**2 + yvelocity**2)**0.5
+        
     def getAngularVelocity(self):
         ''' Returns the angular velocity of the robot '''
         return self.turningvelocity
@@ -241,25 +265,25 @@ class SwerveSubsystem(Subsystem):
         self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
         
         # Reads Absolute Encoders and sends them to Dashboard
-        absoluteEncoder = self.readAbsEncoders()
-        wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
-        wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
-        wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
-        wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
+        # absoluteEncoder = self.readAbsEncoders()
+        # wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
+        # wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
+        # wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
+        # wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
         
-        # Reads Encoders and sends them to Dashboard
-        turnings = self.readTurnEncoders()
-        wpilib.SmartDashboard.putNumber("Turning FL", turnings[0])
-        wpilib.SmartDashboard.putNumber("Turning FR", turnings[1])
-        wpilib.SmartDashboard.putNumber("Turning BL", turnings[2])
-        wpilib.SmartDashboard.putNumber("Turning BR", turnings[3])
+        # # Reads Encoders and sends them to Dashboard
+        # turnings = self.readTurnEncoders()
+        # wpilib.SmartDashboard.putNumber("Turning FL", turnings[0])
+        # wpilib.SmartDashboard.putNumber("Turning FR", turnings[1])
+        # wpilib.SmartDashboard.putNumber("Turning BL", turnings[2])
+        # wpilib.SmartDashboard.putNumber("Turning BR", turnings[3])
 
-        # Reads Distance Travelled and sends them to Dashboard
-        forwards = self.readForwardEncoders()
-        wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
-        wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
-        wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
-        wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
+        # # Reads Distance Travelled and sends them to Dashboard
+        # forwards = self.readForwardEncoders()
+        # wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
+        # wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
+        # wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
+        # wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
 
         # wpilib.SmartDashboard.putNumber("Heading", self.getHeading())
         # wpilib.SmartDashboard.putNumber("Continuous Heading", self.getContinuousHeading())
