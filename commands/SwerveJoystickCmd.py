@@ -32,6 +32,14 @@ class SwerveJoystickCmd(Command):
 
     def initialize(self) -> None:
         return super().initialize()
+    
+    def joystick_attenuator(self, x: float, y: float, rot: float):
+        # This function is used to scale the joystick inputs to make the robot easier to control
+        # This done by cubing the joystick inputs
+        x = x ** 3
+        y = y ** 3
+        rot = rot ** 3
+        return x, y, rot
 
     def execute(self) -> None:
         # Get the x, y, and rotation values from the joystick
@@ -43,6 +51,8 @@ class SwerveJoystickCmd(Command):
         self.xSpeed = x if abs(x) > OIConstants.kDeadband else 0.0
         self.ySpeed = y if abs(y) > OIConstants.kDeadband else 0.0
         self.turningSpeed = rot if abs(rot) > OIConstants.kDeadband else 0.0
+
+        x, y, rot = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeed)
 
         # Saves the last 3 values of the joystick to determine if the joystick is at 0
         if len(self.x_direction_states)<3:
