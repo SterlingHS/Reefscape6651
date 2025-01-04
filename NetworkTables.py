@@ -32,30 +32,5 @@ class NetworkTables:
         # wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
         # wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
         # wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
-        wpilib.SmartDashboard.putNumber("X axis", self.container.driverController.getRawAxis(OIConstants.kDriverXAxis))
-        wpilib.SmartDashboard.putNumber("Y axis", self.container.driverController.getRawAxis(OIConstants.kDriverYAxis))
-        wpilib.SmartDashboard.putNumber("Rot axis", self.container.driverController.getRawAxis(OIConstants.kDriverRotAxis))
-        
-        # Reads Absolute Encoders and sends them to Dashboard
-        absoluteEncoder = self.container.swerveSubsystem.readAbsEncoders()
-        wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
-        wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
-        wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
-        wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
-        
-        # Reads Encoders and sends them to Dashboard
-        turnings = self.container.swerveSubsystem.readTurnEncoders()
-        wpilib.SmartDashboard.putNumber("Turning FL", turnings[0])
-        wpilib.SmartDashboard.putNumber("Turning FR", turnings[1])
-        wpilib.SmartDashboard.putNumber("Turning BL", turnings[2])
-        wpilib.SmartDashboard.putNumber("Turning BR", turnings[3])
-
-        # Reads Distance Travelled and sends them to Dashboard
-        forwards = self.container.swerveSubsystem.readForwardEncoders()
-        wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
-        wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
-        wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
-        wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
-
         pass
 

@@ -7,8 +7,6 @@
 import wpilib
 from math import pi
 
-import wpilib.shuffleboard
-
 from constants import ModuleConstants, DriveConstants
 
 from wpimath.kinematics import SwerveModuleState
@@ -92,13 +90,13 @@ class SwerveModule:
 
             # Same PID but executed by SparkMax instead of Roborio
             # Let's try both and see which one works better
-            # self.RevController = self.turningMotor.getPIDController()
-            # self.RevController.setP(ModuleConstants.kPTurning)
-            # self.RevController.setI(0)
-            # self.RevController.setD(ModuleConstants.kDTurning)   
-            # self.RevController.setPositionPIDWrappingMinInput(-pi) # Wrapping is the same as Continuous Input
-            # self.RevController.setPositionPIDWrappingMaxInput(pi)
-            # self.RevController.setPositionPIDWrappingEnabled(True)
+            self.RevController = self.turningMotor.getPIDController()
+            self.RevController.setP(ModuleConstants.kPTurning)
+            self.RevController.setI(0)
+            self.RevController.setD(ModuleConstants.kDTurning)   
+            self.RevController.setPositionPIDWrappingMinInput(-pi) # Wrapping is the same as Continuous Input
+            self.RevController.setPositionPIDWrappingMaxInput(pi)
+            self.RevController.setPositionPIDWrappingEnabled(True)
 
 
             # PID Controller for driving controlled by Roborio
@@ -174,23 +172,17 @@ class SwerveModule:
         
         # Optimize the state to turn at the most 90 degrees
         state = SwerveModuleState.optimize(state, self.getState().angle)
-        wpilib.SmartDashboard.putNumber("State angle", state.angle.radians())
-        wpilib.SmartDashboard.putNumber("State speed", state.speed)
         
         #Calculate the drive output using the PID controller and the feedforward
-        driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
-        driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
-        wpilib.SmartDashboard.putNumber("Drive Velocity", self.getDriveVelocity())
-        wpilib.SmartDashboard.putNumber("Drive Speed", state.speed)
-        wpilib.SmartDashboard.putNumber("Drive Output", driveOutput)
-        wpilib.SmartDashboard.putNumber("Drive FeedForward", driveFeedForward)
-
-        #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
-        self.driveMotor.set_control(phoenix6.controls.VoltageOut(driveOutput+driveFeedForward))
+        # driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
+        # driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
+        # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
+        # self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
 
         # Calculate the turning output using the PID controller
-        outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())
-        self.turningMotor.set(outputTurn)
+        # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())
+        # self.turningMotor.set(outputTurn)
+        self.RevController.setReference(state.angle.radians(), rev.CANSparkLowLevel.ControlType.kPosition)
         
     def setTurningPID(self, P, I, D):
         ''' Sets the PID values for the turning motor - for tuning purposes'''
@@ -204,5 +196,6 @@ class SwerveModule:
     
     def setSetTurningPosition(self, angle):
         ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''
-        outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
-        self.turningMotor.set(outputTurn)
+        # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
+        # self.turningMotor.set(outputTurn)
+        self.RevController.setReference(angle, rev.CANSparkLowLevel.ControlType.kPosition)
