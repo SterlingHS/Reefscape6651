@@ -71,6 +71,8 @@ class SwerveModule:
             # PID for drive forward using TalonFX instead of Roborio     
             self.drive_pid = phoenix6.configs.Slot0Configs().with_k_p(drivePIDk[0]).with_k_i(drivePIDk[1]).with_k_d(drivePIDk[2])
             self.drive_ff = SimpleMotorFeedforwardMeters(kS=drivePIDk[3], kV=drivePIDk[4], kA=drivePIDk[5])
+            # create a velocity closed-loop request, voltage output, slot 0 configs
+            self.driveMotorRequest = phoenix6.controls.VelocityVoltage(0).with_slot(0)
 
             # Apply the configurations to the drive motor controllers
             drive_config.apply(driveMotorConfig)
@@ -178,6 +180,7 @@ class SwerveModule:
         # driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
         # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
         # self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
+        self.driveMotor.set_control(self.driveMotorRequest.with_velocity(state.speed))
 
         # Calculate the turning output using the PID controller
         # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())
