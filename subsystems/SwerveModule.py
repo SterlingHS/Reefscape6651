@@ -89,13 +89,13 @@ class SwerveModule:
 
             # Same PID but executed by SparkMax instead of Roborio
             # Let's try both and see which one works better
-            # self.RevController = self.turningMotor.getPIDController()
-            # self.RevController.setP(ModuleConstants.kPTurning)
-            # self.RevController.setI(0)
-            # self.RevController.setD(ModuleConstants.kDTurning)   
-            # self.RevController.setPositionPIDWrappingMinInput(-pi) # Wrapping is the same as Continuous Input
-            # self.RevController.setPositionPIDWrappingMaxInput(pi)
-            # self.RevController.setPositionPIDWrappingEnabled(True)
+            self.RevController = self.turningMotor.getPIDController()
+            self.RevController.setP(ModuleConstants.kPTurning)
+            self.RevController.setI(ModuleConstants.kITurning)
+            self.RevController.setD(ModuleConstants.kDTurning)   
+            self.RevController.setPositionPIDWrappingMinInput(-pi) # Wrapping is the same as Continuous Input
+            self.RevController.setPositionPIDWrappingMaxInput(pi)
+            self.RevController.setPositionPIDWrappingEnabled(True)
 
 
             # PID Controller for driving controlled by Roborio
@@ -194,5 +194,6 @@ class SwerveModule:
     
     def setSetTurningPosition(self, angle):
         ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''
-        outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
-        self.turningMotor.set(outputTurn)
+        # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
+        # self.turningMotor.set(outputTurn)
+        self.RevController.setReference(angle, rev.CANSparkLowLevel.ControlType.kPosition)

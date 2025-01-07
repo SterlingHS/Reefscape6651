@@ -93,9 +93,9 @@ class ModuleConstants:
     kTurningEncoderRPM2RadPerSec = kTurningEncoderRot2Rad/60
     
     # To be checked
-    kPTurning = 0.5
-    kITurning = 0.1
-    kDTurning = 0.00
+    kPTurning = 0.6
+    kITurning = 0
+    kDTurning = 0.02
 
 class OIConstants:
     kDriverControllerPort = 0

@@ -111,22 +111,22 @@ class SwerveSubsystem(Subsystem):
         # the entire group to be one motor.
 
         sys_id_routine.motor("drive-front-left"
-            ).voltage(self.frontLeft.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
+            ).voltage(self.frontLeft.driveMotor.get_motor_voltage().value_as_double# * RobotController.getBatteryVoltage()
             ).position(self.frontLeft.getDrivePosition()
             ).velocity(self.frontLeft.getDriveVelocity())
         
         sys_id_routine.motor("drive-front-right"
-            ).voltage(self.frontRight.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
+            ).voltage(self.frontRight.driveMotor.get_motor_voltage().value_as_double# * RobotController.getBatteryVoltage()
             ).position(self.frontRight.getDrivePosition()
             ).velocity(self.frontRight.getDriveVelocity())
 
         sys_id_routine.motor("drive-back-left"
-            ).voltage(self.backLeft.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
+            ).voltage(self.backLeft.driveMotor.get_motor_voltage().value_as_double# * RobotController.getBatteryVoltage()
             ).position(self.backLeft.getDrivePosition()
             ).velocity(self.backLeft.getDriveVelocity())
 
         sys_id_routine.motor("drive-back-right"
-            ).voltage(self.backRight.driveMotor.get_motor_voltage().value_as_double * RobotController.getBatteryVoltage()
+            ).voltage(self.backRight.driveMotor.get_motor_voltage().value_as_double# * RobotController.getBatteryVoltage()
             ).position(self.backRight.getDrivePosition()
             ).velocity(self.backRight.getDriveVelocity())
         pass
