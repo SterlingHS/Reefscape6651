@@ -6,36 +6,30 @@ import wpilib
 
 import commands2
 import commands2.button
-from commands2.sysid import SysIdRoutine
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
-from subsystems.Blinkin import Blinkin
+from constants import OIConstants
 
-import constants
-from constants import OIConstants, DriveConstants, AutoConstants
-
-from math import pi
+from pathplannerlib.auto import PathPlannerAuto
 
 class RobotContainer:
-    """
+    '''
     This class is where the bulk of the robot should be declared. Since Command-based is a
     "declarative" paradigm, very little robot logic should actually be handled in the :class:`.Robot`
     periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
     subsystems, commands, and button mappings) should be declared here.
-
-    """
+    '''
 
     def __init__(self):
-
+        '''The container for the robot. Contains subsystems, OI devices, and commands.'''
         self.swerveSubsystem = SwerveSubsystem()
-        self.blinkinSubsystem = Blinkin()
 
-        """The container for the robot. Contains subsystems, OI devices, and commands."""
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
         # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
-
+        
+        # Set the default commands for the subsystems
         self.swerveSubsystem.setDefaultCommand(
            SwerveJoystickCmd(
                self.swerveSubsystem,
@@ -44,6 +38,7 @@ class RobotContainer:
                lambda : self.driverController.getRawAxis(OIConstants.kDriverRotAxis)
            )
         )
+
         autocommand0: commands2.cmd.Command = None
 
         # autocommand1 = commands.MoveSpeedAndTime.MoveSpeedAndTime(self.swerveSubsystem, -3, 0.5).andThen(
@@ -54,9 +49,12 @@ class RobotContainer:
         # autocommands4 = commands2.WaitCommand(8).andThen(autocommands3)
                
         self.sendableChooser = wpilib.SendableChooser()
-        # self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
+        #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
-        
+        try:
+            self.sendableChooser.addOption("Test", PathPlannerAuto("AutoTest"))
+        except:
+            print("AutoTest not found")
 
         # Configure the button bindings
         self.configureButtonBindings()

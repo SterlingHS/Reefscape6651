@@ -9,83 +9,64 @@ changes.
 """
 
 import math
+import unit_conversions as conv
+import wpilib
+import wpimath.trajectory
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpimath.geometry import Translation2d
 import wpimath
-import wpilib
-import wpimath.trajectory
 
 class DriveConstants:
-    absoulteEncoderCountsPerRev = 4096
-    kFrontLeftDriveMotorPort = 23
-    kFrontLeftTurningMotorPort = 26
+    # absoulteEncoderCountsPerRev = 4096
+
+    kFrontLeftDriveMotorPort = 12
+    kFrontLeftTurningMotorPort = 11
     kFrontLeftDriveMotorReversed = False
-    kFrontLeftTurningMotorReversed = False
-    kFrontLeftAbsoluteEncoderPort = 2
-    kFrontLeftAbsoluteEncoderOffsetRad = (2906/absoulteEncoderCountsPerRev)*(2*math.pi)#
+    kFrontLeftTurningMotorReversed = True
+    kFrontLeftAbsoluteEncoderPort = 13
+    kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
     kFrontLeftAbsoluteEncoderReversed = False
-    kFrontLeftForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
+    kFrontLeftForwardPIDk = [0.42451, 0, 0, 0.057069, 2.1818, 0.051646] # [P, I, D, kS, KV, kA]
 
-    kFrontRightDriveMotorPort = 21
-    kFrontRightTurningMotorPort = 22
+    kFrontRightDriveMotorPort = 22
+    kFrontRightTurningMotorPort = 21
     kFrontRightDriveMotorReversed = True
-    kFrontRightTurningMotorReversed = False
-    kFrontRightAbsoluteEncoderPort = 0
-    kFrontRightAbsoluteEncoderOffsetRad = (87/absoulteEncoderCountsPerRev)*(2*math.pi)
+    kFrontRightTurningMotorReversed = True
+    kFrontRightAbsoluteEncoderPort = 23
+    kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
     kFrontRightAbsoluteEncoderReversed = False
-    kFrontRightForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
+    kFrontRightForwardPIDk = [0.046433, 0, 0, 1.2566, 2.1583, 0.033433] # [P, I, D, kS, KV, kA]
 
-    kBackLeftDriveMotorPort = 13
-    kBackLeftTurningMotorPort = 14
-    kBackLeftDriveMotorReversed = True
-    kBackLeftTurningMotorReversed = False
-    kBackLeftAbsoluteEncoderPort = 3
-    kBackLeftAbsoluteEncoderOffsetRad = (201/absoulteEncoderCountsPerRev)*(2*math.pi)
+    kBackLeftDriveMotorPort = 32
+    kBackLeftTurningMotorPort = 31
+    kBackLeftDriveMotorReversed = False
+    kBackLeftTurningMotorReversed = True
+    kBackLeftAbsoluteEncoderPort = 33
+    kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
     kBackLeftAbsoluteEncoderReversed = False
-    kBackLeftForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
+    kBackLeftForwardPIDk = [0.24322, 0, 0, 0.09109, 2.22, 0.060018] # [P, I, D, kS, KV, kA]
 
-    kBackRightDriveMotorPort = 11
-    kBackRightTurningMotorPort = 12
-    kBackRightDriveMotorReversed = False
-    kBackRightTurningMotorReversed = False
-    kBackRightAbsoluteEncoderPort = 1
-    kBackRightAbsoluteEncoderOffsetRad = (2851/absoulteEncoderCountsPerRev)*(2*math.pi)
+    kBackRightDriveMotorPort = 42
+    kBackRightTurningMotorPort = 41
+    kBackRightDriveMotorReversed = True
+    kBackRightTurningMotorReversed = True
+    kBackRightAbsoluteEncoderPort = 43
+    kBackRightAbsoluteEncoderOffsetRad = 0.409157827
     kBackRightAbsoluteEncoderReversed = False
-    kBackRightForwardPIDk = [0.1, 0, 0, 0.1, 0, 0]
-
-    kEncoderCPR = 1024
-    kWheelDiameterInches = 4
-
-    shuffleMotor = 0
-
-
-    # Assumes the encoders are directly mounted on the wheel shafts
-    kEncoderDistancePerPulse = (kWheelDiameterInches * math.pi) / kEncoderCPR
+    kBackRightForwardPIDk = [1.6845, 0, 0, 0.069495, 2.1808, 0.085083] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
-    kPhysicalMaxSpeedMetersPerSecond = 9 #9 MPS is about 20 miles per hour 
+    kPhysicalMaxSpeedMetersPerSecond = 5 #5 MPS is about 11 miles per hour 
 
-    kGyroReversed = False
-
-    kStabilizationP = 1
-    kStabilizationI = 0.5
-    kStabilizationD = 0
-
-    kTurnP = 1
-    kTurnI = 0
-    kTurnD = 0
-
-    kMaxTurnRateDegPerS = 300 # was 100
-    kMaxTurnAccelerationDegPerSSquared = 100 # was 300
+    kMaxTurnRateDegPerS = 300 
+    kMaxTurnAccelerationDegPerSSquared = 100 
 
     kMaxTurnRateRadPerS = math.radians(kMaxTurnRateDegPerS)
     kMaxTurnAccelerationRadPerSSquared = math.radians(kMaxTurnAccelerationDegPerSSquared)
 
-    kTurnToleranceDeg = 5
-    kTurnRateToleranceDegPerS = 5  # degrees per second, was 10
+    kTrackWidth = conv.inches_meters(22+5/8)  # 22 5/8 inches into meters
+    kWheelBase = kTrackWidth # Square robot
 
-    kTrackWidth = 0.60  #meters
-    kWheelBase = 0.59 #meters
     kDriveKinematics = SwerveDrive4Kinematics(
         Translation2d(kWheelBase/2, kTrackWidth/2),  #LF
         Translation2d(kWheelBase/2, -kTrackWidth/2), #RF
@@ -93,31 +74,28 @@ class DriveConstants:
         Translation2d(-kWheelBase/2, -kTrackWidth/2) #BR
     )
     #this ends up being the damp factor. Right now this is 4.5/9 meaning the max output of the motors should be 50%
-    kTeleDriveMaxSpeedMetersPerSecond = 6.8 #14.5*0.3048 #14.5 feet per second into meters
-    kTeleDriveMaxAngularRadiansPerSecond = 12 #(14.5*12)*0.3048/2 #Transformed 14.5 feet into radians per sec
+    kTeleDriveMaxSpeedMetersPerSecond = 5 #17*0.3048 #17 feet per second into meters
+    kTeleDriveMaxAngularRadiansPerSecond = 8.5 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
     kTeleDriveMaxAccelerationUnitsPerSeconds = kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
-
     kTeleDriveMaxAngularAccelerationUnitsPerSeconds = 0.8 #2*12*0.3048/2 #Transformed from MaxAcceleration
 
-    kTeleDriveMaxDeccelrationUnitsPerSecond = kTeleDriveMaxSpeedMetersPerSecond
-
-    kDistanceSensorID = 7
-
+    # For autonomous mode (PathPlanner)
+    kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
 
 class ModuleConstants:
-    #Figure all this out
-    kWheelDiameterMeters = 0.1016
-    kDriveMotorGearRatio = 1/6.75
-    kTurningMotorGearRatio = 1/12.8
-    kDriveEncoderRot2Meter = kDriveMotorGearRatio*math.pi*kWheelDiameterMeters
+    kWheelDiameterMeters = 0.1016 # 4 inches into meters
+    kDriveMotorGearRatio = 1/6.12 # L3 gearbox
+    kTurningMotorGearRatio = 1/(150/7) # 150:7 gear ratio
+    kDriveEncoderRot2Meter = kDriveMotorGearRatio * math.pi * kWheelDiameterMeters
     kTurningEncoderRot2Rad = kTurningMotorGearRatio*2*math.pi
     kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter/60
     kTurningEncoderRPM2RadPerSec = kTurningEncoderRot2Rad/60
-    kPTurning = 0.4
-    kDTurning = 0.1
-    #maxSpeed = 0.6
-
+    
+    # To be checked
+    kPTurning = 0.6
+    kITurning = 0
+    kDTurning = 0.02
 
 class OIConstants:
     kDriverControllerPort = 0
@@ -128,15 +106,19 @@ class OIConstants:
     kDriverRotAxis = 4
     kDriverFieldOrientedButtonIdx = 3
 
-class BlinkinConstants:
-    kBlinkinPort = 0 #PWM Controller
 
 class AutoConstants:
     from constants import DriveConstants
-    kMaxSpeedMetersPerSecond = 6
+    kMaxSpeedMetersPerSecond = 5
     kMaxAccelerationMetersPerSecondSquared = 3
     kPThetaController = 1
     kThetaControllerConstraints = wpimath.trajectory.TrapezoidProfileRadians.Constraints(DriveConstants.kMaxTurnRateRadPerS, DriveConstants.kMaxTurnAccelerationRadPerSSquared)
-
+    autoTranslationP = 5
+    autoTranslationI = 0
+    autoTranslationD = 0
+    autoRotationP = 5
+    autoRotationI = 0
+    autoTRotationD = 0
     kPXController = 0.1
     kPYController = 0.1
+
