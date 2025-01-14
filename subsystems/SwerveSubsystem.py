@@ -10,7 +10,8 @@ from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 import wpilib
 from commands2 import Subsystem
 from constants import DriveConstants, AutoConstants
-from pathplannerlib.config import HolonomicPathFollowerConfig, PIDConstants, ReplanningConfig
+#from pathplannerlib.config import HolonomicPathFollowerConfig, PIDConstants, ReplanningConfig
+# from pathplannerlib import HolonomicPathFollower
 
 import navx
 import phoenix6
@@ -83,28 +84,28 @@ class SwerveSubsystem(Subsystem):
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)       
 
         # Pathplanner Configuration
-        PPconfig = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    PIDConstants(   AutoConstants.autoTranslationP, 
-                                    AutoConstants.autoTranslationI, 
-                                    AutoConstants.autoTranslationD),    # Translation PID constants
-                    PIDConstants(   AutoConstants.autoRotationP, 
-                                    AutoConstants.autoRotationI,
-                                    AutoConstants.autoTRotationD),      # Rotation PID constants
-                    AutoConstants.kMaxSpeedMetersPerSecond,             # Max module speed, in m/s
-                    DriveConstants.kDriveBaseRadius,                    # Drive base radius in meters. Distance from robot center to furthest module.
-                    ReplanningConfig()                                  # Default path replanning config. See the API for the options here
-            )
+        # PPconfig = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
+        #             PIDConstants(   AutoConstants.autoTranslationP, 
+        #                             AutoConstants.autoTranslationI, 
+        #                             AutoConstants.autoTranslationD),    # Translation PID constants
+        #             PIDConstants(   AutoConstants.autoRotationP, 
+        #                             AutoConstants.autoRotationI,
+        #                             AutoConstants.autoTRotationD),      # Rotation PID constants
+        #             AutoConstants.kMaxSpeedMetersPerSecond,             # Max module speed, in m/s
+        #             DriveConstants.kDriveBaseRadius,                    # Drive base radius in meters. Distance from robot center to furthest module.
+        #             ReplanningConfig()                                  # Default path replanning config. See the API for the options here
+        #     )
 
         # For Autonomous Pathplanner
-        AutoBuilder.configureHolonomic(
-            self.getPose,                   # Robot pose supplier (x,y,heading) of robot
-            self.resetOdometer,             # Reset the robot Odometry (will be called if your auto has a starting pose)
-            self.getChassisSpeed,           # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            self.setChassisSpeeds,          # Method that will drive the robotgiven ROBOT RELATIVE ChassisSpeeds
-            PPconfig,
-            self.shouldFlipPath,            # Supplier to control path flipping based on alliance color
-            self                            # Reference to this subsystem to set requirements
-        )
+        # AutoBuilder.configureHolonomic(
+        #     self.getPose,                   # Robot pose supplier (x,y,heading) of robot
+        #     self.resetOdometer,             # Reset the robot Odometry (will be called if your auto has a starting pose)
+        #     self.getChassisSpeed,           # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        #     self.setChassisSpeeds,          # Method that will drive the robotgiven ROBOT RELATIVE ChassisSpeeds
+        #     PPconfig,
+        #     self.shouldFlipPath,            # Supplier to control path flipping based on alliance color
+        #     self                            # Reference to this subsystem to set requirements
+        # )
 
     def zeroHeading(self):
         ''' Zero the gyro heading '''
