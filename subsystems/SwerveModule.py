@@ -92,10 +92,11 @@ class SwerveModule:
             ##############################################################################################################
 
             # PID Controllers for turning and driving on Roborio
-            self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kITurning, ModuleConstants.kDTurning)
-            self.turningPIDController.enableContinuousInput(-pi, pi)
-            self.turningPIDController.setTolerance(0.0001, 0.01)
+            # self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kITurning, ModuleConstants.kDTurning)
+            # self.turningPIDController.enableContinuousInput(-pi, pi)
+            # self.turningPIDController.setTolerance(0.0001, 0.01)
 
+         
             # Same PID but executed by SparkMax instead of Roborio
             # Let's try both and see which one works better
             self.RevController = self.turningMotor.getClosedLoopController()
@@ -188,27 +189,27 @@ class SwerveModule:
         # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
         # self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
         rotationPerSecond = state.speed/(pi*ModuleConstants.kWheelDiameterMeters)
-        # print(f"Drive Motor {self.driveMotorID} Speed (m/s): {state.speed} Rotation per second: {rotationPerSecond}")
+        #print(f"Drive Motor {self.driveMotorID} Speed (m/s): {state.speed} Rotation per second: {rotationPerSecond}")
         self.driveMotor.set_control(self.driveMotorRequest.with_velocity(rotationPerSecond))
         # print(f"Drive Motor {self.driveMotorID} Request: {self.driveMotorRequest.with_velocity(state.speed)}")
 
         # Calculate the turning output using the PID controller
         # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())
         # self.turningMotor.set(outputTurn)
-        # self.RevController.setReference(state.angle.radians(), rev.CANSparkLowLevel.ControlType.kPosition)
+        self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition)
         
-    def setTurningPID(self, P, I, D):
-        ''' Sets the PID values for the turning motor - for tuning purposes'''
-        self.turningPIDController.setP(P)
-        self.turningPIDController.setI(I)
-        self.turningPIDController.setD(D)
+    # def setTurningPID(self, P, I, D):
+    #     ''' Sets the PID values for the turning motor - for tuning purposes'''
+    #     self.turningPIDController.setP(P)
+    #     self.turningPIDController.setI(I)
+    #     self.turningPIDController.setD(D)
 
-    def getTurningPID(self):
-        ''' Returns the PID values for the turning motor - for tuning purposes '''
-        return (self.turningPIDController.getP(), self.turningPIDController.getI(), self.turningPIDController.getD())
+    # def getTurningPID(self):
+    #     ''' Returns the PID values for the turning motor - for tuning purposes '''
+    #     return (self.turningPIDController.getP(), self.turningPIDController.getI(), self.turningPIDController.getD())
     
-    def setSetTurningPosition(self, angle):
-        ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''
+    # def setSetTurningPosition(self, angle):
+    #     ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''
         # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
         # self.turningMotor.set(outputTurn)
         # self.RevController.setReference(angle, rev.CANSparkLowLevel.ControlType.kPosition)
