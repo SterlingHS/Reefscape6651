@@ -9,15 +9,15 @@ from commands2 import Command
 from wpimath.filter import SlewRateLimiter
 from constants import DriveConstants,OIConstants
 from wpimath.kinematics import ChassisSpeeds
-from subsystems import SwerveSubsystem
+from subsystems.SwerveSubsystem import SwerveSubsystem
 
 signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number (Used?)
 
 class SwerveJoystickCmd(Command):
-    def __init__(self, swerveSub, xSpeedFunc, ySpeedFunc, turningSpeedFunc):
+    def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFunc):
         Command.__init__(self)
 
-        self.swerveSubsystem = swerveSub
+        self.swerveSub = swerveSub
         self.xSpeedFunction = xSpeedFunc
         self.ySpeedFunction = ySpeedFunc
         self.turningSpeedFunction = turningSpeedFunc
@@ -87,7 +87,7 @@ class SwerveJoystickCmd(Command):
 
         # if (self.fieldOrientedFunction):
         #     self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        #         self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSubsystem.getRotation2d()
+        #         self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d()
         #     )
         # else:
         #     self.chassisSpeeds = ChassisSpeeds(self.xSpeed, self.ySpeed, self.turningSpeed)
@@ -95,16 +95,17 @@ class SwerveJoystickCmd(Command):
         #self.chassisSpeeds = ChassisSpeeds(self.xSpeed, self.ySpeed, self.turningSpeed)
 
         self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSubsystem.getRotation2d())
-
-
+                self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
+        
+        # print(f"chalssis speeds: {self.chassisSpeeds}")
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
-        self.swerveSubsystem.setModuleStates(moduleStates)
+        #print(f"module states: {moduleStates}")
+        self.swerveSub.setModuleStates(moduleStates)
 
         return super().execute()
 
     def end(self, interrupted: bool) -> None:
-        self.swerveSubsystem.stopModules()
+        self.swerveSub.stopModules()
         return super().end(interrupted)
 
     def isFinished(self) -> bool:

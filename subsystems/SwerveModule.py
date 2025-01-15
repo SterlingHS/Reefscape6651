@@ -28,6 +28,7 @@ class SwerveModule:
 
             self.absoluteEncoderOffsetRad = absoluteEncoderOffset
             self.absoluteEncoderReversed = absoluteEncoderReversed
+            self.driveMotorID = driveMotorID
             
             # Init of Absolute Encoder (CANCoder)
             self.absoluteEncoder = phoenix6.hardware.CANcoder(absoluteEncoderID)
@@ -37,16 +38,16 @@ class SwerveModule:
 
             # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = SparkMax(turningMotorID, SparkLowLevel.MotorType.kBrushless)
-            self.turningMotor.setInverted(turningMotorReversed)
+            # self.turningMotor.setInverted(turningMotorReversed)
 
             # Init of Encoder to rotate wheel (on the NEO)
             self.turningEncoder = self.turningMotor.getEncoder()
-            configTurningEncoder = SparkMaxConfig()
+            # configTurningEncoder = SparkMaxConfig()
 
-            configTurningEncoder.encoder.positionConversionFactor = ModuleConstants.kTurningEncoderRot2Rad
-            configTurningEncoder.encoder.velocityConversionFactor = ModuleConstants.kTurningEncoderRPM2RadPerSec
+            # configTurningEncoder.encoder.positionConversionFactor = ModuleConstants.kTurningEncoderRot2Rad
+            # configTurningEncoder.encoder.velocityConversionFactor = ModuleConstants.kTurningEncoderRPM2RadPerSec
             
-            self.turningMotor.configure(config=configTurningEncoder)
+            # self.turningMotor.configure(config=configTurningEncoder)
 
             
             ##############################################################################################################
@@ -76,7 +77,7 @@ class SwerveModule:
             # self.drive_pid = phoenix6.configs.Slot0Configs().with_k_p(drivePIDk[0]).with_k_i(drivePIDk[1]).with_k_d(drivePIDk[2])
             # self.drive_ff = SimpleMotorFeedforwardMeters(kS=drivePIDk[3], kV=drivePIDk[4], kA=drivePIDk[5])
             
-            # create a velocity closed-loop request, voltage output, slot 0 configs
+            # create a velocity closed-loop request, voltage output, slot 0 configs for the drive motor
             self.driveMotorRequest = phoenix6.controls.VelocityVoltage(0).with_slot(0)
 
             # Apply the configurations to the drive motor controllers
@@ -97,21 +98,21 @@ class SwerveModule:
 
             # Same PID but executed by SparkMax instead of Roborio
             # Let's try both and see which one works better
-            self.RevController = self.turningMotor.getPIDController()
-            self.RevController.setP(ModuleConstants.kPTurning)
-            self.RevController.setI(0)
-            self.RevController.setD(ModuleConstants.kDTurning)   
-            self.RevController.setPositionPIDWrappingMinInput(-pi) # Wrapping is the same as Continuous Input
-            self.RevController.setPositionPIDWrappingMaxInput(pi)
-            self.RevController.setPositionPIDWrappingEnabled(True)
+            self.RevController = self.turningMotor.getClosedLoopController()
+            # self.RevController.setP(ModuleConstants.kPTurning)
+            # self.RevController.setI(0)
+            # self.RevController.setD(ModuleConstants.kDTurning)   
+            # self.RevController.setPositionPIDWrappingMinInput(-pi) # Wrapping is the same as Continuous Input
+            # self.RevController.setPositionPIDWrappingMaxInput(pi)
+            # self.RevController.setPositionPIDWrappingEnabled(True)
 
 
             # PID Controller for driving controlled by Roborio
-            self.drivePIDController = PIDController(drivePIDk[0], drivePIDk[1], drivePIDk[2])
+            # self.drivePIDController = PIDController(drivePIDk[0], drivePIDk[1], drivePIDk[2])
 
             # The API documentation for Python feedforward components indicate which unit is being used as wpimath.units.NAME. 
             # Users must take care to use correct units, as Python does not have a type-safe unit system.
-            self.driveFeedbackForward = SimpleMotorFeedforwardMeters(drivePIDk[3], drivePIDk[4], drivePIDk[5])
+            # self.driveFeedbackForward = SimpleMotorFeedforwardMeters(drivePIDk[3], drivePIDk[4], drivePIDk[5])
 
             # Set the drive motor to 0 and steer direction encoder to absolute encoder
             self.resetEncoders()
@@ -170,7 +171,7 @@ class SwerveModule:
         self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0))
         self.turningMotor.set(0)
 
-    def setDesiredState(self, state):
+    def setDesiredState(self, state: SwerveModuleState):
         ''' Sets the desired state of the swerve module '''
         # If the speed is less than 0.001, stop the module
         if (abs(state.speed)<0.001):
@@ -178,19 +179,23 @@ class SwerveModule:
             return 0 # Exit the function
         
         # Optimize the state to turn at the most 90 degrees
-        state = SwerveModuleState.optimize(state, self.getState().angle)
+        # SwerveModuleState.optimize(state, self.getState().angle)
+        state.optimize(Rotation2d(self.getTurningPosition()))
         
-        #Calculate the drive output using the PID controller and the feedforward
+        # Calculate the drive output using the PID controller and the feedforward
         # driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
         # driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
         # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
         # self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
-        self.driveMotor.set_control(self.driveMotorRequest.with_velocity(state.speed))
+        rotationPerSecond = state.speed/(pi*ModuleConstants.kWheelDiameterMeters)
+        # print(f"Drive Motor {self.driveMotorID} Speed (m/s): {state.speed} Rotation per second: {rotationPerSecond}")
+        self.driveMotor.set_control(self.driveMotorRequest.with_velocity(rotationPerSecond))
+        # print(f"Drive Motor {self.driveMotorID} Request: {self.driveMotorRequest.with_velocity(state.speed)}")
 
         # Calculate the turning output using the PID controller
         # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())
         # self.turningMotor.set(outputTurn)
-        self.RevController.setReference(state.angle.radians(), rev.CANSparkLowLevel.ControlType.kPosition)
+        # self.RevController.setReference(state.angle.radians(), rev.CANSparkLowLevel.ControlType.kPosition)
         
     def setTurningPID(self, P, I, D):
         ''' Sets the PID values for the turning motor - for tuning purposes'''
@@ -206,4 +211,4 @@ class SwerveModule:
         ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''
         # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
         # self.turningMotor.set(outputTurn)
-        self.RevController.setReference(angle, rev.CANSparkLowLevel.ControlType.kPosition)
+        # self.RevController.setReference(angle, rev.CANSparkLowLevel.ControlType.kPosition)
