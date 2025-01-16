@@ -84,7 +84,7 @@ class SwerveSubsystem(Subsystem):
     # Periodic is called every cycle (20ms)
     def periodic(self):
         
-        # Drivee straight at 0 degrees
+        # Drive straight at 0 degrees
         self.setSetTurningPoint(0)
 
         wpilib.SmartDashboard.putNumber("Turning FL", self.frontLeft.getTurningPosition())
