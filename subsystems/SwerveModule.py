@@ -17,7 +17,8 @@ import wpimath.kinematics
 
 import phoenix6.hardware
 import phoenix6
-from rev import SparkMaxConfig, SparkMax, SparkLowLevel
+from rev import SparkMaxConfig, SparkMax, SparkLowLevel, SparkBaseConfig
+import rev
 
 # Class: SwerveModule
 class SwerveModule:
@@ -38,11 +39,18 @@ class SwerveModule:
 
             # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = SparkMax(turningMotorID, SparkLowLevel.MotorType.kBrushless)
-            # self.turningMotor.setInverted(turningMotorReversed)
+            configRevMotor = SparkMaxConfig()
+            resetMode = rev.SparkBase.ResetMode(0)
+            persistMode = rev.SparkBase.PersistMode()
+            configRevMotor.inverted(turningMotorReversed)
+            configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake)
+            configRevMotor.encoder.positionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad)
+            configRevMotor.encoder.velocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec)
+            self.turningMotor.configure(configRevMotor,resetMode,persistMode)
 
             # Init of Encoder to rotate wheel (on the NEO)
             self.turningEncoder = self.turningMotor.getEncoder()
-            # configTurningEncoder = SparkMaxConfig()
+            #configTurningEncoder = SparkMaxConfig()
 
             # configTurningEncoder.encoder.positionConversionFactor = ModuleConstants.kTurningEncoderRot2Rad
             # configTurningEncoder.encoder.velocityConversionFactor = ModuleConstants.kTurningEncoderRPM2RadPerSec
