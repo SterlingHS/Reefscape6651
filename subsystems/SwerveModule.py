@@ -39,25 +39,29 @@ class SwerveModule:
 
             # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = SparkMax(turningMotorID, SparkLowLevel.MotorType.kBrushless)
-            configRevMotor = SparkMaxConfig()
-            resetMode = rev.SparkBase.ResetMode(0)
-            persistMode = rev.SparkBase.PersistMode()
-            configRevMotor.inverted(turningMotorReversed)
-            configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake)
+
+            # Config of Turning Motor
+            configRevMotor = SparkMaxConfig()  # Creates a new SparkMaxConfig object
+            resetMode = rev.SparkBase.ResetMode(0) # Reset mode is set to Not Reset before Config
+            persistMode = rev.SparkBase.PersistMode(1) # Persist mode is set to Save In Lasting Memory
+            configRevMotor.inverted(turningMotorReversed) # Inverts the motor if needed
+            configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
+            # Encoder configuration for position and velocity
             configRevMotor.encoder.positionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad)
             configRevMotor.encoder.velocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec)
+            # PID configuration for position control
+            configRevMotor.closedLoop.pid(0.6, 0, 0.02, slot=rev.ClosedLoopSlot.kSlot0) # P, I, D
+            configRevMotor.closedLoop.positionWrappingEnabled(True) # Wraps the position input
+            configRevMotor.closedLoop.positionWrappingInputRange(-pi, pi) # Sets the input range for the position
+            # Sends the configuration to the motor
             self.turningMotor.configure(configRevMotor,resetMode,persistMode)
+
+            # PID Controller for turning controlled by SparkMax
+            self.RevController = self.turningMotor.getClosedLoopController()
 
             # Init of Encoder to rotate wheel (on the NEO)
             self.turningEncoder = self.turningMotor.getEncoder()
-            #configTurningEncoder = SparkMaxConfig()
 
-            # configTurningEncoder.encoder.positionConversionFactor = ModuleConstants.kTurningEncoderRot2Rad
-            # configTurningEncoder.encoder.velocityConversionFactor = ModuleConstants.kTurningEncoderRPM2RadPerSec
-            
-            # self.turningMotor.configure(config=configTurningEncoder)
-
-            
             ##############################################################################################################
             # Encoder Kraken X.60
             # Encoder is included in TalonFX so no need to initialize it
@@ -98,23 +102,6 @@ class SwerveModule:
             # print("After update - Drive Motor CAN status frame rates: ", info)
 
             ##############################################################################################################
-
-            # PID Controllers for turning and driving on Roborio
-            # self.turningPIDController = PIDController(ModuleConstants.kPTurning, ModuleConstants.kITurning, ModuleConstants.kDTurning)
-            # self.turningPIDController.enableContinuousInput(-pi, pi)
-            # self.turningPIDController.setTolerance(0.0001, 0.01)
-
-         
-            # Same PID but executed by SparkMax instead of Roborio
-            # Let's try both and see which one works better
-            self.RevController = self.turningMotor.getClosedLoopController()
-            # self.RevController.setP(ModuleConstants.kPTurning)
-            # self.RevController.setI(0)
-            # self.RevController.setD(ModuleConstants.kDTurning)   
-            # self.RevController.setPositionPIDWrappingMinInput(-pi) # Wrapping is the same as Continuous Input
-            # self.RevController.setPositionPIDWrappingMaxInput(pi)
-            # self.RevController.setPositionPIDWrappingEnabled(True)
-
 
             # PID Controller for driving controlled by Roborio
             # self.drivePIDController = PIDController(drivePIDk[0], drivePIDk[1], drivePIDk[2])
@@ -202,9 +189,7 @@ class SwerveModule:
         # print(f"Drive Motor {self.driveMotorID} Request: {self.driveMotorRequest.with_velocity(state.speed)}")
 
         # Calculate the turning output using the PID controller
-        # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), state.angle.radians())
-        # self.turningMotor.set(outputTurn)
-        self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition)
+        self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
         
     # def setTurningPID(self, P, I, D):
     #     ''' Sets the PID values for the turning motor - for tuning purposes'''
