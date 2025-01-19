@@ -5,6 +5,7 @@
 # using a joystick.
 ####################################################################################################
 
+from subsystems.SwerveSubsystem import SwerveSubsystem
 from commands2 import Command
 from constants import OIConstants
 import math
@@ -12,7 +13,7 @@ import wpilib
 
 
 class TunePIDTurning(Command):
-    def __init__(self, swerveSub, xSpeedFunc, ySpeedFunc, turningSpeedFunc):
+    def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFunc):
         Command.__init__(self)
 
         self.swerveSubsystem = swerveSub
