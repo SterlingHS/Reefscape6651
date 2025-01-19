@@ -16,7 +16,8 @@ import wpimath.kinematics
 
 import phoenix6.hardware
 import phoenix6
-from rev import SparkMaxConfig, SparkMax, SparkLowLevel
+from rev import SparkMaxConfig, SparkMax, SparkLowLevel, SparkBaseConfig
+import rev
 
 
 # Class: SwerveModule
@@ -37,6 +38,25 @@ class SwerveModule:
             # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = SparkMax(turningMotorID, SparkLowLevel.MotorType.kBrushless)
     
+            # Config of Turning Motor
+            configRevMotor = SparkMaxConfig()  # Creates a new SparkMaxConfig object
+            resetMode = rev.SparkBase.ResetMode(0) # Reset mode is set to Not Reset before Config
+            persistMode = rev.SparkBase.PersistMode(1) # Persist mode is set to Save In Lasting Memory
+            configRevMotor.inverted(turningMotorReversed) # Inverts the motor if needed
+            configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
+            # Encoder configuration for position and velocity
+            configRevMotor.encoder.positionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad)
+            configRevMotor.encoder.velocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec)
+            # PID configuration for position control
+            configRevMotor.closedLoop.pid(0.6, 0, 0.02, slot=rev.ClosedLoopSlot.kSlot0) # P, I, D
+            configRevMotor.closedLoop.positionWrappingEnabled(True) # Wraps the position input
+            configRevMotor.closedLoop.positionWrappingInputRange(-pi, pi) # Sets the input range for the position
+            # Sends the configuration to the motor
+            self.turningMotor.configure(configRevMotor,resetMode,persistMode)
+
+            # REV PID Controller
+            self.RevController = self.turningMotor.getClosedLoopController()
+
             # Init of Encoder to rotate wheel (on the NEO)
             self.turningEncoder = self.turningMotor.getEncoder()
                  
