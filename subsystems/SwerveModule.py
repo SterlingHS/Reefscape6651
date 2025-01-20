@@ -17,6 +17,7 @@ import wpimath.kinematics
 
 import phoenix6.hardware
 import phoenix6
+from phoenix6 import configs
 from rev import SparkMaxConfig, SparkMax, SparkLowLevel, SparkBaseConfig
 import rev
 
@@ -68,6 +69,16 @@ class SwerveModule:
             # set position conversion factor for driver motor encoder
             # Configure drive motor
 
+            slot0_configs = configs.Slot0Configs()
+
+            slot0_configs.k_s = drivePIDk[3] # Add 0.1 V output to overcome static friction
+            slot0_configs.k_v = drivePIDk[4] # A velocity target of 1 rps results in 0.12 V output
+            slot0_configs.k_a = drivePIDk[5] # A velocity target of 1 rps results in 0.12 V output
+            slot0_configs.k_p = drivePIDk[0] # An error of 1 rps results in 0.11 V output
+            slot0_configs.k_i = 0 # no output for integrated error
+            slot0_configs.k_d = 0 # no output for error derivative
+
+            self.driveMotor.configurator.apply(slot0_configs)
             # drive_config = self.driveMotor.configurator
             # driveMotorConfig = phoenix6.configs.MotorOutputConfigs()
             # driveMotorConfig.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
@@ -184,13 +195,19 @@ class SwerveModule:
         # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
         # self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
         rotationPerSecond = state.speed/(pi*ModuleConstants.kWheelDiameterMeters)
+
         #print(f"Drive Motor {self.driveMotorID} Speed (m/s): {state.speed} Rotation per second: {rotationPerSecond}")
         self.driveMotor.set_control(self.driveMotorRequest.with_velocity(rotationPerSecond))
         # print(f"Drive Motor {self.driveMotorID} Request: {self.driveMotorRequest.with_velocity(state.speed)}")
 
         # Calculate the turning output using the PID controller
         self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
-        
+
+        wpilib.SmartDashboard.putNumber("Speed mps "+str(self.driveMotorID), state.speed )
+        wpilib.SmartDashboard.putNumber("Speed rot "+str(self.driveMotorID), rotationPerSecond )
+        wpilib.SmartDashboard.putNumber("Speed mot "+str(self.driveMotorID), rotationPerSecond/6.12 )
+        wpilib.SmartDashboard.putNumber("Distance"+str(self.driveMotorID), self.driveMotor.get_position().value) 
+        wpilib.SmartDashboard.putNumber("Velocity"+str(self.driveMotorID), self.driveMotor.get_velocity().value)
     # def setTurningPID(self, P, I, D):
     #     ''' Sets the PID values for the turning motor - for tuning purposes'''
     #     self.turningPIDController.setP(P)

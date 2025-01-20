@@ -26,7 +26,7 @@ class DriveConstants:
     kFrontLeftAbsoluteEncoderPort = 13
     kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
     kFrontLeftAbsoluteEncoderReversed = False
-    kFrontLeftForwardPIDk = [0.42451, 0, 0, 0.057069, 2.1818, 0.051646] # [P, I, D, kS, KV, kA]
+    kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
 
     kFrontRightDriveMotorPort = 22
     kFrontRightTurningMotorPort = 21
@@ -35,7 +35,7 @@ class DriveConstants:
     kFrontRightAbsoluteEncoderPort = 23
     kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
     kFrontRightAbsoluteEncoderReversed = False
-    kFrontRightForwardPIDk = [0.046433, 0, 0, 1.2566, 2.1583, 0.033433] # [P, I, D, kS, KV, kA]
+    kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
 
     kBackLeftDriveMotorPort = 32
     kBackLeftTurningMotorPort = 31
@@ -44,7 +44,7 @@ class DriveConstants:
     kBackLeftAbsoluteEncoderPort = 33
     kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
     kBackLeftAbsoluteEncoderReversed = False
-    kBackLeftForwardPIDk = [0.24322, 0, 0, 0.09109, 2.22, 0.060018] # [P, I, D, kS, KV, kA]
+    kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
 
     kBackRightDriveMotorPort = 42
     kBackRightTurningMotorPort = 41
@@ -53,7 +53,7 @@ class DriveConstants:
     kBackRightAbsoluteEncoderPort = 43
     kBackRightAbsoluteEncoderOffsetRad = 0.409157827
     kBackRightAbsoluteEncoderReversed = False
-    kBackRightForwardPIDk = [1.6845, 0, 0, 0.069495, 2.1808, 0.085083] # [P, I, D, kS, KV, kA]
+    kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
     kPhysicalMaxSpeedMetersPerSecond = 5 #5 MPS is about 11 miles per hour 

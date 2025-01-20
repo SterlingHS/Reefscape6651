@@ -10,6 +10,7 @@ from wpimath.filter import SlewRateLimiter
 from constants import DriveConstants,OIConstants
 from wpimath.kinematics import ChassisSpeeds
 from subsystems.SwerveSubsystem import SwerveSubsystem
+import wpilib
 
 signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number (Used?)
 
@@ -52,7 +53,11 @@ class SwerveJoystickCmd(Command):
         self.ySpeed = y if abs(y) > OIConstants.kDeadband else 0.0
         self.turningSpeed = rot if abs(rot) > OIConstants.kDeadband else 0.0
 
-        x, y, rot = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeed)
+        wpilib.SmartDashboard.putNumber("X", self.xSpeed)
+
+
+        self.xSpeed, self.ySpeed, self.turningSpeed = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeed)
+        wpilib.SmartDashboard.putNumber("X atenuated", self.xSpeed)
 
         # Saves the last 3 values of the joystick to determine if the joystick is at 0
         if len(self.x_direction_states)<3:
