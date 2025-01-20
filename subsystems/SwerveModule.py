@@ -41,7 +41,8 @@ class SwerveModule:
             # Init of Turning Motor (SparkMax) for NEO v1.1
             self.turningMotor = SparkMax(turningMotorID, SparkLowLevel.MotorType.kBrushless)
 
-            # Config of Turning Motor
+            ##############################################################################################################
+            # Config SparkMax for turning motor 
             configRevMotor = SparkMaxConfig()  # Creates a new SparkMaxConfig object
             resetMode = rev.SparkBase.ResetMode(0) # Reset mode is set to Not Reset before Config
             persistMode = rev.SparkBase.PersistMode(1) # Persist mode is set to Save In Lasting Memory
@@ -66,60 +67,20 @@ class SwerveModule:
             ##############################################################################################################
             # Encoder Kraken X.60
             # Encoder is included in TalonFX so no need to initialize it
-            # set position conversion factor for driver motor encoder
             # Configure drive motor
-
             slot0_configs = configs.Slot0Configs()
 
+            # PID for drive forward using TalonFX instead of Roborio
             slot0_configs.k_s = drivePIDk[3] # Add 0.1 V output to overcome static friction
             slot0_configs.k_v = drivePIDk[4] # A velocity target of 1 rps results in 0.12 V output
             slot0_configs.k_a = drivePIDk[5] # A velocity target of 1 rps results in 0.12 V output
             slot0_configs.k_p = drivePIDk[0] # An error of 1 rps results in 0.11 V output
             slot0_configs.k_i = 0 # no output for integrated error
             slot0_configs.k_d = 0 # no output for error derivative
-
             self.driveMotor.configurator.apply(slot0_configs)
-            # drive_config = self.driveMotor.configurator
-            # driveMotorConfig = phoenix6.configs.MotorOutputConfigs()
-            # driveMotorConfig.neutral_mode = phoenix6.signals.NeutralModeValue.BRAKE
-            # driveMotorConfig.inverted = (
-            #     phoenix6.signals.InvertedValue.CLOCKWISE_POSITIVE 
-            #     if driveMotorReversed 
-            #     else phoenix6.signals.InvertedValue.COUNTER_CLOCKWISE_POSITIVE
-            # )
-            # drive_gear_ratio_config = phoenix6.configs.FeedbackConfigs().with_sensor_to_mechanism_ratio(1/ModuleConstants.kDriveEncoderRot2Meter)
-
-            # Reduce CAN status frame rates before configuring
-            # info = self.driveMotor.get_fault_field().get_applied_update_frequency()
-            # print("Before change of frame rate - Drive Motor CAN status frame rates: ", info)                  # It does not print!!! Why?
-            # self.driveMotor.get_fault_field().set_update_frequency(frequency_hz=4, timeout_seconds=0.01)
-            # info2 = self.driveMotor.get_fault_field().get_applied_update_frequency()
-            # print("After change of frame rate - Drive Motor CAN status frame rates: ", info2)
-
-            # PID for drive forward using TalonFX instead of Roborio     
-            # self.drive_pid = phoenix6.configs.Slot0Configs().with_k_p(drivePIDk[0]).with_k_i(drivePIDk[1]).with_k_d(drivePIDk[2])
-            # self.drive_ff = SimpleMotorFeedforwardMeters(kS=drivePIDk[3], kV=drivePIDk[4], kA=drivePIDk[5])
-            
+           
             # create a velocity closed-loop request, voltage output, slot 0 configs for the drive motor
             self.driveMotorRequest = phoenix6.controls.VelocityVoltage(0).with_slot(0)
-
-            # Apply the configurations to the drive motor controllers
-            # drive_config.apply(driveMotorConfig)
-            # drive_config.apply(self.drive_pid, 0.01)
-            # drive_config.apply(drive_gear_ratio_config)
-
-            # self.driveMotor.get_fault_field().set_update_frequency(info)
-            # info = self.driveMotor.get_fault_field().get_applied_update_frequency()
-            # print("After update - Drive Motor CAN status frame rates: ", info)
-
-            ##############################################################################################################
-
-            # PID Controller for driving controlled by Roborio
-            # self.drivePIDController = PIDController(drivePIDk[0], drivePIDk[1], drivePIDk[2])
-
-            # The API documentation for Python feedforward components indicate which unit is being used as wpimath.units.NAME. 
-            # Users must take care to use correct units, as Python does not have a type-safe unit system.
-            # self.driveFeedbackForward = SimpleMotorFeedforwardMeters(drivePIDk[3], drivePIDk[4], drivePIDk[5])
 
             # Set the drive motor to 0 and steer direction encoder to absolute encoder
             self.resetEncoders()
