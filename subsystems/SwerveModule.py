@@ -189,37 +189,11 @@ class SwerveModule:
         # SwerveModuleState.optimize(state, self.getState().angle)
         state.optimize(Rotation2d(self.getTurningPosition()))
         
-        # Calculate the drive output using the PID controller and the feedforward
-        # driveOutput = self.drivePIDController.calculate(self.getDriveVelocity(),state.speed)
-        # driveFeedForward = self.driveFeedbackForward.calculate(state.speed)
-        # #self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(state.speed/DriveConstants.kPhysicalMaxSpeedMetersPerSecond))
-        # self.driveMotor.set_control(phoenix6.controls.DutyCycleOut(driveOutput+driveFeedForward))
+        # Calculate the rotation per second
         rotationPerSecond = state.speed/(pi*ModuleConstants.kWheelDiameterMeters)
 
-        #print(f"Drive Motor {self.driveMotorID} Speed (m/s): {state.speed} Rotation per second: {rotationPerSecond}")
+        # Set the drive motor to the desired speed
         self.driveMotor.set_control(self.driveMotorRequest.with_velocity(rotationPerSecond))
-        # print(f"Drive Motor {self.driveMotorID} Request: {self.driveMotorRequest.with_velocity(state.speed)}")
-
+        
         # Calculate the turning output using the PID controller
         self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
-
-        wpilib.SmartDashboard.putNumber("Speed mps "+str(self.driveMotorID), state.speed )
-        wpilib.SmartDashboard.putNumber("Speed rot "+str(self.driveMotorID), rotationPerSecond )
-        wpilib.SmartDashboard.putNumber("Speed mot "+str(self.driveMotorID), rotationPerSecond/6.12 )
-        wpilib.SmartDashboard.putNumber("Distance"+str(self.driveMotorID), self.driveMotor.get_position().value) 
-        wpilib.SmartDashboard.putNumber("Velocity"+str(self.driveMotorID), self.driveMotor.get_velocity().value)
-    # def setTurningPID(self, P, I, D):
-    #     ''' Sets the PID values for the turning motor - for tuning purposes'''
-    #     self.turningPIDController.setP(P)
-    #     self.turningPIDController.setI(I)
-    #     self.turningPIDController.setD(D)
-
-    # def getTurningPID(self):
-    #     ''' Returns the PID values for the turning motor - for tuning purposes '''
-    #     return (self.turningPIDController.getP(), self.turningPIDController.getI(), self.turningPIDController.getD())
-    
-    # def setSetTurningPosition(self, angle):
-    #     ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''
-        # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
-        # self.turningMotor.set(outputTurn)
-        # self.RevController.setReference(angle, rev.CANSparkLowLevel.ControlType.kPosition)
