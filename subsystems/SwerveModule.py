@@ -10,8 +10,6 @@ from math import pi
 from constants import ModuleConstants, DriveConstants
 
 from wpimath.kinematics import SwerveModuleState
-from wpimath.controller import PIDController
-from wpimath.controller import SimpleMotorFeedforwardMeters
 from wpimath.geometry import Rotation2d
 import wpimath.kinematics
 
@@ -126,6 +124,11 @@ class SwerveModule:
         self.driveMotor.set_position(0)
         self.turningEncoder.setPosition(self.getAbsoluteEncoderRad())
 
+    def getSwerveModulePosition(self):
+        ''' Returns the position of the swerve module '''
+        return wpimath.kinematics.SwerveModulePosition(self.getDrivePosition(), Rotation2d(self.getTurningPosition()))
+
+
     def getState(self):
         ''' Returns the state of the swerve module '''
         return SwerveModuleState(self.getDriveVelocity(), Rotation2d(self.getTurningPosition()))
@@ -147,7 +150,6 @@ class SwerveModule:
             return 0 # Exit the function
         
         # Optimize the state to turn at the most 90 degrees
-        # SwerveModuleState.optimize(state, self.getState().angle)
         state.optimize(Rotation2d(self.getTurningPosition()))
         
         # Calculate the rotation per second

@@ -112,7 +112,7 @@ class SwerveSubsystem(Subsystem):
         #     self                            # Reference to this subsystem to set requirements
         # )
 
-        AutoBuilder.configureHolonomic(
+        AutoBuilder.configure(
             self.getPose, # Robot pose supplier
             self.resetOdometer, # Method to reset odometry (will be called if your auto has a starting pose)
             self.getChassisSpeed, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
@@ -149,17 +149,12 @@ class SwerveSubsystem(Subsystem):
     def getPose(self):
         ''' Returns the pose of the robot '''
         return self.odometer.getPose()
-
-    def getModuleStates(self):
-        ''' Returns the states of the swerve modules '''
-        states = [self.frontLeft.getState(), self.frontRight.getState(),self.backLeft.getState(),self.backRight.getState()]
-        return states
     
-    def getSwerveModulePosition(self):
-        ''' Returns the position of the swerve module '''
-        return wpimath.kinematics.SwerveModulePosition(self.getDrivePosition(), Rotation2d(self.getTurningPosition()))
-
     def resetOdometer(self, pose):
+        ''' Resets the odometer to a specific pose '''
+        self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
+        
+    def resetOdometerBackup(self, pose):
         ''' Resets the odometer to a specific pose '''
         # self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
         self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getDrivePosition(), self.frontRight.getDrivePosition(), self.backLeft.getDrivePosition(), self.backRight.getDrivePosition()), pose)

@@ -11,7 +11,9 @@ from commands.SwerveJoystickCmd import SwerveJoystickCmd
 from subsystems.SwerveSubsystem import SwerveSubsystem
 from constants import OIConstants
 
-from pathplannerlib.auto import PathPlannerAuto
+from pathplannerlib.auto import PathPlannerAuto, AutoBuilder
+
+from wpilib import SendableChooser
 
 class RobotContainer:
     '''
@@ -39,6 +41,10 @@ class RobotContainer:
            )
         )
 
+        # Build an auto chooser. This will use Commands.none() as the default option.
+        # self.autoChooser = AutoBuilder.buildAutoChooser()
+        # wpilib.SmartDashboard.putData("Auto Chooser", self.autoChooser)
+
         autocommand0: commands2.cmd.Command = None
 
         # autocommand1 = commands.MoveSpeedAndTime.MoveSpeedAndTime(self.swerveSubsystem, -3, 0.5).andThen(
@@ -48,12 +54,13 @@ class RobotContainer:
         
         # autocommands4 = commands2.WaitCommand(8).andThen(autocommands3)
                
-        self.sendableChooser = wpilib.SendableChooser()
-        #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
+        self.sendableChooser = SendableChooser()
+        # #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
         try:
-            self.sendableChooser.addOption("Test", PathPlannerAuto("New Auto"))
+            self.sendableChooser.addOption("Test", PathPlannerAuto("TestDrive"))
         except:
+            print("##########################################################################")
             print("AutoTest not found")
 
         # Configure the button bindings
@@ -80,6 +87,5 @@ class RobotContainer:
         there's more at the door
         :returns: the command to run in autonomous
         """
-       
-        #autocommand1 = AutoTrajectory.AutoTrajectory(self.swerveSubsystem, "/home/lvuser/py/autoTrajectories/Blue22.wpilib.json")
+        return PathPlannerAuto('TestDrive')
         return self.sendableChooser.getSelected()
