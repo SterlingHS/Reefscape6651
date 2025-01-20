@@ -52,7 +52,7 @@ class RobotContainer:
         #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
         try:
-            self.sendableChooser.addOption("Test", PathPlannerAuto("AutoTest"))
+            self.sendableChooser.addOption("Test", PathPlannerAuto("New Auto"))
         except:
             print("AutoTest not found")
 

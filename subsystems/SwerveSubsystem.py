@@ -18,7 +18,10 @@ import phoenix6
 
 # Autonomous Pathplanner
 from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.controller import PPHolonomicDriveController
+from pathplannerlib.config import RobotConfig, PIDConstants
 from wpilib import DriverStation
+
 
 # For NavX to calibrate
 from time import sleep
@@ -84,6 +87,8 @@ class SwerveSubsystem(Subsystem):
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(DriveConstants.kDriveKinematics,self.getRotation2d(), swerveModulePositions)       
 
         # Pathplanner Configuration
+        config = RobotConfig.fromGUISettings() # RobotConfig, this should likely live in your Constants class
+        
         # PPconfig = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
         #             PIDConstants(   AutoConstants.autoTranslationP, 
         #                             AutoConstants.autoTranslationI, 
@@ -106,6 +111,20 @@ class SwerveSubsystem(Subsystem):
         #     self.shouldFlipPath,            # Supplier to control path flipping based on alliance color
         #     self                            # Reference to this subsystem to set requirements
         # )
+
+        AutoBuilder.configureHolonomic(
+            self.getPose, # Robot pose supplier
+            self.resetOdometer, # Method to reset odometry (will be called if your auto has a starting pose)
+            self.getChassisSpeed, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            lambda speeds, feedforwards: self.setChassisSpeeds(speeds), # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also outputs individual module feedforwards
+            PPHolonomicDriveController( # PPHolonomicController is the built in path following controller for holonomic drive trains
+                PIDConstants(5.0, 0.0, 0.0), # Translation PID constants
+                PIDConstants(5.0, 0.0, 0.0) # Rotation PID constants
+            ),
+            config, # The robot configuration
+            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
+            self # Reference to this subsystem to set requirements
+        )
 
     def zeroHeading(self):
         ''' Zero the gyro heading '''
