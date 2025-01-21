@@ -63,7 +63,9 @@ class NetworkTables:
         # errorVelocity = desiredVelocity - velocity
         # wpilib.SmartDashboard.putNumber("Velocity", velocity)
         # wpilib.SmartDashboard.putNumber("Desired Velocity", desiredVelocity)
-        # wpilib.SmartDashboard.putNumber("Vlocity Error", errorVelocity)
+        # wpilib.SmartDashboard.putNumber("Velocity Error", errorVelocity)
+
+        wpilib.SmartDashboard.putNumber("Angle Gyro", self.container.swerveSubsystem.getHeading())
 
         pass
 

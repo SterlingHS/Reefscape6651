@@ -88,30 +88,9 @@ class SwerveSubsystem(Subsystem):
 
         # Pathplanner Configuration
         config = RobotConfig.fromGUISettings() # RobotConfig, this should likely live in your Constants class
-        
-        # PPconfig = HolonomicPathFollowerConfig(                           # HolonomicPathFollowerConfig, this should likely live in your Constants class
-        #             PIDConstants(   AutoConstants.autoTranslationP, 
-        #                             AutoConstants.autoTranslationI, 
-        #                             AutoConstants.autoTranslationD),    # Translation PID constants
-        #             PIDConstants(   AutoConstants.autoRotationP, 
-        #                             AutoConstants.autoRotationI,
-        #                             AutoConstants.autoTRotationD),      # Rotation PID constants
-        #             AutoConstants.kMaxSpeedMetersPerSecond,             # Max module speed, in m/s
-        #             DriveConstants.kDriveBaseRadius,                    # Drive base radius in meters. Distance from robot center to furthest module.
-        #             ReplanningConfig()                                  # Default path replanning config. See the API for the options here
-        #     )
-
+        print("Pathplanner Configuration")
+        print(config)
         # For Autonomous Pathplanner
-        # AutoBuilder.configureHolonomic(
-        #     self.getPose,                   # Robot pose supplier (x,y,heading) of robot
-        #     self.resetOdometer,             # Reset the robot Odometry (will be called if your auto has a starting pose)
-        #     self.getChassisSpeed,           # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        #     self.setChassisSpeeds,          # Method that will drive the robotgiven ROBOT RELATIVE ChassisSpeeds
-        #     PPconfig,
-        #     self.shouldFlipPath,            # Supplier to control path flipping based on alliance color
-        #     self                            # Reference to this subsystem to set requirements
-        # )
-
         AutoBuilder.configure(
             self.getPose, # Robot pose supplier
             self.resetOdometer, # Method to reset odometry (will be called if your auto has a starting pose)
@@ -131,16 +110,16 @@ class SwerveSubsystem(Subsystem):
         self.gyro.reset()
 
     def getCompass(self)->float: 
-        ''' Return heading in degrees for values between 0 and 360 '''
+        ''' Return heading in degrees for values between 0 and 360 (from Gyro)'''
         return self.gyro.getFusedHeading()
 
     def getHeading(self):
-        ''' Return heading in degrees for values between 0 and 360 '''
-        return -1*self.gyro.getAngle() % 360
+        ''' Return heading in degrees for values between 0 and 360 (from Gyro)'''
+        return self.gyro.getAngle() % 360
 
     def getContinuousHeading(self):
-        ''' Return heading in degrees '''
-        return -1*self.gyro.getAngle()
+        ''' Return heading in degrees (from Gyro)'''
+        return self.gyro.getAngle()
 
     def getRotation2d(self):
         ''' Returns heading in Rotation2d format '''
