@@ -122,3 +122,6 @@ class AutoConstants:
     kPXController = 0.1
     kPYController = 0.1
 
+class DropperConstants:
+    DropperMotorID = 60
+    DropperReversed = False

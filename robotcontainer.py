@@ -6,9 +6,13 @@ import wpilib
 
 import commands2
 import commands2.button
+
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
+from commands.DropCoral import DropCoral
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
+from subsystems.Dropper import Dropper
+
 from constants import OIConstants
 
 from pathplannerlib.auto import PathPlannerAuto, AutoBuilder
@@ -26,6 +30,7 @@ class RobotContainer:
     def __init__(self):
         '''The container for the robot. Contains subsystems, OI devices, and commands.'''
         self.swerveSubsystem = SwerveSubsystem()
+        self.dropper = Dropper()
 
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
@@ -72,14 +77,15 @@ class RobotContainer:
         factories on commands2.button.CommandGenericHID or one of its
         subclasses (commands2.button.CommandJoystick or command2.button.CommandXboxController).
         """
-        '''commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kA).whileTrue(commands.PickUpSimple2.PickUpSimple2(self.intake, self.blinkinSubsystem).andThen(
-            commands.DropNote.DropNote(self.intake)))'''
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kA).whileTrue(commands.PickUpSimple2.PickUpSimple2(self.intake, self.blinkinSubsystem).andThen(
+        #     commands.DropNote.DropNote(self.intake)))
         
-        ''' commands2.button.POVButton(
-            self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) '''
+        # commands2.button.POVButton(
+        #     self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) 
 
-        pass
+        commands2.button.JoystickButton(
+             self.driverController, wpilib.XboxController.Button.kA).whileTrue(DropCoral(self.dropper))
 
     def getAutonomousCommand(self) -> commands2.Command:
         """
