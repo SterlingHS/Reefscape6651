@@ -1,5 +1,6 @@
 from commands2 import Command
 from subsystems.Elevator import Elevator
+from constants import ElevatorConstants
 
 
 class ElevatorMove(Command):
@@ -12,8 +13,11 @@ class ElevatorMove(Command):
         return super().initialize()
     
     def execute(self) -> None:
-        if self.elevator.readEncoder() < 5 and self.direction == -1:
-            self.elevator.setMotor(0)
+        position = self.elevator.readEncoder()
+        if position <= ElevatorConstants.Min and self.direction == -1:
+            self.elevator.stopMotor()
+        elif position >= ElevatorConstants.Max and self.direction == 1:
+            self.elevator.stopMotor()
         else:
             self.elevator.setMotor(self.direction*0.2)
 
