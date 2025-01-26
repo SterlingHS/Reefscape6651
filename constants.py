@@ -122,3 +122,10 @@ class AutoConstants:
     kPXController = 0.1
     kPYController = 0.1
 
+class ElevatorConstants:
+    ElevatorMotorID1 = 61
+    ElevatorMotorID2 = 62
+    ElevatorReversed1 = False
+    ElevatorReversed2 = True
+    kElevatorEncoderRot2Meter = 52.5/92.38
+    kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
