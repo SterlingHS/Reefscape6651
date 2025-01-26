@@ -20,7 +20,11 @@ class Dropper(Subsystem):
         configRevMotor.inverted(DropperConstants.DropperReversed) # Inverts the motor if needed
         configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
         # PID configuration for position control
-        configRevMotor.closedLoop.pid(0.6, 0, 0.02, slot=rev.ClosedLoopSlot.kSlot0) # P, I, D
+        configRevMotor.closedLoop.pid(
+            DropperConstants.P, 
+            DropperConstants.I, 
+            DropperConstants.D, 
+            slot=rev.ClosedLoopSlot.kSlot0)
         # Sends the configuration to the motor
         self.dropperMotor.configure(configRevMotor,resetMode,persistMode)
 
@@ -30,6 +34,12 @@ class Dropper(Subsystem):
         # PID Controller for turning controlled by SparkMax
         self.RevController = self.dropperMotor.getClosedLoopController()
 
+        # Reset encoder
+        self.resetEncoder()
+
+    def resetEncoder(self):
+        ''' Resets the encoder position '''
+        self.dropperEncoder.setPosition(0)
 
     def readEncoder(self):
         ''' Reads the encoder position '''
