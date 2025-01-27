@@ -127,5 +127,5 @@ class ElevatorConstants:
     ElevatorMotorID2 = 62
     ElevatorReversed1 = False
     ElevatorReversed2 = True
-    kElevatorEncoderRot2Meter = 52.5/92.38
+    kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
     kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
