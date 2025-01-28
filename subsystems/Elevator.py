@@ -28,6 +28,7 @@ class Elevator(Subsystem):
             ElevatorConstants.I1,
             ElevatorConstants.D1,
             slot=rev.ClosedLoopSlot.kSlot0)
+        configRevMotor.closedLoop.outputRange(ElevatorConstants.Min, ElevatorConstants.Max, slot=rev.ClosedLoopSlot.kSlot0)
         # Encoder configuration for position and velocity
         configRevMotor.encoder.positionConversionFactor(ElevatorConstants.kElevatorEncoderRot2Meter)
         configRevMotor.encoder.velocityConversionFactor(ElevatorConstants.kElevatorEncoderRPM2MeterPerSec)
