@@ -134,15 +134,17 @@ class ElevatorConstants:
     ElevatorMotorID2 = 62
     ElevatorReversed1 = False
     ElevatorReversed2 = True
+    MaxVelocityUp = 1
+    MaxVelocityDown = -.4
     Max = 53
     Min = 0
-    P1 = 0.6
+    P1 = 0.04
     I1 = 0
     D1 = 0.02
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
     kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
     L1 = 0
-    L2 = 11 # 11 inches
-    L3 = 28 # 28 inches
-    L4 = 52 # 52 inches
+    L2 = 13 # 11 inches
+    L3 = 29 # 28 inches
+    L4 = 53 # 52 inches
     

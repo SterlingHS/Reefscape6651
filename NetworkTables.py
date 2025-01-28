@@ -67,5 +67,7 @@ class NetworkTables:
 
         wpilib.SmartDashboard.putNumber("Angle Gyro", self.container.swerveSubsystem.getHeading())
         wpilib.SmartDashboard.putNumber("Elevator Encoder", self.container.elevator.readEncoder())
+        wpilib.SmartDashboard.putNumber("Elevator floor", self.container.elevator.readFloor())
+
         pass
 

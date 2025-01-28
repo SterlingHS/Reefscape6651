@@ -11,6 +11,7 @@ from commands.SwerveJoystickCmd import SwerveJoystickCmd
 from commands.DropCoral import DropCoral
 from commands.ElevatorFloor import ElevatorFloor
 from commands.ElevatorMove import ElevatorMove
+from commands.ElevatorChange import ElevatorChange
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
 from subsystems.Dropper import Dropper
@@ -95,7 +96,7 @@ class RobotContainer:
              self.driverController, wpilib.XboxController.Button.kB).whileTrue(ElevatorFloor(self.elevator,2))
 
         commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kA).onTrue(ElevatorFloor(self.elevator,1))
+             self.driverController, wpilib.XboxController.Button.kA).whileTrue(ElevatorFloor(self.elevator,3))
 
         commands2.button.JoystickButton(
              self.driverController, wpilib.XboxController.Button.kX).whileTrue(ElevatorMove(self.elevator,-1))
@@ -103,6 +104,13 @@ class RobotContainer:
 
         commands2.button.JoystickButton(
                 self.driverController, wpilib.XboxController.Button.kY).whileTrue(ElevatorMove(self.elevator,1))
+
+
+        commands2.button.POVButton(
+             self.driverController, 0).onTrue(ElevatorChange(self.elevator,1))
+
+        commands2.button.POVButton(
+             self.driverController, 180).onTrue(ElevatorChange(self.elevator,-1))
 
     def getAutonomousCommand(self) -> commands2.Command:
         """

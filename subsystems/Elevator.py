@@ -28,7 +28,9 @@ class Elevator(Subsystem):
             ElevatorConstants.I1,
             ElevatorConstants.D1,
             slot=rev.ClosedLoopSlot.kSlot0)
-        configRevMotor.closedLoop.outputRange(ElevatorConstants.Min, ElevatorConstants.Max, slot=rev.ClosedLoopSlot.kSlot0)
+        configRevMotor.closedLoop.outputRange(ElevatorConstants.MaxVelocityDown,ElevatorConstants.MaxVelocityUp,slot=rev.ClosedLoopSlot.kSlot0)
+        
+        
         # Encoder configuration for position and velocity
         configRevMotor.encoder.positionConversionFactor(ElevatorConstants.kElevatorEncoderRot2Meter)
         configRevMotor.encoder.velocityConversionFactor(ElevatorConstants.kElevatorEncoderRPM2MeterPerSec)
@@ -62,6 +64,9 @@ class Elevator(Subsystem):
 
         # Init floor
         self.floor = 0
+
+    def readFloor(self):
+        return self.floor
 
     def resetEncoder(self):
         ''' Resets the encoder position '''
@@ -114,6 +119,13 @@ class Elevator(Subsystem):
             self.setElevatorPosition(ElevatorConstants.L3)
         elif floor == 4:
             self.setElevatorPosition(ElevatorConstants.L4)
+
+    def changeFloor(self,changeInFloor:int):
+        if self.floor >= 2 and changeInFloor == -1:
+            self.floor = self.floor - 1
+        
+        if self.floor <= 3 and changeInFloor == 1:
+            self.floor = self.floor + 1
 
     def setPeriodicFloor(self, floor:int):
         self.floor = floor
