@@ -11,7 +11,7 @@ class DropCoral(Command):
         return super().initialize()
     
     def execute(self) -> None:
-        self.dropper.setMotor(0.5)
+        self.dropper.setMotor(0.25)
 
     def end(self, interrupted: bool) -> None:
         self.dropper.stopMotor()

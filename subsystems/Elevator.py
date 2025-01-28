@@ -59,6 +59,9 @@ class Elevator(Subsystem):
         # Reset encoder
         self.resetEncoder()
 
+        # Init floor
+        self.floor = 0
+
     def resetEncoder(self):
         ''' Resets the encoder position '''
         self.elevatorEncoder.setPosition(0)
@@ -111,3 +114,10 @@ class Elevator(Subsystem):
         elif floor == 4:
             self.setElevatorPosition(ElevatorConstants.L4)
 
+    def setPeriodicFloor(self, floor:int):
+        self.floor = floor
+
+    def periodic(self):
+        if self.floor in [1,2,3,4]:
+            self.setElevatorFloor(self.floor)
+        return super().periodic()

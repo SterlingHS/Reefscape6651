@@ -12,7 +12,8 @@ class ElevatorFloor(Command):
         return super().initialize()
     
     def execute(self) -> None:
-        self.elevator.setElevatorFloor(self.floor)
+        # self.elevator.setElevatorFloor(self.floor)
+        self.elevator.setPeriodicFloor(self.floor)
 
     def end(self, interrupted: bool) -> None:
         return super().end(interrupted)

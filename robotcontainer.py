@@ -33,7 +33,7 @@ class RobotContainer:
     def __init__(self):
         '''The container for the robot. Contains subsystems, OI devices, and commands.'''
         self.swerveSubsystem = SwerveSubsystem()
-        #self.dropper = Dropper()
+        self.dropper = Dropper()
         self.elevator = Elevator()
 
         # The driver's controller
@@ -88,14 +88,14 @@ class RobotContainer:
         # commands2.button.POVButton(
         #     self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) 
 
-        # commands2.button.JoystickButton(
-        #      self.driverController, wpilib.XboxController.Button.kA).whileTrue(DropCoral(self.dropper))
+        commands2.button.JoystickButton(
+             self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(DropCoral(self.dropper))
         
         commands2.button.JoystickButton(
              self.driverController, wpilib.XboxController.Button.kB).whileTrue(ElevatorFloor(self.elevator,2))
 
         commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kA).whileTrue(ElevatorFloor(self.elevator,1))
+             self.driverController, wpilib.XboxController.Button.kA).onTrue(ElevatorFloor(self.elevator,1))
 
         commands2.button.JoystickButton(
              self.driverController, wpilib.XboxController.Button.kX).whileTrue(ElevatorMove(self.elevator,-1))

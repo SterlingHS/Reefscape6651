@@ -141,8 +141,8 @@ class ElevatorConstants:
     D1 = 0.02
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
     kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
-    L1 = 2
-    L2 = 15 # 5 inches
-    L3 = 30 # 10 inches
-    L4 = 48 # 15 inches
+    L1 = 0
+    L2 = 11 # 11 inches
+    L3 = 28 # 28 inches
+    L4 = 52 # 52 inches
     
