@@ -134,7 +134,7 @@ class ElevatorConstants:
     ElevatorMotorID2 = 62
     ElevatorReversed1 = False
     ElevatorReversed2 = True
-    MaxVelocityUp = 1
+    MaxVelocityUp = .8
     MaxVelocityDown = -0.4
     
     # For maxMotion
