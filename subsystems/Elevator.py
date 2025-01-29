@@ -28,9 +28,19 @@ class Elevator(Subsystem):
             ElevatorConstants.I1,
             ElevatorConstants.D1,
             slot=rev.ClosedLoopSlot.kSlot0)
+        
+        # For maxMotion
+        # configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot0)
+        # configRevMotor.closedLoop.maxMotion.maxAcceleration(ElevatorConstants.MaxAcceleration,slot=rev.ClosedLoopSlot.kSlot0)
+        
         configRevMotor.closedLoop.outputRange(ElevatorConstants.MaxVelocityDown,ElevatorConstants.MaxVelocityUp,slot=rev.ClosedLoopSlot.kSlot0)
         
-        
+        # Soft Limits
+        configRevMotor.softLimit.forwardSoftLimit(ElevatorConstants.Max)
+        configRevMotor.softLimit.reverseSoftLimit(ElevatorConstants.Min)
+        configRevMotor.softLimit.forwardSoftLimitEnabled(True)
+        configRevMotor.softLimit.reverseSoftLimitEnabled(True)
+
         # Encoder configuration for position and velocity
         configRevMotor.encoder.positionConversionFactor(ElevatorConstants.kElevatorEncoderRot2Meter)
         configRevMotor.encoder.velocityConversionFactor(ElevatorConstants.kElevatorEncoderRPM2MeterPerSec)

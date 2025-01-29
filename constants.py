@@ -135,14 +135,26 @@ class ElevatorConstants:
     ElevatorReversed1 = False
     ElevatorReversed2 = True
     MaxVelocityUp = 1
-    MaxVelocityDown = -.4
+    MaxVelocityDown = -0.4
+    
+    # For maxMotion
+    MaxRPM = 8000
+    MaxAcceleration = 5000
+
+    # Max and Min values for the elevator for Soft Limits
     Max = 53
     Min = 0
-    P1 = 0.04
+
+    # PID Constants
+    P1 = .5
     I1 = 0
-    D1 = 0.02
+    D1 = .4
+
+    # Encoder Constants Conversion
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
     kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
+
+    # Position of different levels
     L1 = 0
     L2 = 13 # 11 inches
     L3 = 29 # 28 inches
