@@ -146,9 +146,9 @@ class ElevatorConstants:
     Min = 0
 
     # PID Constants
-    P1 = .5
+    P1 = .5 # it may be 0.05
     I1 = 0
-    D1 = .4
+    D1 = .4 # it may be 0.02 
 
     # Encoder Constants Conversion
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
