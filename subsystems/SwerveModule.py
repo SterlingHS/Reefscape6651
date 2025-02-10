@@ -30,8 +30,10 @@ class SwerveModule:
             self.absoluteEncoderReversed = absoluteEncoderReversed
             self.driveMotorID = driveMotorID
             
-            # Init of Absolute Encoder (CANCoder)
-            self.absoluteEncoder = phoenix6.hardware.CANcoder(absoluteEncoderID)
+            # Init of Absolute Encoder
+            self.absoluteEncoderOffsetRad = absoluteEncoderOffset
+            self.absoluteEncoderReversed = absoluteEncoderReversed
+            self.absoluteEncoder = wpilib.AnalogInput(absoluteEncoderID)
 
             # Init of Drive Motor (TalonFX) for Kraken X.60
             self.driveMotor = phoenix6.hardware.TalonFX(driveMotorID)
@@ -109,7 +111,8 @@ class SwerveModule:
 
     def getAbsoluteEncoderRad(self):
         ''' Returns the absolute position of the turning motor in radians (0-2pi) '''
-        angle = self.absoluteEncoder.get_absolute_position().value # Output is from -0.5 to 0.5
+        angleVolts = self.absoluteEncoder.getValue() # Output is 12 bits integer representing voltage 0-5v
+        angle = 2*pi*angleVolts/4095 # Converting the voltage to radians
         angle = angle * 2*pi # Output is from -pi to pi
         angle-=self.absoluteEncoderOffsetRad # Offset
         if angle > pi: # Makes the output be between -pi and pi

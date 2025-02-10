@@ -66,8 +66,18 @@ class NetworkTables:
         # wpilib.SmartDashboard.putNumber("Velocity Error", errorVelocity)
 
         wpilib.SmartDashboard.putNumber("Angle Gyro", self.container.swerveSubsystem.getHeading())
-        wpilib.SmartDashboard.putNumber("Elevator Encoder", self.container.elevator.readEncoder())
-        wpilib.SmartDashboard.putNumber("Elevator floor", self.container.elevator.readFloor())
+        
+        wpilib.SmartDashboard.putNumber("Absolute encoder FR", self.container.swerveSubsystem.frontRight.getAbsoluteEncoderRad())
+        wpilib.SmartDashboard.putNumber("Steer Encoder FR", self.container.swerveSubsystem.frontRight.getTurningPosition())
+        
+        wpilib.SmartDashboard.putNumber("Absolute encoder FL", self.container.swerveSubsystem.frontLeft.getAbsoluteEncoderRad())
+        wpilib.SmartDashboard.putNumber("Steer Encoder FL", self.container.swerveSubsystem.frontLeft.getTurningPosition())
+
+        wpilib.SmartDashboard.putNumber("Absolute encoder BR", self.container.swerveSubsystem.backRight.getAbsoluteEncoderRad())
+        wpilib.SmartDashboard.putNumber("Steer Encoder BR", self.container.swerveSubsystem.backRight.getTurningPosition())
+
+        wpilib.SmartDashboard.putNumber("Absolute encoder BL", self.container.swerveSubsystem.backLeft.getAbsoluteEncoderRad())
+        wpilib.SmartDashboard.putNumber("Steer Encoder BL", self.container.swerveSubsystem.backLeft.getTurningPosition())
 
         pass
 

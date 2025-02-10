@@ -8,14 +8,10 @@ import commands2
 import commands2.button
 
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
-from commands.DropCoral import DropCoral
-from commands.ElevatorFloor import ElevatorFloor
-from commands.ElevatorMove import ElevatorMove
-from commands.ElevatorChange import ElevatorChange
+
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
-from subsystems.Dropper import Dropper
-from subsystems.Elevator import Elevator
+
 
 from constants import OIConstants
 
@@ -34,8 +30,7 @@ class RobotContainer:
     def __init__(self):
         '''The container for the robot. Contains subsystems, OI devices, and commands.'''
         self.swerveSubsystem = SwerveSubsystem()
-        self.dropper = Dropper()
-        self.elevator = Elevator()
+       
 
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
@@ -63,15 +58,6 @@ class RobotContainer:
         #     commands.MoveSpeedTimeField.MoveSpeedTimeField(self.swerveSubsystem, -4.2, 1))
         
         # autocommands4 = commands2.WaitCommand(8).andThen(autocommands3)
-               
-        self.sendableChooser = SendableChooser()
-        # #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
-        self.sendableChooser.setDefaultOption("Nothing", autocommand0)
-        try:
-            self.sendableChooser.addOption("Test", PathPlannerAuto("TestDrive"))
-        except:
-            print("##########################################################################")
-            print("AutoTest not found")
 
         # Configure the button bindings
         self.configureButtonBindings()
@@ -88,35 +74,12 @@ class RobotContainer:
         
         # commands2.button.POVButton(
         #     self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) 
-
-        commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(DropCoral(self.dropper))
-        
-        commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kB).whileTrue(ElevatorFloor(self.elevator,2))
-
-        commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kA).whileTrue(ElevatorFloor(self.elevator,3))
-
-        commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kX).whileTrue(ElevatorMove(self.elevator,-1))
-
-
-        commands2.button.JoystickButton(
-                self.driverController, wpilib.XboxController.Button.kY).whileTrue(ElevatorMove(self.elevator,1))
-
-
-        commands2.button.POVButton(
-             self.driverController, 0).onTrue(ElevatorChange(self.elevator,1))
-
-        commands2.button.POVButton(
-             self.driverController, 180).onTrue(ElevatorChange(self.elevator,-1))
-
+        pass
+       
     def getAutonomousCommand(self) -> commands2.Command:
         """
         Use this to pass the autonomous command to the main :class:`.Robot` class.
         there's more at the door
         :returns: the command to run in autonomous
         """
-        return PathPlannerAuto('TestDrive')
-        return self.sendableChooser.getSelected()
+        return None

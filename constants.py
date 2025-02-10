@@ -19,38 +19,38 @@ import wpimath
 class DriveConstants:
     # absoulteEncoderCountsPerRev = 4096
 
-    kFrontLeftDriveMotorPort = 12
-    kFrontLeftTurningMotorPort = 11
+    kFrontLeftDriveMotorPort = 12 # neos
+    kFrontLeftTurningMotorPort = 11 # sparks
     kFrontLeftDriveMotorReversed = False
     kFrontLeftTurningMotorReversed = True
-    kFrontLeftAbsoluteEncoderPort = 13
+    kFrontLeftAbsoluteEncoderPort = 1
     kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
     kFrontLeftAbsoluteEncoderReversed = False
     kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
 
-    kFrontRightDriveMotorPort = 22
-    kFrontRightTurningMotorPort = 21
+    kFrontRightDriveMotorPort = 14 # neos
+    kFrontRightTurningMotorPort = 13 # sparks
     kFrontRightDriveMotorReversed = True
     kFrontRightTurningMotorReversed = True
-    kFrontRightAbsoluteEncoderPort = 23
+    kFrontRightAbsoluteEncoderPort = 3
     kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
     kFrontRightAbsoluteEncoderReversed = False
     kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
 
-    kBackLeftDriveMotorPort = 32
-    kBackLeftTurningMotorPort = 31
+    kBackLeftDriveMotorPort = 22 # neos
+    kBackLeftTurningMotorPort = 21 # sparks
     kBackLeftDriveMotorReversed = False
     kBackLeftTurningMotorReversed = True
-    kBackLeftAbsoluteEncoderPort = 33
+    kBackLeftAbsoluteEncoderPort = 0
     kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
     kBackLeftAbsoluteEncoderReversed = False
     kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
 
-    kBackRightDriveMotorPort = 42
-    kBackRightTurningMotorPort = 41
+    kBackRightDriveMotorPort = 24 # neos
+    kBackRightTurningMotorPort = 23 # sparks
     kBackRightDriveMotorReversed = True
     kBackRightTurningMotorReversed = True
-    kBackRightAbsoluteEncoderPort = 43
+    kBackRightAbsoluteEncoderPort = 2
     kBackRightAbsoluteEncoderOffsetRad = 0.409157827
     kBackRightAbsoluteEncoderReversed = False
     kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]

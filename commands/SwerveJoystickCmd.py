@@ -44,9 +44,9 @@ class SwerveJoystickCmd(Command):
 
     def execute(self) -> None:
         # Get the x, y, and rotation values from the joystick
-        x = 0 #self.xSpeedFunction()
-        y = 0 #self.ySpeedFunction()
-        rot = 0#self.turningSpeedFunction()
+        x = self.xSpeedFunction()
+        y = self.ySpeedFunction()
+        rot = self.turningSpeedFunction()
 
         # Apply a deadband to the joystick
         self.xSpeed = x if abs(x) > OIConstants.kDeadband else 0.0
