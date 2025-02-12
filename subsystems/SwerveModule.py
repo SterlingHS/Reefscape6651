@@ -109,11 +109,14 @@ class SwerveModule:
         ''' Returns the velocity of the turning motor in radians per second '''
         return self.turningEncoder.getVelocity()
 
+    def getAbsoluteEncoder(self):
+        ''' Returns the absolute position of the turning motor in volts '''
+        return self.absoluteEncoder.getValue() *2*pi/4095
+
     def getAbsoluteEncoderRad(self):
         ''' Returns the absolute position of the turning motor in radians (0-2pi) '''
         angleVolts = self.absoluteEncoder.getValue() # Output is 12 bits integer representing voltage 0-5v
-        angle = 2*pi*angleVolts/4095 # Converting the voltage to radians
-        angle = angle * 2*pi # Output is from -pi to pi
+        angle = 2*pi*angleVolts/4095 - pi# Converting the voltage to radians
         angle-=self.absoluteEncoderOffsetRad # Offset
         if angle > pi: # Makes the output be between -pi and pi
             angle -= 2*pi

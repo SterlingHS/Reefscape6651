@@ -79,5 +79,6 @@ class NetworkTables:
         wpilib.SmartDashboard.putNumber("Absolute encoder BL", self.container.swerveSubsystem.backLeft.getAbsoluteEncoderRad())
         wpilib.SmartDashboard.putNumber("Steer Encoder BL", self.container.swerveSubsystem.backLeft.getTurningPosition())
 
+        wpilib.SmartDashboard.putNumber("Abs encoder", self.container.swerveSubsystem.frontRight.getAbsoluteEncoder())
         pass
 

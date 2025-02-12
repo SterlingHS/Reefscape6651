@@ -24,8 +24,8 @@ class DriveConstants:
     kFrontLeftDriveMotorReversed = False
     kFrontLeftTurningMotorReversed = True
     kFrontLeftAbsoluteEncoderPort = 1
-    kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
-    kFrontLeftAbsoluteEncoderReversed = False
+    kFrontLeftAbsoluteEncoderOffsetRad = 1.94479545
+    kFrontLeftAbsoluteEncoderReversed = True
     kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
 
     kFrontRightDriveMotorPort = 14 # neos
@@ -33,8 +33,8 @@ class DriveConstants:
     kFrontRightDriveMotorReversed = True
     kFrontRightTurningMotorReversed = True
     kFrontRightAbsoluteEncoderPort = 3
-    kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
-    kFrontRightAbsoluteEncoderReversed = False
+    kFrontRightAbsoluteEncoderOffsetRad = .24
+    kFrontRightAbsoluteEncoderReversed = True
     kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
 
     kBackLeftDriveMotorPort = 22 # neos
@@ -42,8 +42,8 @@ class DriveConstants:
     kBackLeftDriveMotorReversed = False
     kBackLeftTurningMotorReversed = True
     kBackLeftAbsoluteEncoderPort = 0
-    kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
-    kBackLeftAbsoluteEncoderReversed = False
+    kBackLeftAbsoluteEncoderOffsetRad = -3.14
+    kBackLeftAbsoluteEncoderReversed = True
     kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
 
     kBackRightDriveMotorPort = 24 # neos
@@ -51,8 +51,8 @@ class DriveConstants:
     kBackRightDriveMotorReversed = True
     kBackRightTurningMotorReversed = True
     kBackRightAbsoluteEncoderPort = 2
-    kBackRightAbsoluteEncoderOffsetRad = 0.409157827
-    kBackRightAbsoluteEncoderReversed = False
+    kBackRightAbsoluteEncoderOffsetRad = 2.004 
+    kBackRightAbsoluteEncoderReversed = True
     kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
@@ -86,7 +86,7 @@ class DriveConstants:
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
     kDriveMotorGearRatio = 1/6.12 # L3 gearbox
-    kTurningMotorGearRatio = 1/(150/7) # 150:7 gear ratio
+    kTurningMotorGearRatio = 1/12.8 # 12.8:1 gear ratio
     kDriveEncoderRot2Meter = kDriveMotorGearRatio * math.pi * kWheelDiameterMeters
     kTurningEncoderRot2Rad = kTurningMotorGearRatio*2*math.pi
     kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter/60
