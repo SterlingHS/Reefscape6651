@@ -12,10 +12,13 @@ from commands.DropCoral import DropCoral
 from commands.ElevatorFloor import ElevatorFloor
 from commands.ElevatorMove import ElevatorMove
 from commands.ElevatorChange import ElevatorChange
+from commands.ARArmChange import ARArmChange
+from commands.ARStarToggle import ARStarToggle
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
 from subsystems.Dropper import Dropper
 from subsystems.Elevator import Elevator
+from subsystems.AlgaeRemover import AlgaeRemover
 
 from constants import OIConstants
 
@@ -36,6 +39,7 @@ class RobotContainer:
         self.swerveSubsystem = SwerveSubsystem()
         self.dropper = Dropper()
         self.elevator = Elevator()
+        self.algaeR = AlgaeRemover()
 
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
@@ -90,27 +94,37 @@ class RobotContainer:
         #     self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) 
 
         commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(DropCoral(self.dropper))
+            self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(DropCoral(self.dropper))
         
         commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kB).whileTrue(ElevatorFloor(self.elevator,2))
+            self.driverController, wpilib.XboxController.Button.kB).whileTrue(ElevatorFloor(self.elevator,2))
 
         commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kA).whileTrue(ElevatorFloor(self.elevator,3))
+            self.driverController, wpilib.XboxController.Button.kA).whileTrue(ElevatorFloor(self.elevator,3))
 
         commands2.button.JoystickButton(
-             self.driverController, wpilib.XboxController.Button.kX).whileTrue(ElevatorMove(self.elevator,-1))
+            self.driverController, wpilib.XboxController.Button.kX).whileTrue(ElevatorMove(self.elevator,-1))
 
 
         commands2.button.JoystickButton(
-                self.driverController, wpilib.XboxController.Button.kY).whileTrue(ElevatorMove(self.elevator,1))
+            self.driverController, wpilib.XboxController.Button.kY).whileTrue(ElevatorMove(self.elevator,1))
 
 
         commands2.button.POVButton(
-             self.driverController, 0).onTrue(ElevatorChange(self.elevator,1))
+            self.driverController, 0).onTrue(ElevatorChange(self.elevator,1))
 
         commands2.button.POVButton(
-             self.driverController, 180).onTrue(ElevatorChange(self.elevator,-1))
+            self.driverController, 180).onTrue(ElevatorChange(self.elevator,-1))
+
+        commands2.button.POVButton(
+            self.driverController, 90).onTrue(ARArmChange(self.algaeR,0))
+
+        commands2.button.POVButton(
+            self.driverController, 270).onTrue(ARArmChange(self.algaeR,5))
+
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kLeftBumper).onTrue(ARStarToggle(self.algaeR))
+      
 
     def getAutonomousCommand(self) -> commands2.Command:
         """
