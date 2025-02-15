@@ -1,51 +1,52 @@
 from commands2 import Subsystem
 
-from constants import AlgaeRemoverConstants
+from constants import AlgaeCollectorConstants
 from rev import SparkMax, SparkLowLevel, SparkMaxConfig, SparkBaseConfig
 import rev
 
-class AlgaeRemover(Subsystem):
+
+class AlgaeCollector(Subsystem):
     def __init__(self):
         Subsystem.__init__(self)
 
         # Init of Motors for subsystem (SparkMax) for NEO v1.1
-        self.ARStarMotor = SparkMax(AlgaeRemoverConstants.ARStarMotorID, SparkLowLevel.MotorType.kBrushless)
-        self.ARArmMotor = SparkMax(AlgaeRemoverConstants.ARArmMotorID, SparkLowLevel.MotorType.kBrushless)
+        self.ACStarMotor = SparkMax(AlgaeCollectorConstants.ACStarMotorID, SparkLowLevel.MotorType.kBrushless)
+        self.ACArmMotor = SparkMax(AlgaeCollectorConstants.ACArmMotorID, SparkLowLevel.MotorType.kBrushless)
 
         ##############################################################################################################
-        # Config SparkMax for ARStarMotor
+        # Config SparkMax for ACStarMotor
         configRevMotor = SparkMaxConfig()  # Creates a new SparkMaxConfig object
         resetMode = rev.SparkBase.ResetMode(0) # Reset mode is set to Not Reset before Config
         persistMode = rev.SparkBase.PersistMode(1) # Persist mode is set to Save In Lasting Memory
-        configRevMotor.inverted(AlgaeRemoverConstants.ARStarReversed) # Inverts the motor if needed
+        configRevMotor.inverted(AlgaeCollectorConstants.ACStarReversed) # Inverts the motor if needed
         configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
 
         # Sends the configuration to the motor
-        self.ARStarMotor.configure(configRevMotor,resetMode,persistMode)
+        self.ACStarMotor.configure(configRevMotor,resetMode,persistMode)
 
         ##############################################################################################################
-        # Config SparkMax for ARArmMotor
+        # Config SparkMax for ACArmMotor
         configRevMotor = SparkMaxConfig()  # Creates a new SparkMaxConfig object
         resetMode = rev.SparkBase.ResetMode(0) # Reset mode is set to Not Reset before Config
         persistMode = rev.SparkBase.PersistMode(1) # Persist mode is set to Save In Lasting Memory
-        configRevMotor.inverted(AlgaeRemoverConstants.ARArmReversed) # Inverts the motor if needed
+        configRevMotor.inverted(AlgaeCollectorConstants.ACArmReversed) # Inverts the motor if needed
         configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
 
         # PID configuration for position control
         configRevMotor.closedLoop.pid(
-            AlgaeRemoverConstants.P, 
-            AlgaeRemoverConstants.I, 
-            AlgaeRemoverConstants.D, 
+            AlgaeCollectorConstants.P, 
+            AlgaeCollectorConstants.I, 
+            AlgaeCollectorConstants.D, 
             slot=rev.ClosedLoopSlot.kSlot0)
 
         # Sends the configuration to the motor
-        self.ARStarMotor.configure(configRevMotor,resetMode,persistMode)
+        self.ACStarMotor.configure(configRevMotor,resetMode,persistMode)
 
         # Init of Encoder to rotate wheel (on the NEO)
-        self.ArmEncoder = self.ARArmMotor.getEncoder()
+        self.ArmEncoder = self.ACArmMotor.getEncoder()
 
         # PID Controller for turning controlled by SparkMax
-        self.ArmPIDController = self.ARArmMotor.getClosedLoopController()
+        self.ArmPIDController = self.ACArmMotor.getClosedLoopController()
 
         # Reset encoder
         self.resetArmEncoder()
@@ -74,7 +75,7 @@ class AlgaeRemover(Subsystem):
             speed = 1
         elif speed < -1:
             speed = -1
-        self.ARArmMotor.set(speed)
+        self.ACArmMotor.set(speed)
 
     def setStarMotor(self, speed):
         ''' Sets the motor speed for the Star'''
@@ -82,22 +83,22 @@ class AlgaeRemover(Subsystem):
             speed = 1
         elif speed < -1:
             speed = -1
-        self.ARStarMotor.set(speed)
+        self.ACStarMotor.set(speed)
 
     def stopStarMotor(self):
         ''' Stops the motor '''
-        self.ARStarMotor.stopMotor()
+        self.ACStarMotor.stopMotor()
 
     def stopArmMotor(self):
         ''' Stops the motor '''
-        self.ARArmMotor.stopMotor()
+        self.ACArmMotor.stopMotor()
 
     def setArmHeight(self, height):
         ''' Sets the height of the Arm'''
         if height < 0:
             height = 0
-        elif height > AlgaeRemoverConstants.Max:
-            height = AlgaeRemoverConstants.Max
+        elif height > AlgaeCollectorConstants.Max:
+            height = AlgaeCollectorConstants.Max
         else:
             self.height = height
 
@@ -109,16 +110,12 @@ class AlgaeRemover(Subsystem):
     def toggleStar(self):
         ''' Toggles the Star'''
         if self.starSpeed == 0:
-            self.starSpeed = AlgaeRemoverConstants.starSpeed
+            self.starSpeed = AlgaeCollectorConstants.starSpeed
         else:
             self.starSpeed = 0
 
     def periodic(self):
         ''' Runs every loop '''
         self.setArmPosition(self.height)
-        if self.height == 0:
-            self.starSpeed = 0
-        else:
-            self.starSpeed = AlgaeRemoverConstants.starSpeed
         self.setStarMotor(self.starSpeed)
         return super().periodic()

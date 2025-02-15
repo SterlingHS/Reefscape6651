@@ -127,6 +127,10 @@ class SwerveSubsystem(Subsystem):
 
     def getPose(self):
         ''' Returns the pose of the robot '''
+        # Read limelight if available and update pose with the limelight pose
+        # if self.limelight.hasTarget():
+        #     self.odometer.addVisionMeasurement(self.limelight.getBotPose2d(), self.limelight.getTimestamp())
+        
         return self.odometer.getPose()
     
     def resetOdometer(self, pose):

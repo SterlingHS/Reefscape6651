@@ -170,3 +170,14 @@ class AlgaeRemoverConstants:
     I = 0
     D = 0.02
     starSpeed = 0.1
+
+class AlgaeCollectorConstants:
+    ACStarMotorID = 65
+    ACArmMotorID = 66
+    ACStarReversed = False
+    ACArmReversed = False
+    Max = 10
+    P = 0.6
+    I = 0
+    D = 0.02
+    starSpeed = 0.1
