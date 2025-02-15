@@ -24,7 +24,7 @@ class DriveConstants:
     kFrontLeftDriveMotorReversed = False
     kFrontLeftTurningMotorReversed = True
     kFrontLeftAbsoluteEncoderPort = 1
-    kFrontLeftAbsoluteEncoderOffsetRad = 1.94479545
+    kFrontLeftAbsoluteEncoderOffsetRad = 1.25
     kFrontLeftAbsoluteEncoderReversed = True
     kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
 
@@ -33,7 +33,7 @@ class DriveConstants:
     kFrontRightDriveMotorReversed = True
     kFrontRightTurningMotorReversed = True
     kFrontRightAbsoluteEncoderPort = 3
-    kFrontRightAbsoluteEncoderOffsetRad = .24
+    kFrontRightAbsoluteEncoderOffsetRad = -2.905
     kFrontRightAbsoluteEncoderReversed = True
     kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
 
@@ -42,7 +42,7 @@ class DriveConstants:
     kBackLeftDriveMotorReversed = False
     kBackLeftTurningMotorReversed = True
     kBackLeftAbsoluteEncoderPort = 0
-    kBackLeftAbsoluteEncoderOffsetRad = -3.14
+    kBackLeftAbsoluteEncoderOffsetRad = -0.08
     kBackLeftAbsoluteEncoderReversed = True
     kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
 
@@ -51,7 +51,7 @@ class DriveConstants:
     kBackRightDriveMotorReversed = True
     kBackRightTurningMotorReversed = True
     kBackRightAbsoluteEncoderPort = 2
-    kBackRightAbsoluteEncoderOffsetRad = 2.004 
+    kBackRightAbsoluteEncoderOffsetRad = 1.30036 
     kBackRightAbsoluteEncoderReversed = True
     kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
 

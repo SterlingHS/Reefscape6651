@@ -1,5 +1,6 @@
 from subsystems.SwerveModule import SwerveModule
 
+
 from math import cos, sin
 
 import wpimath
@@ -21,6 +22,13 @@ from pathplannerlib.auto import AutoBuilder
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import RobotConfig, PIDConstants
 from wpilib import DriverStation
+
+### SysId Imports ###
+from wpilib import RobotController
+from wpilib.sysid import SysIdRoutineLog
+from commands2.sysid import SysIdRoutine
+from wpimath.units import volts
+
 
 
 # For NavX to calibrate
@@ -306,3 +314,43 @@ class SwerveSubsystem(Subsystem):
 
     def moveBRDMotor(self):
         self.backRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
+
+
+################################################################################
+# SYSID CODE
+
+    # Tell SysId how to record a frame of data for each motor on the mechanism being
+    # characterized.
+
+    def log(self, sys_id_routine: SysIdRoutineLog) -> None:
+        # Record a frame for the left motors.  Since these share an encoder, we consider
+        # the entire group to be one motor.
+
+        sys_id_routine.motor("drive-front-left"
+            ).voltage(self.frontLeft.driveMotor.get_motor_voltage().value_as_double# * RobotController.getBatteryVoltage()
+            ).position(self.frontLeft.getDrivePosition()
+            ).velocity(self.frontLeft.getDriveVelocity())
+        
+        sys_id_routine.motor("drive-front-right"
+            ).voltage(self.frontRight.driveMotor.get_motor_voltage().value_as_double# * RobotController.getBatteryVoltage()
+            ).position(self.frontRight.getDrivePosition()
+            ).velocity(self.frontRight.getDriveVelocity())
+
+        sys_id_routine.motor("drive-back-left"
+            ).voltage(self.backLeft.driveMotor.get_motor_voltage().value_as_double# * RobotController.getBatteryVoltage()
+            ).position(self.backLeft.getDrivePosition()
+            ).velocity(self.backLeft.getDriveVelocity())
+
+        sys_id_routine.motor("drive-back-right"
+            ).voltage(self.backRight.driveMotor.get_motor_voltage().value_as_double# * RobotController.getBatteryVoltage()
+            ).position(self.backRight.getDrivePosition()
+            ).velocity(self.backRight.getDriveVelocity())
+        pass
+
+    def sysIdQuasistatic(self, direction: SysIdRoutine.Direction):
+        ''' Run the SysId routine in quasistatic mode ''' 
+        return self.sys_id_routine.quasistatic(direction)
+
+    def sysIdDynamic(self, direction: SysIdRoutine.Direction):
+        ''' Run the SysId routine in dynamic mode '''
+        return self.sys_id_routine.dynamic(direction)

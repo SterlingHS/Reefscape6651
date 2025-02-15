@@ -19,6 +19,12 @@ from pathplannerlib.auto import PathPlannerAuto, AutoBuilder
 
 from wpilib import SendableChooser
 
+###
+from wpilib import RobotController
+from wpilib.sysid import SysIdRoutineLog
+from commands2.sysid import SysIdRoutine
+from wpimath.units import volts
+
 class RobotContainer:
     '''
     This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -42,7 +48,7 @@ class RobotContainer:
                self.swerveSubsystem,
                lambda : self.driverController.getRawAxis(OIConstants.kDriverYAxis),
                lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
-               lambda : self.driverController.getRawAxis(OIConstants.kDriverRotAxis)
+               lambda : self.driverController.getRawAxis(OIConstants.kDriverRotAxis),
            )
         )
 
@@ -74,6 +80,16 @@ class RobotContainer:
         
         # commands2.button.POVButton(
         #     self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) 
+
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kA).whileTrue(self.swerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kB).whileTrue(self.swerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kX).whileTrue(self.swerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kY).whileTrue(self.swerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
+    
         pass
        
     def getAutonomousCommand(self) -> commands2.Command:
@@ -83,3 +99,5 @@ class RobotContainer:
         :returns: the command to run in autonomous
         """
         return None
+    
+    
