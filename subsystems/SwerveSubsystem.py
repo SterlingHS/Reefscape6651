@@ -113,6 +113,33 @@ class SwerveSubsystem(Subsystem):
             self # Reference to this subsystem to set requirements
         )
 
+        def sysidDrive(voltage: volts) -> None:
+            ''' Drive to tune up drive system with SysId '''
+            self.frontLeft.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
+            self.frontRight.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
+            self.backLeft.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
+            self.backRight.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
+
+        phoenix6.SignalLogger.set_path("sysid")
+        SysConfig = SysIdRoutine.Config(
+            # This is the function that will be called to set the mechanism to a given state
+            volts_per_second=.5,
+            volts=7,
+            seconds=15
+            # recordState = lambda state: phoenix6.SignalLogger.write_string("state", SysIdRoutineLog.stateEnumToString(state)),
+        )
+
+        SysMechanism = SysIdRoutine.Mechanism(
+            sysidDrive, 
+            self.log, 
+            self
+        )
+
+        self.sys_id_routine = SysIdRoutine(
+            SysConfig,
+            SysMechanism
+        )
+
     def zeroHeading(self):
         ''' Zero the gyro heading '''
         self.gyro.reset()
@@ -260,12 +287,25 @@ class SwerveSubsystem(Subsystem):
         ''' Returns the angular velocity of the robot '''
         return self.turningvelocity
 
+    def setSetTurningPoint(self, angle):
+        ''' Sets the the setPoint of the turning PID to a specific angle - Used to tune up PID '''
+        self.frontLeft.setSetTurningPosition(angle)
+        self.frontRight.setSetTurningPosition(angle)
+        self.backLeft.setSetTurningPosition(angle)
+        self.backRight.setSetTurningPosition(angle)
+
     # Periodic is called every cycle (20ms)
     def periodic(self):
         ''' The code that runs periodically '''
         # Reads Odometer (location of robot (x,y))
-        self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
-        
+        #self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
+        self.setSetTurningPoint(0)
+
+        wpilib.SmartDashboard.putNumber("Turning FL", self.frontLeft.getTurningPosition())
+        wpilib.SmartDashboard.putNumber("Turning FR", self.frontRight.getTurningPosition())
+        wpilib.SmartDashboard.putNumber("Turning BL", self.backLeft.getTurningPosition())
+        wpilib.SmartDashboard.putNumber("Turning BR", self.backRight.getTurningPosition())
+        pass
         # Reads Absolute Encoders and sends them to Dashboard
         # absoluteEncoder = self.readAbsEncoders()
         # wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])

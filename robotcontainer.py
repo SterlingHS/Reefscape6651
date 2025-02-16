@@ -82,13 +82,13 @@ class RobotContainer:
         #     self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) 
 
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kA).whileTrue(self.swerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
+            self.driverController, wpilib.XboxController.Button.kA).whileTrue(self.swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kForward))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kB).whileTrue(self.swerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
+            self.driverController, wpilib.XboxController.Button.kB).whileTrue(self.swerveSubsystem.sysIdQuasistatic(SysIdRoutine.Direction.kReverse))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kX).whileTrue(self.swerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
+            self.driverController, wpilib.XboxController.Button.kX).whileTrue(self.swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kForward))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kY).whileTrue(self.swerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
+            self.driverController, wpilib.XboxController.Button.kY).whileTrue(self.swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse))
     
         pass
        

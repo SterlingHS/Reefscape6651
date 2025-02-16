@@ -166,3 +166,9 @@ class SwerveModule:
         
         # Calculate the turning output using the PID controller
         self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
+
+    def setSetTurningPosition(self, angle):
+        ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''
+        # outputTurn = self.turningPIDController.calculate(self.getTurningPosition(), angle)
+        # self.turningMotor.set(outputTurn)
+        self.RevController.setReference(angle, SparkLowLevel.ControlType.kPosition)
