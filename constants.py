@@ -161,23 +161,27 @@ class ElevatorConstants:
     L4 = 53 # 52 inches
     
 class AlgaeRemoverConstants:
-    ARStarMotorID = 63
-    ARArmMotorID = 64
+    ARStarMotorID = 47
+    ARArmMotorID = 48
     ARStarReversed = False
     ARArmReversed = False
-    Max = 10
-    P = 0.6
+    Max = 6
+    P = 0.03
     I = 0
-    D = 0.02
+    D = 0.005
     starSpeed = 0.1
+    highPosition = 1
+    lowPosition = 4
 
 class AlgaeCollectorConstants:
-    ACStarMotorID = 65
-    ACArmMotorID = 66
+    ACStarMotorID = 45
+    ACArmMotorID = 46
     ACStarReversed = False
     ACArmReversed = False
-    Max = 10
-    P = 0.6
+    Max = 0
+    P = 0.03
     I = 0
-    D = 0.02
+    D = 0.005
     starSpeed = 0.1
+    highPosition = -1
+    lowPosition = -14
