@@ -128,6 +128,7 @@ class DropperConstants:
     P = 0.6 
     I = 0
     D = 0.02
+    DropSpeed = 2
 
 class ElevatorConstants:
     ElevatorMotorID1 = 61
@@ -142,23 +143,23 @@ class ElevatorConstants:
     MaxAcceleration = 5000
 
     # Max and Min values for the elevator for Soft Limits
-    Max = 53
+    Max = 54
     Min = 0
 
     # PID Constants
-    P1 = .5
+    P1 = .4
     I1 = 0
-    D1 = .4
+    D1 = .3
 
     # Encoder Constants Conversion
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
     kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
 
     # Position of different levels
-    L1 = 0
-    L2 = 13 # 11 inches
-    L3 = 29 # 28 inches
-    L4 = 53 # 52 inches
+    L1 = 1
+    L2 = 14 # 11 inches
+    L3 = 30 # 28 inches
+    L4 = 54 # 52 inches, Max height 54 inches
     
 class AlgaeRemoverConstants:
     ARStarMotorID = 47

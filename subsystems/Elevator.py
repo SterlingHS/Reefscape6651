@@ -73,7 +73,7 @@ class Elevator(Subsystem):
         self.resetEncoder()
 
         # Init floor
-        self.floor = 0
+        self.floor = 1
 
     def readFloor(self):
         return self.floor

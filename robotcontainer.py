@@ -9,6 +9,7 @@ import commands2.button
 
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
 from commands.DropCoral import DropCoral
+from commands.DropCoralSpeed import DropCoralSpeed
 from commands.ElevatorFloor import ElevatorFloor
 from commands.ElevatorMove import ElevatorMove
 from commands.ElevatorChange import ElevatorChange
@@ -24,6 +25,7 @@ from subsystems.AlgaeRemover import AlgaeRemover
 from subsystems.AlgaeCollector import AlgaeCollector
 
 from constants import OIConstants
+from constants import DropperConstants
 
 from pathplannerlib.auto import PathPlannerAuto, AutoBuilder
 
@@ -99,7 +101,7 @@ class RobotContainer:
 
         # CORAL DROPPER
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(DropCoral(self.dropper))
+            self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(DropCoralSpeed(self.dropper,DropperConstants.DropSpeed))
         
         # ELEVATOR
         commands2.button.JoystickButton(
@@ -115,15 +117,15 @@ class RobotContainer:
         commands2.button.JoystickButton(
             self.driverController, wpilib.XboxController.Button.kA).onTrue(ACArmChange(self.elevator,0))
 
-        self.driverController.leftTrigger(.5, ACBallIn())
-        self.driverController.rightTrigger(.5, ACBallOut())
+        #self.driverController.leftTrigger(.5, ACBallIn())
+        #self.driverController.rightTrigger(.5, ACBallOut())
 
         # ELEVATOR
         commands2.button.POVButton(
-            self.driverController, 0).onTrue(ElevatorMove(self.elevator,1))
+            self.driverController, 0).onTrue(ElevatorChange(self.elevator,1))
 
         commands2.button.POVButton(
-            self.driverController, 180).onTrue(ElevatorMove(self.elevator,-1))
+            self.driverController, 180).onTrue(ElevatorChange(self.elevator,-1))
 
 
         # ALGAE REMOVER
