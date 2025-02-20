@@ -14,9 +14,10 @@ from commands.ElevatorFloor import ElevatorFloor
 from commands.ElevatorMove import ElevatorMove
 from commands.ElevatorChange import ElevatorChange
 from commands.ARArmChange import ARArmChange
-from commands.ACBallIn import ACBallIn
-from commands.ACBallOut import ACBallOut
+from commands.ACBallInSetUp import ACBallInSetUp
+from commands.ACBallOutSetUp import ACBallOutSetUp
 from commands.ACArmChange import ACArmChange
+from commands.ACBallCancel import ACBallCancel
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
 from subsystems.Dropper import Dropper
@@ -112,13 +113,13 @@ class RobotContainer:
 
         # ALGAE COLLECTOR
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kY).onTrue(ACArmChange(self.algaeC,5))
-
+            self.driverController, wpilib.XboxController.Button.kStart).onTrue(ACBallCancel(self.algaeC))
+        
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kA).onTrue(ACArmChange(self.elevator,0))
-
-        #self.driverController.leftTrigger(.5, ACBallIn())
-        #self.driverController.rightTrigger(.5, ACBallOut())
+            self.driverController, wpilib.XboxController.Axis.kLeftTrigger).onTrue(ACBallInSetUp(self.algaeC))
+        
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Axis.kRightTrigger).onTrue(ACBallOutSetUp(self.algaeC))
 
         # ELEVATOR
         commands2.button.POVButton(
@@ -134,6 +135,7 @@ class RobotContainer:
 
         commands2.button.POVButton(
             self.driverController, 270).onTrue(ARArmChange(self.algaeR,5))
+        
 
     def getAutonomousCommand(self) -> commands2.Command:
         """

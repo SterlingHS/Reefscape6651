@@ -123,6 +123,8 @@ class AutoConstants:
     kPYController = 0.1
 
 class DropperConstants:
+    LaserTopCanID = 55
+    LaserBottomCanID = 56
     DropperMotorID = 60
     DropperReversed = False
     P = 0.6 
@@ -186,3 +188,4 @@ class AlgaeCollectorConstants:
     starSpeed = 0.1
     highPosition = -1
     lowPosition = -14
+    algaeArmHeight = -12

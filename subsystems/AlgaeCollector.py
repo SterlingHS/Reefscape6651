@@ -56,6 +56,13 @@ class AlgaeCollector(Subsystem):
 
         # Init Speed of the Star
         self.starSpeed = 0
+
+        # modes for the Arm
+        # mode 0 = Starting State
+        # mode 1 = Picking up algae
+        # mode 2 = Carry algae
+        # mode 3 = Dropping algae
+        self.mode = 0
         
     def resetArmEncoder(self):
         ''' Resets the encoder position '''
@@ -114,8 +121,30 @@ class AlgaeCollector(Subsystem):
         else:
             self.starSpeed = 0
 
+    def setStarSpeed(self, speed):
+        ''' Sets the speed of the Star'''
+        self.starSpeed = speed
+
+    def setMode(self, mode):
+        ''' Sets the mode of the Arm'''
+        self.mode = mode
+
+    def getMode(self):
+        ''' Gets the mode of the Arm'''
+        return self.mode
+
     def periodic(self):
         ''' Runs every loop '''
-        self.setArmPosition(self.height)
+        # Set the Arm to the desired height
+        if self.mode == 0:
+            self.setArmPosition(self.height)
+        elif self.mode == 1:
+            self.stopArmMotor()
+        elif self.mode == 2:
+            self.stopArmMotor()
+            self.starSpeed = 0
+        elif self.mode == 3:
+            self.stopArmMotor() #Maybe move arm down to lower position to push algae out
+            self.starSpeed = -AlgaeCollectorConstants.starSpeed
         self.setStarMotor(self.starSpeed)
         return super().periodic()
