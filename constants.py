@@ -8,6 +8,7 @@ This offers a convenient resources to teams who need to make both quick and univ
 changes.
 """
 
+from enum import Enum
 import math
 import unit_conversions as conv
 import wpilib
@@ -189,3 +190,25 @@ class AlgaeCollectorConstants:
     highPosition = -1
     lowPosition = -14
     algaeArmHeight = -12
+
+class FieldOrientedConstants:
+    RedReefX = 1.524 # In meters
+    RedReefY = 6.778
+    BlueReefX = 15.175
+    BlueReefY = 6.778
+
+class DrivingModes(Enum):
+    # Mode 0 = Field Oriented
+    # Mode 1 = Reef Oriented
+    # Mode 2 = Processor Oriented
+    # Mode 3 = Coral Station Oriented
+    # Coral Station Processor Oriented
+    #   Red2   - 234 degrees
+    #   Blue12 -  54 degrees
+    # Coral Station Far side Oriented
+    #   Red1   - 126 degrees
+    #   Blue13 - 306 degrees
+    FieldOriented = 0
+    ReefOriented = 1
+    ProcessorOriented = 2
+    CoralStationOriented = 3
