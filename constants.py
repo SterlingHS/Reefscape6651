@@ -18,7 +18,6 @@ from wpimath.geometry import Translation2d
 import wpimath
 
 class DriveConstants:
-    # absoulteEncoderCountsPerRev = 4096
 
     kFrontLeftDriveMotorPort = 12
     kFrontLeftTurningMotorPort = 11
@@ -83,6 +82,9 @@ class DriveConstants:
 
     # For autonomous mode (PathPlanner)
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
+
+    # Drive enabler
+    DriveEnabled = False
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters

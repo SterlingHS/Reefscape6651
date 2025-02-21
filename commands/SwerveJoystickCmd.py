@@ -44,20 +44,21 @@ class SwerveJoystickCmd(Command):
 
     def execute(self) -> None:
         # Get the x, y, and rotation values from the joystick
-        x = 0 #self.xSpeedFunction()
-        y = 0 #self.ySpeedFunction()
-        rot = 0#self.turningSpeedFunction()
+        if DriveConstants.DriveEnabled == True: # Disable the drive for testing purposes (to avoid accidents)
+            x = self.xSpeedFunction()
+            y = self.ySpeedFunction()
+            rot = self.turningSpeedFunction()
+        else:
+            x = 0 
+            y = 0 
+            rot = 0
 
         # Apply a deadband to the joystick
         self.xSpeed = x if abs(x) > OIConstants.kDeadband else 0.0
         self.ySpeed = y if abs(y) > OIConstants.kDeadband else 0.0
         self.turningSpeed = rot if abs(rot) > OIConstants.kDeadband else 0.0
 
-        wpilib.SmartDashboard.putNumber("X", self.xSpeed)
-
-
         self.xSpeed, self.ySpeed, self.turningSpeed = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeed)
-        wpilib.SmartDashboard.putNumber("X atenuated", self.xSpeed)
 
         # Saves the last 3 values of the joystick to determine if the joystick is at 0
         if len(self.x_direction_states)<3:

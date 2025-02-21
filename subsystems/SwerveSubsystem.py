@@ -310,6 +310,9 @@ class SwerveSubsystem(Subsystem):
         ''' Sets the driving mode '''
         self.drivingMode = mode
 
+##############################################################################################
+############## Periodic Methods
+
     # Periodic is called every cycle (20ms)
     def periodic(self):
         ''' The code that runs periodically '''
