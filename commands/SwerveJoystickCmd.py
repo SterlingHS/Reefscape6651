@@ -145,6 +145,28 @@ class SwerveJoystickCmd(Command):
             self.turningSpeed = max(min(self.turningSpeed, 1), -1)
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
+        
+        # Mode 3: Coral Station Oriented
+        elif self.swerveSub.getDrivingMode() == DrivingModes.CoralStationOriented:
+            if DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
+                # Checks which coral is the closest
+                if self.swerveSub.getPose().X() < 8.229: # 8.229 is the x coordinate of the middle of the field - CHECK THIS VALUE!!
+                    angle_to_coral_station = 234*pi/180  # CHECK THIS ANGLE!!!
+                else:
+                    angle_to_coral_station = 126*pi/180  # CHECK THIS ANGLE!!!
+            else:
+                # Checks which coral is the closest
+                if self.swerveSub.getPose().X() < 8.229:
+                    angle_to_coral_station = 54*pi/180
+                else:
+                    angle_to_coral_station = 306*pi/180
+            
+            self.turningPID.setSetpoint(angle_to_coral_station)
+            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())
+            # filter turningspeed so it is between 1 and -1
+            self.turningSpeed = max(min(self.turningSpeed, 1), -1)
+            self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
 
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
         self.swerveSub.setModuleStates(moduleStates)
