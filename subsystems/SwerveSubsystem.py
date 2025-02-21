@@ -8,9 +8,7 @@ import wpimath.kinematics
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 
 from commands2 import Subsystem
-from constants import DriveConstants
-from constants import FieldOrientedConstants
-from constants import DrivingModes
+from constants import DriveConstants, FieldOrientedConstants, DrivingModes
 #from pathplannerlib.config import HolonomicPathFollowerConfig, PIDConstants, ReplanningConfig
 # from pathplannerlib import HolonomicPathFollower
 

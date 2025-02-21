@@ -6,11 +6,19 @@
 ####################################################################################################
 
 from commands2 import Command
+
 from wpimath.filter import SlewRateLimiter
-from constants import DriveConstants,OIConstants
+from wpimath.controller import PIDController
 from wpimath.kinematics import ChassisSpeeds
+
+from constants import DriveConstants,OIConstants, DrivingModes
 from subsystems.SwerveSubsystem import SwerveSubsystem
+
+from math import pi
+
 import wpilib
+from wpilib import DriverStation
+
 
 signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number (Used?)
 
@@ -31,6 +39,11 @@ class SwerveJoystickCmd(Command):
         self.y_direction_states = [0,0,0]
         self.addRequirements(swerveSub)
 
+        # PID to control turning speed of the robot
+        self.turningPID = PIDController(0.1, 0, 0) # P, I, D to be checked
+        self.turningPID.enableContinuousInput(-pi, pi) 
+        self.turningPID.setTolerance(0.01) # around 0.5 degrees
+
     def initialize(self) -> None:
         return super().initialize()
     
@@ -43,6 +56,9 @@ class SwerveJoystickCmd(Command):
         return x, y, rot
 
     def execute(self) -> None:
+
+        ################################################################################
+        # Read joystick and filter and attenuate the values
         # Get the x, y, and rotation values from the joystick
         if DriveConstants.DriveEnabled == True: # Disable the drive for testing purposes (to avoid accidents)
             x = self.xSpeedFunction()
@@ -89,23 +105,48 @@ class SwerveJoystickCmd(Command):
         # TO BE CHECKED!!
         self.turningSpeed *= DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
 
+        #################################################################################
+        # Select correct driving mode and apply the correct scaling
+
         self.chassisSpeeds = ChassisSpeeds()
 
-        # if (self.fieldOrientedFunction):
-        #     self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        #         self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d()
-        #     )
-        # else:
-        #     self.chassisSpeeds = ChassisSpeeds(self.xSpeed, self.ySpeed, self.turningSpeed)
+        # Mode 0: Field Oriented
+        if self.swerveSub.getDrivingMode() == DrivingModes.FieldOriented:
 
-        #self.chassisSpeeds = ChassisSpeeds(self.xSpeed, self.ySpeed, self.turningSpeed)
+            self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
+            
+        # Mode 1: Reef Oriented
+        elif self.swerveSub.getDrivingMode() == DrivingModes.ReefOriented:
+            self.turningPID.setSetpoint(self.swerveSub.angleToReef())
 
-        self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
-        
-        # print(f"chalssis speeds: {self.chassisSpeeds}")
+            # Gets the current angle of the robot
+            robotDirection = self.swerveSub.getRotation2d().radians()
+            # Converts it  to an angle between pi and -pi
+            while robotDirection > pi:
+                robotDirection -= 2*pi
+            while robotDirection < -pi:
+                robotDirection += 2*pi
+            self.turningSpeed = self.turningPID.calculate(robotDirection)
+            # filter turningspeed so it is between 1 and -1
+            self.turningSpeed = max(min(self.turningSpeed, 1), -1)
+            self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
+            
+        # Mode 2: Processor Oriented
+        elif self.swerveSub.getDrivingMode() == DrivingModes.ProcessorOriented:
+            if DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
+                angle_to_processor = 90*pi/180 # CHECK THIS ANGLE!!!
+            else:
+                angle_to_processor = 180*pi/180 # CHECK THIS ANGLE!!!
+            self.turningPID.setSetpoint(angle_to_processor)
+            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())
+            # filter turningspeed so it is between 1 and -1
+            self.turningSpeed = max(min(self.turningSpeed, 1), -1)
+            self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
+
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
-        #print(f"module states: {moduleStates}")
         self.swerveSub.setModuleStates(moduleStates)
 
         return super().execute()
