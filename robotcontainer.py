@@ -116,10 +116,10 @@ class RobotContainer:
             self.driverController, wpilib.XboxController.Button.kStart).onTrue(ACBallCancel(self.algaeC))
         
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Axis.kLeftTrigger).onTrue(ACBallInSetUp(self.algaeC))
+            self.driverController, wpilib.XboxController.Button.kY).whileTrue(ACBallInSetUp(self.algaeC))
         
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Axis.kRightTrigger).onTrue(ACBallOutSetUp(self.algaeC))
+            self.driverController, wpilib.XboxController.Button.kA).whileTrue(ACBallOutSetUp(self.algaeC))
 
         # ELEVATOR
         commands2.button.POVButton(

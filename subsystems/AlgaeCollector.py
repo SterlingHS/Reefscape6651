@@ -102,12 +102,7 @@ class AlgaeCollector(Subsystem):
 
     def setArmHeight(self, height):
         ''' Sets the height of the Arm'''
-        if height < 0:
-            height = 0
-        elif height > AlgaeCollectorConstants.Max:
-            height = AlgaeCollectorConstants.Max
-        else:
-            self.height = height
+        self.height = height
 
     def setArmPosition(self, position):
         ''' Sets the motor speed using PID controller'''

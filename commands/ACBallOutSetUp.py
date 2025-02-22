@@ -18,7 +18,7 @@ class ACBallOutSetUp(Command):
 
     def end(self, interrupted: bool) -> None:
         self.algaeC.setArmHeight(AlgaeCollectorConstants.highPosition)
-        self.algaeC.stopStarMotor()
+        self.algaeC.setStarSpeed(0)
         return super().end(interrupted)
 
     def isFinished(self) -> bool:

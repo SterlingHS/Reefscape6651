@@ -156,7 +156,7 @@ class SwerveModule:
         rotationPerSecond = state.speed/(pi*ModuleConstants.kWheelDiameterMeters)
 
         # Set the drive motor to the desired speed
-        #self.driveMotor.set_control(self.driveMotorRequest.with_velocity(rotationPerSecond))
+        self.driveMotor.set_control(self.driveMotorRequest.with_velocity(rotationPerSecond))
         
         # Calculate the turning output using the PID controller
         self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)

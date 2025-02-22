@@ -2,7 +2,7 @@ from commands2 import Subsystem
 
 from rev import SparkMax, SparkLowLevel, SparkMaxConfig, SparkBaseConfig
 import rev
-#from libgrapplefrc import laserCAN
+# from libgrapplefrc import laserCAN
 
 from constants import DropperConstants
 
@@ -39,8 +39,8 @@ class Dropper(Subsystem):
         self.resetEncoder()
 
         # Init lasercan 
-        #self.lasercanTop = laserCAN(DropperConstants.LaserTopCanID)
-        #self.lasercanBottom = laserCAN(DropperConstants.LaserBottomCanID)
+        # self.lasercanTop = laserCAN(DropperConstants.LaserTopCanID)
+        # self.lasercanBottom = laserCAN(DropperConstants.LaserBottomCanID)
 
     # def getLaserTop(self):
     #     ''' Returns the distance from the laser top '''
@@ -52,7 +52,7 @@ class Dropper(Subsystem):
     
     # def is_Coral_in(self):
     #     ''' Returns true if coral is in the dropper '''
-    #     return self.lasercanTop.get_measurement() < 100
+    #     return self.getLaserTop() < 100
     
     # def is_Coral_ready(self):
     #     ''' Returns true if coral is ready to be dropped '''

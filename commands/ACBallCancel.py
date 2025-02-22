@@ -13,7 +13,7 @@ class ACBallCancel(Command):
     
     def execute(self) -> None:
         self.algaeC.setArmHeight(AlgaeCollectorConstants.highPosition)
-        self.algaeC.stopStarMotor()
+        self.algaeC.setStarSpeed(0)
 
     def end(self, interrupted: bool) -> None:
         return super().end(interrupted)

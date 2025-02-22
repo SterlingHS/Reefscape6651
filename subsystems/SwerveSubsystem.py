@@ -156,11 +156,6 @@ class SwerveSubsystem(Subsystem):
         ''' Resets the odometer to a specific pose '''
         self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
         
-    def resetOdometerBackup(self, pose):
-        ''' Resets the odometer to a specific pose '''
-        # self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
-        self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getDrivePosition(), self.frontRight.getDrivePosition(), self.backLeft.getDrivePosition(), self.backRight.getDrivePosition()), pose)
-
     def resetEncoder(self):
         ''' Resets all the encoders - 
         Forward encoders to 0, rotation encoder to output of Absolute Encoder. '''

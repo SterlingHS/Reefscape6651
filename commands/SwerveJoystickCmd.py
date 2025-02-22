@@ -50,9 +50,9 @@ class SwerveJoystickCmd(Command):
     def joystick_attenuator(self, x: float, y: float, rot: float):
         # This function is used to scale the joystick inputs to make the robot easier to control
         # This done by cubing the joystick inputs
-        x = x ** 3
-        y = y ** 3
-        rot = rot ** 3
+        x = .6*(x ** 3)
+        y = .6*(y ** 3)
+        rot = .6*(rot ** 3)
         return x, y, rot
 
     def execute(self) -> None:
@@ -138,7 +138,7 @@ class SwerveJoystickCmd(Command):
             if DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
                 angle_to_processor = 90*pi/180 # CHECK THIS ANGLE!!!
             else:
-                angle_to_processor = 180*pi/180 # CHECK THIS ANGLE!!!
+                angle_to_processor = 270*pi/180 # CHECK THIS ANGLE!!!
             self.turningPID.setSetpoint(angle_to_processor)
             self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())
             # filter turningspeed so it is between 1 and -1
@@ -150,13 +150,13 @@ class SwerveJoystickCmd(Command):
         elif self.swerveSub.getDrivingMode() == DrivingModes.CoralStationOriented:
             if DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
                 # Checks which coral is the closest
-                if self.swerveSub.getPose().X() < 8.229: # 8.229 is the x coordinate of the middle of the field - CHECK THIS VALUE!!
-                    angle_to_coral_station = 234*pi/180  # CHECK THIS ANGLE!!!
+                if self.swerveSub.getPose().Y() < 4.020: # 4.020m is the y coordinate of the middle of the field - CHECK THIS VALUE!!
+                    angle_to_coral_station = 126*pi/180  # CHECK THIS ANGLE!!! Could need to add/subtract 360 or 2pi
                 else:
-                    angle_to_coral_station = 126*pi/180  # CHECK THIS ANGLE!!!
+                    angle_to_coral_station = 234*pi/180  # CHECK THIS ANGLE!!!
             else:
                 # Checks which coral is the closest
-                if self.swerveSub.getPose().X() < 8.229:
+                if self.swerveSub.getPose().Y() < 4.020:
                     angle_to_coral_station = 54*pi/180
                 else:
                     angle_to_coral_station = 306*pi/180

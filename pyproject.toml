@@ -21,8 +21,8 @@ robotpy_extras = [
     "phoenix6",
     # "playingwithfusion",
     "sysid",
-    "rev",
-    "libgrapplefrc-py"
+    "rev"
+    #"libgrapplefrc-py"
     # "romi",
     # "sim",
     # "xrp",

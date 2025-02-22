@@ -56,7 +56,7 @@ class DriveConstants:
     kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
-    kPhysicalMaxSpeedMetersPerSecond = 5 #5 MPS is about 11 miles per hour 
+    kPhysicalMaxSpeedMetersPerSecond = 3 #5 MPS is about 11 miles per hour 
 
     kMaxTurnRateDegPerS = 300 
     kMaxTurnAccelerationDegPerSSquared = 100 
@@ -74,17 +74,17 @@ class DriveConstants:
         Translation2d(-kWheelBase/2, -kTrackWidth/2) #BR
     )
     #this ends up being the damp factor. Right now this is 4.5/9 meaning the max output of the motors should be 50%
-    kTeleDriveMaxSpeedMetersPerSecond = 5 #17*0.3048 #17 feet per second into meters
+    kTeleDriveMaxSpeedMetersPerSecond = 3 #17*0.3048 #17 feet per second into meters
     kTeleDriveMaxAngularRadiansPerSecond = 8.5 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
-    kTeleDriveMaxAccelerationUnitsPerSeconds = kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
+    kTeleDriveMaxAccelerationUnitsPerSeconds = 3#kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
     kTeleDriveMaxAngularAccelerationUnitsPerSeconds = 0.8 #2*12*0.3048/2 #Transformed from MaxAcceleration
 
     # For autonomous mode (PathPlanner)
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
 
     # Drive enabler
-    DriveEnabled = False
+    DriveEnabled = True
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
@@ -190,14 +190,35 @@ class AlgaeCollectorConstants:
     D = 0.005
     starSpeed = 0.1
     highPosition = -1
-    lowPosition = -14
-    algaeArmHeight = -12
+    lowPosition = -12
+    algaeArmHeight = -11
 
-class FieldOrientedConstants:
-    RedReefX = 1.524 # In meters
-    RedReefY = 6.778
-    BlueReefX = 15.175
-    BlueReefY = 6.778
+class FieldOrientedConstants: 
+    # Andymark Field
+    # Centers in inches: Blue (176.745, 158.30) and Red (514.13, 158.30)
+    # Centers in meter: Blue (4.489, 4.020) and Red (13.059, 4.020)
+    # Welded Field
+    # Centers: Blue (176.745, 158.50) and Red (514.13, 158.50)
+    # Centers in meter: Blue (4.489, 4.026) and Red (13.059, 4.026)
+    RedReefX = 4.489 
+    RedReefY = 13.059
+    BlueReefX = 4.489
+    BlueReefY = 4.020
+
+# class ReefPositions: 
+#     # (x,y,angle) in meters and radians
+#     # First tuple is center
+#     # Second tuple is left reef (6 inches from center)
+#     # Third tuple is right reef (6 inches from center)
+#     ### Blue side
+#     B17 = ((,,),(,,),(,,))
+#     B18 =
+#     ...
+
+#     ### Red side
+#     B6 = 
+#     ...
+
 
 class DrivingModes(Enum):
     # Mode 0 = Field Oriented
