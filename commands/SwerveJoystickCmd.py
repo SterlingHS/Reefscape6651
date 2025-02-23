@@ -105,7 +105,7 @@ class SwerveJoystickCmd(Command):
         # print(f"chalssis speeds: {self.chassisSpeeds}")
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
         #print(f"module states: {moduleStates}")
-        self.swerveSub.setModuleStates(moduleStates)
+        #self.swerveSub.setModuleStates(moduleStates)
 
         return super().execute()
 
