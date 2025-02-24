@@ -68,19 +68,19 @@ class SwerveModule:
             # Encoder Kraken X.60
             # Encoder is included in TalonFX so no need to initialize it
             # Configure drive motor
-            # slot0_configs = configs.Slot0Configs()
+            slot0_configs = configs.Slot0Configs()
 
-            # # PID for drive forward using TalonFX instead of Roborio
-            # slot0_configs.k_s = drivePIDk[3] # Add 0.1 V output to overcome static friction
-            # slot0_configs.k_v = drivePIDk[4] # A velocity target of 1 rps results in 0.12 V output
-            # slot0_configs.k_a = drivePIDk[5] # A velocity target of 1 rps results in 0.12 V output
-            # slot0_configs.k_p = drivePIDk[0] # An error of 1 rps results in 0.11 V output
-            # slot0_configs.k_i = 0 # no output for integrated error
-            # slot0_configs.k_d = 0 # no output for error derivative
-            # self.driveMotor.configurator.apply(slot0_configs)
+            # PID for drive forward using TalonFX instead of Roborio
+            slot0_configs.k_s = drivePIDk[3] # Add 0.1 V output to overcome static friction
+            slot0_configs.k_v = drivePIDk[4] # A velocity target of 1 rps results in 0.12 V output
+            slot0_configs.k_a = drivePIDk[5] # A velocity target of 1 rps results in 0.12 V output
+            slot0_configs.k_p = drivePIDk[0] # An error of 1 rps results in 0.11 V output
+            slot0_configs.k_i = 0 # no output for integrated error
+            slot0_configs.k_d = 0 # no output for error derivative
+            self.driveMotor.configurator.apply(slot0_configs)
            
             # create a velocity closed-loop request, voltage output, slot 0 configs for the drive motor
-            # self.driveMotorRequest = phoenix6.controls.VelocityVoltage(0).with_slot(0)
+            self.driveMotorRequest = phoenix6.controls.VelocityVoltage(0).with_slot(0)
 
             # Set the drive motor to 0 and steer direction encoder to absolute encoder
             self.resetEncoders()
@@ -162,10 +162,10 @@ class SwerveModule:
         rotationPerSecond = state.speed/(pi*ModuleConstants.kWheelDiameterMeters)
 
         # Set the drive motor to the desired speed
-        #self.driveMotor.set_control(self.driveMotorRequest.with_velocity(rotationPerSecond))
+        self.driveMotor.set_control(self.driveMotorRequest.with_velocity(rotationPerSecond))
         
         # Calculate the turning output using the PID controller
-        #self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
+        self.RevController.setReference(state.angle.radians(), SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
 
     def setSetTurningPosition(self, angle):
         ''' Sets the desired turning position to angle in radians - Used to tuned up PID'''

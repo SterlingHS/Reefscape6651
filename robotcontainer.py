@@ -43,14 +43,14 @@ class RobotContainer:
         # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
         
         # Set the default commands for the subsystems
-        # self.swerveSubsystem.setDefaultCommand(
-        #    SwerveJoystickCmd(
-        #        self.swerveSubsystem,
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverYAxis),
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverRotAxis),
-        #    )
-        # )
+        self.swerveSubsystem.setDefaultCommand(
+           SwerveJoystickCmd(
+               self.swerveSubsystem,
+               lambda : self.driverController.getRawAxis(OIConstants.kDriverYAxis),
+               lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
+               lambda : self.driverController.getRawAxis(OIConstants.kDriverRotAxis),
+           )
+        )
 
         # Build an auto chooser. This will use Commands.none() as the default option.
         # self.autoChooser = AutoBuilder.buildAutoChooser()
@@ -91,14 +91,14 @@ class RobotContainer:
         #     self.driverController, wpilib.XboxController.Button.kY).whileTrue(self.swerveSubsystem.sysIdDynamic(SysIdRoutine.Direction.kReverse))
 
         # Sysid routine for the swerve drive
-        commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kA).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
-        commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kB).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
-        commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kX).whileTrue(SwerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
-        commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kY).whileTrue(SwerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kA).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kB).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kX).whileTrue(SwerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kY).whileTrue(SwerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
         pass
        
     def getAutonomousCommand(self) -> commands2.Command:

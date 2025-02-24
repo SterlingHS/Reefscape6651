@@ -19,41 +19,41 @@ import wpimath
 class DriveConstants:
     # absoulteEncoderCountsPerRev = 4096
 
-    kFrontLeftDriveMotorPort = 12 # neos
-    kFrontLeftTurningMotorPort = 11 # sparks
+    kFrontLeftDriveMotorPort = 24 # kraken
+    kFrontLeftTurningMotorPort = 23 # sparks
     kFrontLeftDriveMotorReversed = False
     kFrontLeftTurningMotorReversed = True
     kFrontLeftAbsoluteEncoderPort = 1
-    kFrontLeftAbsoluteEncoderOffsetRad = 1.25
+    kFrontLeftAbsoluteEncoderOffsetRad = -0.03
     kFrontLeftAbsoluteEncoderReversed = True
-    kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
+    kFrontLeftForwardPIDk = [0.02835, 0, 0, 0.10656, 0.11608, 0.0031195] # [P, I, D, kS, KV, kA]
 
-    kFrontRightDriveMotorPort = 14 # neos
-    kFrontRightTurningMotorPort = 13 # sparks
+    kFrontRightDriveMotorPort = 22 # neos
+    kFrontRightTurningMotorPort = 21 # sparks
     kFrontRightDriveMotorReversed = True
     kFrontRightTurningMotorReversed = True
     kFrontRightAbsoluteEncoderPort = 3
-    kFrontRightAbsoluteEncoderOffsetRad = -2.905
+    kFrontRightAbsoluteEncoderOffsetRad = 1.17
     kFrontRightAbsoluteEncoderReversed = True
-    kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
+    kFrontRightForwardPIDk = [0.059807, 0, 0, 0.073438, 0.11566, 0.0080922] # [P, I, D, kS, KV, kA]
 
-    kBackLeftDriveMotorPort = 22 # neos
-    kBackLeftTurningMotorPort = 21 # sparks
+    kBackLeftDriveMotorPort = 14 # neos
+    kBackLeftTurningMotorPort = 13 # sparks
     kBackLeftDriveMotorReversed = False
     kBackLeftTurningMotorReversed = True
     kBackLeftAbsoluteEncoderPort = 0
-    kBackLeftAbsoluteEncoderOffsetRad = -0.08
+    kBackLeftAbsoluteEncoderOffsetRad = 0.157
     kBackLeftAbsoluteEncoderReversed = True
-    kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
+    kBackLeftForwardPIDk = [0.0037818, 0, 0, 0.11117, 0.11517, 0.0020784] # [P, I, D, kS, KV, kA]
 
-    kBackRightDriveMotorPort = 24 # neos
-    kBackRightTurningMotorPort = 23 # sparks
+    kBackRightDriveMotorPort = 12 # neos
+    kBackRightTurningMotorPort = 11 # sparks
     kBackRightDriveMotorReversed = True
     kBackRightTurningMotorReversed = True
     kBackRightAbsoluteEncoderPort = 2
-    kBackRightAbsoluteEncoderOffsetRad = 1.30036 
+    kBackRightAbsoluteEncoderOffsetRad = 0.02 
     kBackRightAbsoluteEncoderReversed = True
-    kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
+    kBackRightForwardPIDk = [0.10569, 0, 0, 0.083133, 0.10946, 0.011833] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
     kPhysicalMaxSpeedMetersPerSecond = 5 #5 MPS is about 11 miles per hour 
