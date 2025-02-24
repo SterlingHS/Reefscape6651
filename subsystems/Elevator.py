@@ -14,7 +14,7 @@ class Elevator(Subsystem):
         self.elevatorMotor2 = SparkMax(ElevatorConstants.ElevatorMotorID2, SparkLowLevel.MotorType.kBrushless)
 
          ##############################################################################################################
-        # Config SparkMax for turning motor
+        # Config SparkMax for elevator motor
         # 
         # Motor1 
         configRevMotor = SparkMaxConfig()  # Creates a new SparkMaxConfig object
@@ -27,7 +27,9 @@ class Elevator(Subsystem):
             ElevatorConstants.P1,
             ElevatorConstants.I1,
             ElevatorConstants.D1,
-            slot=rev.ClosedLoopSlot.kSlot0)
+            slot=rev.ClosedLoopSlot.kSlot0
+            )
+        configRevMotor.closedLoopRampRate(rate=.5) # Time in seconds to go from 0 to full throttle.
         
         # For maxMotion
         # configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot0)
