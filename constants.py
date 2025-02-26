@@ -8,6 +8,7 @@ This offers a convenient resources to teams who need to make both quick and univ
 changes.
 """
 
+from enum import Enum
 import math
 import unit_conversions as conv
 import wpilib
@@ -17,7 +18,6 @@ from wpimath.geometry import Translation2d
 import wpimath
 
 class DriveConstants:
-    # absoulteEncoderCountsPerRev = 4096
 
     kFrontLeftDriveMotorPort = 12
     kFrontLeftTurningMotorPort = 11
@@ -56,7 +56,7 @@ class DriveConstants:
     kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
-    kPhysicalMaxSpeedMetersPerSecond = 5 #5 MPS is about 11 miles per hour 
+    kPhysicalMaxSpeedMetersPerSecond = 3 #5 MPS is about 11 miles per hour 
 
     kMaxTurnRateDegPerS = 300 
     kMaxTurnAccelerationDegPerSSquared = 100 
@@ -74,14 +74,17 @@ class DriveConstants:
         Translation2d(-kWheelBase/2, -kTrackWidth/2) #BR
     )
     #this ends up being the damp factor. Right now this is 4.5/9 meaning the max output of the motors should be 50%
-    kTeleDriveMaxSpeedMetersPerSecond = 5 #17*0.3048 #17 feet per second into meters
+    kTeleDriveMaxSpeedMetersPerSecond = 3 #17*0.3048 #17 feet per second into meters
     kTeleDriveMaxAngularRadiansPerSecond = 8.5 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
-    kTeleDriveMaxAccelerationUnitsPerSeconds = kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
+    kTeleDriveMaxAccelerationUnitsPerSeconds = 3#kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
     kTeleDriveMaxAngularAccelerationUnitsPerSeconds = 0.8 #2*12*0.3048/2 #Transformed from MaxAcceleration
 
     # For autonomous mode (PathPlanner)
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
+
+    # Drive enabler
+    DriveEnabled = True
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
@@ -122,3 +125,121 @@ class AutoConstants:
     kPXController = 0.1
     kPYController = 0.1
 
+class DropperConstants:
+    LaserTopCanID = 55
+    LaserBottomCanID = 56
+    DropperMotorID = 60
+    DropperReversed = False
+    P = 0.6 
+    I = 0
+    D = 0.02
+    DropSpeed = 2
+    DropIntakeSpeed = 1
+    DropTransitSpeed = 0.5
+
+class ElevatorConstants:
+    ElevatorMotorID1 = 62 # Sparkmax with limit switches
+    ElevatorMotorID2 = 61 # Follower
+    ElevatorReversed1 = False
+    ElevatorReversed2 = True
+    MaxVelocityUp = 1
+    MaxVelocityDown = -1
+    
+    # For maxMotion
+    MaxRPM = 8000
+    MaxAcceleration = 8000
+
+    # Max and Min values for the elevator for Soft Limits
+    Max = 54
+    Min = 0
+
+    # PID Constants
+    P0 = .03
+    I0 = 0
+    D0 = .02
+    kF0 = 0.008
+
+    P1 = .04
+    I1 = 0
+    D1 = .02
+    kF1 = 0.001
+
+    # Encoder Constants Conversion
+    kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
+    kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
+
+    # Position of different levels
+    L1 = 1
+    L2 = 14 # 11 inches
+    L3 = 30 # 28 inches
+    L4 = 54 # 52 inches, Max height 54 inches
+    
+class AlgaeRemoverConstants:
+    ARStarMotorID = 47
+    ARArmMotorID = 48
+    ARStarReversed = False
+    ARArmReversed = False
+    Max = 6
+    P = 0.03
+    I = 0
+    D = 0.005
+    starSpeed = 0.1
+    highPosition = 1
+    lowPosition = 4
+
+class AlgaeCollectorConstants:
+    ACStarMotorID = 45
+    ACArmMotorID = 46
+    ACStarReversed = False
+    ACArmReversed = False
+    Max = 0
+    P = 0.03
+    I = 0
+    D = 0.005
+    starSpeed = 0.1
+    highPosition = -1
+    lowPosition = -12
+    algaeArmHeight = -11
+
+class FieldOrientedConstants: 
+    # Andymark Field
+    # Centers in inches: Blue (176.745, 158.30) and Red (514.13, 158.30)
+    # Centers in meter: Blue (4.489, 4.020) and Red (13.059, 4.020)
+    # Welded Field
+    # Centers: Blue (176.745, 158.50) and Red (514.13, 158.50)
+    # Centers in meter: Blue (4.489, 4.026) and Red (13.059, 4.026)
+    RedReefX = 4.489 
+    RedReefY = 13.059
+    BlueReefX = 4.489
+    BlueReefY = 4.020
+
+# class ReefPositions: 
+#     # (x,y,angle) in meters and radians
+#     # First tuple is center
+#     # Second tuple is left reef (6 inches from center)
+#     # Third tuple is right reef (6 inches from center)
+#     ### Blue side
+#     B17 = ((,,),(,,),(,,))
+#     B18 =
+#     ...
+
+#     ### Red side
+#     B6 = 
+#     ...
+
+
+class DrivingModes(Enum):
+    # Mode 0 = Field Oriented
+    # Mode 1 = Reef Oriented
+    # Mode 2 = Processor Oriented
+    # Mode 3 = Coral Station Oriented
+    # Coral Station Processor Oriented
+    #   Red2   - 234 degrees
+    #   Blue12 -  54 degrees
+    # Coral Station Far side Oriented
+    #   Red1   - 126 degrees
+    #   Blue13 - 306 degrees
+    FieldOriented = 0
+    ReefOriented = 1
+    ProcessorOriented = 2
+    CoralStationOriented = 3

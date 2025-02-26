@@ -66,6 +66,11 @@ class NetworkTables:
         # wpilib.SmartDashboard.putNumber("Velocity Error", errorVelocity)
 
         wpilib.SmartDashboard.putNumber("Angle Gyro", self.container.swerveSubsystem.getHeading())
+        wpilib.SmartDashboard.putNumber("Elevator Encoder", self.container.elevator.readEncoder())
+        wpilib.SmartDashboard.putNumber("Elevator floor", self.container.elevator.readFloor())
+
+        wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
+
 
         pass
 

@@ -1,15 +1,14 @@
 from subsystems.SwerveModule import SwerveModule
 
-from math import cos, sin
+from math import cos, sin, atan2
 
 import wpimath
 from wpimath.geometry import Rotation2d
 import wpimath.kinematics
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 
-import wpilib
 from commands2 import Subsystem
-from constants import DriveConstants, AutoConstants
+from constants import DriveConstants, FieldOrientedConstants, DrivingModes
 #from pathplannerlib.config import HolonomicPathFollowerConfig, PIDConstants, ReplanningConfig
 # from pathplannerlib import HolonomicPathFollower
 
@@ -105,6 +104,24 @@ class SwerveSubsystem(Subsystem):
             self # Reference to this subsystem to set requirements
         )
 
+        # Init reef depending on Allliance
+        if DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
+            self.reefLocationX = FieldOrientedConstants.BlueReefX
+            self.reefLocationY = FieldOrientedConstants.BlueReefY
+        else:
+            self.reefLocationX = FieldOrientedConstants.RedReefX
+            self.reefLocationY = FieldOrientedConstants.RedReefY
+
+        # Driving Modes
+        self.drivingMode = DrivingModes.FieldOriented
+        # Mode 0 = Field Oriented
+        # Mode 1 = Reef Oriented
+        # Mode 2 = Processor Oriented
+        # Mode 3 = Coral Station Oriented
+
+################################################################################################
+############## Gyro Methods
+
     def zeroHeading(self):
         ''' Zero the gyro heading '''
         self.gyro.reset()
@@ -121,23 +138,24 @@ class SwerveSubsystem(Subsystem):
         ''' Return heading in degrees (from Gyro)'''
         return self.gyro.getAngle()
 
+################################################################################################
+############## Odometer Methods
+
     def getRotation2d(self):
         ''' Returns heading in Rotation2d format '''
         return Rotation2d.fromDegrees(self.getHeading())
 
     def getPose(self):
         ''' Returns the pose of the robot '''
+        # Read limelight if available and update pose with the limelight pose
+        # if self.limelight.hasTarget():
+        #     self.odometer.addVisionMeasurement(self.limelight.getBotPose2d(), self.limelight.getTimestamp())
         return self.odometer.getPose()
-    
+
     def resetOdometer(self, pose):
         ''' Resets the odometer to a specific pose '''
         self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
         
-    def resetOdometerBackup(self, pose):
-        ''' Resets the odometer to a specific pose '''
-        # self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
-        self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getDrivePosition(), self.frontRight.getDrivePosition(), self.backLeft.getDrivePosition(), self.backRight.getDrivePosition()), pose)
-
     def resetEncoder(self):
         ''' Resets all the encoders - 
         Forward encoders to 0, rotation encoder to output of Absolute Encoder. '''
@@ -169,6 +187,9 @@ class SwerveSubsystem(Subsystem):
         BL = self.backLeft.getDrivePosition()
         BR = self.backRight.getDrivePosition()
         return [FL,FR,BL,BR]
+
+################################################################################################
+############## Movement Methods
 
     def stopModules(self):
         ''' Stops all motors '''
@@ -218,6 +239,9 @@ class SwerveSubsystem(Subsystem):
         THE ORIGIN WILL REMAIN ON THE BLUE SIDE '''
         return DriverStation.getAlliance() == DriverStation.Alliance.kBlue
 
+################################################################################################
+############## Velocity Methods
+
     def getXVelocity(self):
         ''' Returns the X velocity of the robot '''
         return self.xvelocity
@@ -251,6 +275,36 @@ class SwerveSubsystem(Subsystem):
     def getAngularVelocity(self):
         ''' Returns the angular velocity of the robot '''
         return self.turningvelocity
+
+###############################################################################################
+############## Reef Oriented Methods
+
+    def angleToReef(self):
+        ''' Returns the angle to the reef '''
+        pose = self.getPose() # Current position of the robot
+        # Calculates the angle to the reef in radians from curent location (pose)
+        try:
+            return atan2(self.reefLocationY  - pose.Y(), self.reefLocationX - pose.X())
+        except: # just in case we get an error from the division by zero
+            return 0
+
+##############################################################################################
+############## Driving Modes
+
+    def nextDrivingMode(self):
+        ''' Changes to the next driving mode '''
+        self.drivingMode = (self.drivingMode + 1) % 4
+
+    def getDrivingMode(self):
+        ''' Returns the current driving mode '''
+        return self.drivingMode
+    
+    def setDrivingMode(self, mode):
+        ''' Sets the driving mode '''
+        self.drivingMode = mode
+
+##############################################################################################
+############## Periodic Methods
 
     # Periodic is called every cycle (20ms)
     def periodic(self):

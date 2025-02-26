@@ -6,10 +6,27 @@ import wpilib
 
 import commands2
 import commands2.button
+
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
+from commands.CoralDrop import DropCoral
+from commands.CoralDropSpeed import DropCoralSpeed
+from commands.ElevatorFloor import ElevatorFloor
+from commands.ElevatorMove import ElevatorMove
+from commands.ElevatorChange import ElevatorChange
+from commands.ARArmChange import ARArmChange
+from commands.ACBallInSetUp import ACBallInSetUp
+from commands.ACBallOutSetUp import ACBallOutSetUp
+from commands.ACArmChange import ACArmChange
+from commands.ACBallCancel import ACBallCancel
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
+from subsystems.Dropper import Dropper
+from subsystems.Elevator import Elevator
+from subsystems.AlgaeRemover import AlgaeRemover
+from subsystems.AlgaeCollector import AlgaeCollector
+
 from constants import OIConstants
+from constants import DropperConstants
 
 from pathplannerlib.auto import PathPlannerAuto, AutoBuilder
 
@@ -26,6 +43,10 @@ class RobotContainer:
     def __init__(self):
         '''The container for the robot. Contains subsystems, OI devices, and commands.'''
         self.swerveSubsystem = SwerveSubsystem()
+        self.dropper = Dropper()
+        self.elevator = Elevator()
+        self.algaeR = AlgaeRemover()
+        self.algaeC = AlgaeCollector()
 
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
@@ -72,14 +93,49 @@ class RobotContainer:
         factories on commands2.button.CommandGenericHID or one of its
         subclasses (commands2.button.CommandJoystick or command2.button.CommandXboxController).
         """
-        '''commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kA).whileTrue(commands.PickUpSimple2.PickUpSimple2(self.intake, self.blinkinSubsystem).andThen(
-            commands.DropNote.DropNote(self.intake)))'''
+        # commands2.button.JoystickButton(
+        #     self.driverController, wpilib.XboxController.Button.kA).whileTrue(commands.PickUpSimple2.PickUpSimple2(self.intake, self.blinkinSubsystem).andThen(
+        #     commands.DropNote.DropNote(self.intake)))
         
-        ''' commands2.button.POVButton(
-            self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) '''
+        # commands2.button.POVButton(
+        #     self.driverController, 270).whileTrue(commands.LowerRightHook.LowerRightHook(self.climber)) 
 
-        pass
+        # CORAL DROPPER
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(DropCoralSpeed(self.dropper,DropperConstants.DropSpeed))
+        
+        # ELEVATOR
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kX).whileTrue(ElevatorFloor(self.elevator,2))
+
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kB).whileTrue(ElevatorFloor(self.elevator,3))
+
+        # ALGAE COLLECTOR
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kStart).onTrue(ACBallCancel(self.algaeC))
+        
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kY).whileTrue(ACBallInSetUp(self.algaeC))
+        
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.XboxController.Button.kA).whileTrue(ACBallOutSetUp(self.algaeC))
+
+        # ELEVATOR
+        commands2.button.POVButton(
+            self.driverController, 0).onTrue(ElevatorChange(self.elevator,1))
+
+        commands2.button.POVButton(
+            self.driverController, 180).onTrue(ElevatorChange(self.elevator,-1))
+
+
+        # ALGAE REMOVER
+        commands2.button.POVButton(
+            self.driverController, 90).onTrue(ARArmChange(self.algaeR,0))
+
+        commands2.button.POVButton(
+            self.driverController, 270).onTrue(ARArmChange(self.algaeR,5))
+        
 
     def getAutonomousCommand(self) -> commands2.Command:
         """
