@@ -1,7 +1,8 @@
+# Sets up the Algae Collector for the Ball In command
+
 from commands2 import Command
 from subsystems.AlgaeCollector import AlgaeCollector
 from constants import AlgaeCollectorConstants
-
 
 class ACBallInSetUp(Command):
     def __init__(self, algaeC:AlgaeCollector):

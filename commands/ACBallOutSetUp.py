@@ -1,3 +1,5 @@
+# Sets up the Algae Collector to spit out the ball (Algae)
+
 from commands2 import Command
 from subsystems.AlgaeCollector import AlgaeCollector
 from constants import AlgaeCollectorConstants

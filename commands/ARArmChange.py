@@ -1,6 +1,7 @@
+# Changes the position of the Algae Remover arm
+
 from commands2 import Command
 from subsystems.AlgaeRemover import AlgaeRemover
-
 
 class ARArmChange(Command):
     def __init__(self, algaeR:AlgaeRemover, changeHeight:int):

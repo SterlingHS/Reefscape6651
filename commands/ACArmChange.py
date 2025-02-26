@@ -1,6 +1,7 @@
+# Sends the Algae Collector arm to a certain height
+
 from commands2 import Command
 from subsystems.AlgaeCollector import AlgaeCollector
-
 
 class ACArmChange(Command):
     def __init__(self, algaeC:AlgaeCollector, changeHeight:int):

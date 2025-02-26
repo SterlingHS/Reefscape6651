@@ -1,7 +1,9 @@
+# Cancel the algae collector ball command
+# Stops Star and sets arm to high position
+
 from commands2 import Command
 from subsystems.AlgaeCollector import AlgaeCollector
 from constants import AlgaeCollectorConstants
-
 
 class ACBallCancel(Command):
     def __init__(self, algaeC:AlgaeCollector):

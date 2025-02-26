@@ -1,3 +1,6 @@
+# Makes the elevator move up or down at a specific speed
+# For testing purposes
+
 from commands2 import Command
 from subsystems.Elevator import Elevator
 from constants import ElevatorConstants

@@ -1,6 +1,7 @@
+# Command that sends elevator to a specific floor
+
 from commands2 import Command
 from subsystems.Elevator import Elevator
-
 
 class ElevatorFloor(Command):
     def __init__(self, elevator:Elevator, floor:int):

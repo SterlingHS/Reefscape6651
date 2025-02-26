@@ -8,8 +8,8 @@ import commands2
 import commands2.button
 
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
-from commands.DropCoral import DropCoral
-from commands.DropCoralSpeed import DropCoralSpeed
+from commands.CoralDrop import DropCoral
+from commands.CoralDropSpeed import DropCoralSpeed
 from commands.ElevatorFloor import ElevatorFloor
 from commands.ElevatorMove import ElevatorMove
 from commands.ElevatorChange import ElevatorChange

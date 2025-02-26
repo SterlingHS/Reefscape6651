@@ -24,18 +24,26 @@ class Elevator(Subsystem):
         configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
         # PID configuration for position control
         configRevMotor.closedLoop.pid(
+            ElevatorConstants.P0,
+            ElevatorConstants.I0,
+            ElevatorConstants.D0,
+            slot=rev.ClosedLoopSlot.kSlot0
+            )
+        configRevMotor.closedLoop.pid(
             ElevatorConstants.P1,
             ElevatorConstants.I1,
             ElevatorConstants.D1,
-            slot=rev.ClosedLoopSlot.kSlot0
+            slot=rev.ClosedLoopSlot.kSlot1
             )
-        configRevMotor.closedLoopRampRate(rate=.5) # Time in seconds to go from 0 to full throttle.
+        #configRevMotor.closedLoopRampRate(rate=.5) # Time in seconds to go from 0 to full throttle.
         
         # For maxMotion
-        # configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot0)
-        # configRevMotor.closedLoop.maxMotion.maxAcceleration(ElevatorConstants.MaxAcceleration,slot=rev.ClosedLoopSlot.kSlot0)
+        configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot0)
+        configRevMotor.closedLoop.maxMotion.maxAcceleration(ElevatorConstants.MaxAcceleration,slot=rev.ClosedLoopSlot.kSlot0)
+        configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot1)
+        configRevMotor.closedLoop.maxMotion.maxAcceleration(ElevatorConstants.MaxAcceleration,slot=rev.ClosedLoopSlot.kSlot1)
         
-        configRevMotor.closedLoop.outputRange(ElevatorConstants.MaxVelocityDown,ElevatorConstants.MaxVelocityUp,slot=rev.ClosedLoopSlot.kSlot0)
+        #configRevMotor.closedLoop.outputRange(ElevatorConstants.MaxVelocityDown,ElevatorConstants.MaxVelocityUp,slot=rev.ClosedLoopSlot.kSlot0)
         
         # Soft Limits
         configRevMotor.softLimit.forwardSoftLimit(ElevatorConstants.Max)
@@ -109,7 +117,10 @@ class Elevator(Subsystem):
         if position < 0:
             position = 0
         # Calculate the turning output using the PID controller
-        self.RevController1.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
+        if position < self.readEncoder():
+            self.RevController1.setReference(position, SparkLowLevel.ControlType.kMAXMotionPositionControl, arbFeedforward=0.001,slot=rev.ClosedLoopSlot.kSlot1)
+        else:
+            self.RevController1.setReference(position, SparkLowLevel.ControlType.kMAXMotionPositionControl, arbFeedforward=0.008, slot=rev.ClosedLoopSlot.kSlot0)
 
     def setElevatorVelocity(self, speed):
         ''' Sets the motor speed using PID controller'''

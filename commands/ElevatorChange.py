@@ -1,6 +1,8 @@
+# Changes the floor of the elevator by 1 or -1
+# 
+
 from commands2 import Command
 from subsystems.Elevator import Elevator
-
 
 class ElevatorChange(Command):
     def __init__(self, elevator:Elevator, changeInFloor:int):

@@ -134,27 +134,35 @@ class DropperConstants:
     I = 0
     D = 0.02
     DropSpeed = 2
+    DropIntakeSpeed = 1
+    DropTransitSpeed = 0.5
 
 class ElevatorConstants:
-    ElevatorMotorID1 = 61
-    ElevatorMotorID2 = 62
+    ElevatorMotorID1 = 62 # Sparkmax with limit switches
+    ElevatorMotorID2 = 61 # Follower
     ElevatorReversed1 = False
     ElevatorReversed2 = True
-    MaxVelocityUp = .8
-    MaxVelocityDown = -0.4
+    MaxVelocityUp = 1
+    MaxVelocityDown = -1
     
     # For maxMotion
     MaxRPM = 8000
-    MaxAcceleration = 5000
+    MaxAcceleration = 8000
 
     # Max and Min values for the elevator for Soft Limits
     Max = 54
     Min = 0
 
     # PID Constants
-    P1 = .4
+    P0 = .03
+    I0 = 0
+    D0 = .02
+    kF0 = 0.008
+
+    P1 = .04
     I1 = 0
-    D1 = .3
+    D1 = .02
+    kF1 = 0.001
 
     # Encoder Constants Conversion
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38

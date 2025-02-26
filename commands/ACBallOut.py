@@ -1,7 +1,8 @@
+# Make the algae collector star motor spin in the opposite direction to spit out the ball
+
 from commands2 import Command
 from subsystems.AlgaeCollector import AlgaeCollector
 from constants import AlgaeCollectorConstants
-
 
 class ACBallOut(Command):
     def __init__(self, algaeC:AlgaeCollector):

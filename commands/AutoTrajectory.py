@@ -1,3 +1,7 @@
+#############################################################################################
+# Decrapited. 
+# Saved as an example... May be used for pathplanner on the fly
+
 import wpimath.geometry, wpimath.trajectory, wpimath.controller
 from constants import DriveConstants, AutoConstants
 import commands2
