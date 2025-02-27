@@ -57,8 +57,8 @@ class Dropper(Subsystem):
 
         SysConfig = SysIdRoutine.Config(
             # This is the function that will be called to set the mechanism to a given state
-            rampRate=volts(.5),
-            stepVoltage=volts(7.0),
+            rampRate=volts(1),
+            stepVoltage=volts(5.0),
             timeout=10.0,
         )
 
@@ -145,16 +145,9 @@ class Dropper(Subsystem):
     def log(self, sys_id_routine: SysIdRoutineLog) -> None:
         # Record a frame for the left motors.  Since these share an encoder, we consider
         # the entire group to be one motor.
-        status = self.elevatorMotor1.getAnalog()
 
-        sys_id_routine.motor("Elevator1"
-            ).voltage(status.getVoltage()
-            ).position(status.getPosition()
-            ).velocity(status.getVelocity())
+        sys_id_routine.motor("Dropper"
+            ).voltage(self.dropperMotor.getAppliedOutput()*self.dropperMotor.getBusVoltage()
+            ).position(self.dropperMotor.getEncoder().getPosition()
+            ).velocity(self.dropperMotor.getEncoder().getVelocity())
         
-        status = self.elevatorMotor2.getAnalog()
-
-        sys_id_routine.motor("Elevator2"
-            ).voltage(status.getVoltage()
-            ).position(status.getPosition()
-            ).velocity(status.getVelocity())
