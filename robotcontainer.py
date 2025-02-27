@@ -9,6 +9,7 @@ import commands2.button
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
 from subsystems.Elevator import Elevator
+from subsystems.Dropper import Dropper
 from constants import OIConstants
 
 # Import for the sysid routine
@@ -26,7 +27,7 @@ class RobotContainer:
     def __init__(self):
         '''The container for the robot. Contains subsystems, OI devices, and commands.'''
         #self.swerveSubsystem = SwerveSubsystem()
-        self.elevator = Elevator()
+        self.dropper = Dropper()
 
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
@@ -56,13 +57,13 @@ class RobotContainer:
 
         # Sysid routine for the elevator
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kA).whileTrue(Elevator.sysIdQuasistatic(self.elevator, SysIdRoutine.Direction.kForward))
+            self.driverController, wpilib.XboxController.Button.kA).whileTrue(Dropper.sysIdQuasistatic(self.dropper, SysIdRoutine.Direction.kForward))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kB).whileTrue(Elevator.sysIdQuasistatic(self.elevator, SysIdRoutine.Direction.kReverse))
+            self.driverController, wpilib.XboxController.Button.kB).whileTrue(Dropper.sysIdQuasistatic(self.dropper, SysIdRoutine.Direction.kReverse))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kX).whileTrue(Elevator.sysIdDynamic(self.elevator, SysIdRoutine.Direction.kForward))
+            self.driverController, wpilib.XboxController.Button.kX).whileTrue(Dropper.sysIdDynamic(self.dropper, SysIdRoutine.Direction.kForward))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kY).whileTrue(Elevator.sysIdDynamic(self.elevator, SysIdRoutine.Direction.kReverse))
+            self.driverController, wpilib.XboxController.Button.kY).whileTrue(Dropper.sysIdDynamic(self.dropper, SysIdRoutine.Direction.kReverse))
 
 
         pass

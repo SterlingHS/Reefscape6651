@@ -8,6 +8,7 @@ This offers a convenient resources to teams who need to make both quick and univ
 changes.
 """
 
+from enum import Enum
 import math
 import unit_conversions as conv
 import wpilib
@@ -17,7 +18,6 @@ from wpimath.geometry import Translation2d
 import wpimath
 
 class DriveConstants:
-    # absoulteEncoderCountsPerRev = 4096
 
     kFrontLeftDriveMotorPort = 12
     kFrontLeftTurningMotorPort = 11
@@ -26,7 +26,7 @@ class DriveConstants:
     kFrontLeftAbsoluteEncoderPort = 13
     kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
     kFrontLeftAbsoluteEncoderReversed = False
-    kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
 
     kFrontRightDriveMotorPort = 22
     kFrontRightTurningMotorPort = 21
@@ -35,7 +35,7 @@ class DriveConstants:
     kFrontRightAbsoluteEncoderPort = 23
     kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
     kFrontRightAbsoluteEncoderReversed = False
-    kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
 
     kBackLeftDriveMotorPort = 32
     kBackLeftTurningMotorPort = 31
@@ -44,7 +44,7 @@ class DriveConstants:
     kBackLeftAbsoluteEncoderPort = 33
     kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
     kBackLeftAbsoluteEncoderReversed = False
-    kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
 
     kBackRightDriveMotorPort = 42
     kBackRightTurningMotorPort = 41
@@ -53,10 +53,10 @@ class DriveConstants:
     kBackRightAbsoluteEncoderPort = 43
     kBackRightAbsoluteEncoderOffsetRad = 0.409157827
     kBackRightAbsoluteEncoderReversed = False
-    kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA] - From reca.lc/drive kV = 2.3, kA = 0.06 - Use SysID for kS
+    kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
-    kPhysicalMaxSpeedMetersPerSecond = 9 #9 MPS is about 20 miles per hour 
+    kPhysicalMaxSpeedMetersPerSecond = 3 #5 MPS is about 11 miles per hour 
 
     kMaxTurnRateDegPerS = 300 
     kMaxTurnAccelerationDegPerSSquared = 100 
@@ -74,14 +74,17 @@ class DriveConstants:
         Translation2d(-kWheelBase/2, -kTrackWidth/2) #BR
     )
     #this ends up being the damp factor. Right now this is 4.5/9 meaning the max output of the motors should be 50%
-    kTeleDriveMaxSpeedMetersPerSecond = 6.8 #14.5*0.3048 #14.5 feet per second into meters
-    kTeleDriveMaxAngularRadiansPerSecond = 12 #(14.5*12)*0.3048/2 #Transformed 14.5 feet into radians per sec
+    kTeleDriveMaxSpeedMetersPerSecond = 3 #17*0.3048 #17 feet per second into meters
+    kTeleDriveMaxAngularRadiansPerSecond = 8.5 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
-    kTeleDriveMaxAccelerationUnitsPerSeconds = kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
+    kTeleDriveMaxAccelerationUnitsPerSeconds = 3#kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
     kTeleDriveMaxAngularAccelerationUnitsPerSeconds = 0.8 #2*12*0.3048/2 #Transformed from MaxAcceleration
 
     # For autonomous mode (PathPlanner)
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
+
+    # Drive enabler
+    DriveEnabled = False
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
@@ -109,7 +112,7 @@ class OIConstants:
 
 class AutoConstants:
     from constants import DriveConstants
-    kMaxSpeedMetersPerSecond = 6
+    kMaxSpeedMetersPerSecond = 5
     kMaxAccelerationMetersPerSecondSquared = 3
     kPThetaController = 1
     kThetaControllerConstraints = wpimath.trajectory.TrapezoidProfileRadians.Constraints(DriveConstants.kMaxTurnRateRadPerS, DriveConstants.kMaxTurnAccelerationRadPerSSquared)
@@ -122,11 +125,122 @@ class AutoConstants:
     kPXController = 0.1
     kPYController = 0.1
 
+class DropperConstants:
+    LaserTopCanID = 55
+    LaserBottomCanID = 56
+    DropperMotorID = 60
+    DropperReversed = False
+    P = 0.0001 
+    I = 0
+    D = 0
+    F = 0.0021141649
+    DropSpeed = 180
+    DropIntakeSpeed = 1
+    DropTransitSpeed = 0.5
+
 class ElevatorConstants:
-    ElevatorMotorID1 = 62
-    ElevatorMotorID2 = 61
+    ElevatorMotorID1 = 62 # Sparkmax with limit switches
+    ElevatorMotorID2 = 61 # Follower
     ElevatorReversed1 = True
-    ElevatorReversed2 = False
-    FollowerReversed = True
+    ElevatorReversed2 = True
+    MaxVelocityUp = 1
+    MaxVelocityDown = -1
+    
+    # For maxMotion
+    MaxRPM = 8000
+    MaxAcceleration = 8000
+
+    # Max and Min values for the elevator for Soft Limits
+    Min = 0
+    Max = 54
+
+    # PID Constants
+    P0 = .01
+    I0 = 0
+    D0 = .01
+    kF0 = 0.008
+
+    P1 = .04
+    I1 = 0
+    D1 = .02
+    kF1 = 0.001
+
+    # Encoder Constants Conversion
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
     kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
+
+    # Position of different levels
+    L1 = 1
+    L2 = 14 # 11 inches
+    L3 = 30 # 28 inches
+    L4 = 54 # 52 inches, Max height 54 inches
+    
+class AlgaeRemoverConstants:
+    ARStarMotorID = 47
+    ARArmMotorID = 48
+    ARStarReversed = False
+    ARArmReversed = False
+    Max = 6
+    P = 0.03
+    I = 0
+    D = 0.005
+    starSpeed = 0.1
+    highPosition = 1
+    lowPosition = 4
+
+class AlgaeCollectorConstants:
+    ACStarMotorID = 45
+    ACArmMotorID = 46
+    ACStarReversed = False
+    ACArmReversed = False
+    Max = 0
+    P = 0.03
+    I = 0
+    D = 0.005
+    starSpeed = 0.1
+    highPosition = -1
+    lowPosition = -12
+    algaeArmHeight = -11
+
+class FieldOrientedConstants: 
+    # Andymark Field
+    # Centers in inches: Blue (176.745, 158.30) and Red (514.13, 158.30)
+    # Centers in meter: Blue (4.489, 4.020) and Red (13.059, 4.020)
+    # Welded Field
+    # Centers: Blue (176.745, 158.50) and Red (514.13, 158.50)
+    # Centers in meter: Blue (4.489, 4.026) and Red (13.059, 4.026)
+    RedReefX = 4.489 
+    RedReefY = 13.059
+    BlueReefX = 4.489
+    BlueReefY = 4.020
+
+# class ReefPositions: 
+#     # (x,y,angle) in meters and radians
+#     # First tuple is center
+#     # Second tuple is left reef (6 inches from center)
+#     # Third tuple is right reef (6 inches from center)
+#     ### Blue side
+#     B17 = ((,,),(,,),(,,))
+#     B18 =
+#     ...
+
+#     ### Red side
+#     B6 = 
+#     ...
+
+
+class DrivingModes(Enum):
+    # Mode 0 = Field Oriented
+    # Mode 1 = Reef Oriented
+    # Mode 2 = Processor Oriented
+    # Mode 3 = Coral Station Oriented
+    # Coral Station Processor Oriented
+    #   Red2   - 234 degrees
+    #   Blue12 -  54 degrees
+    # Coral Station Far side Oriented
+    #   Red1   - 126 degrees
+    #   Blue13 - 306 degrees
+    FieldOriented = 0
+    ReefOriented = 1
+    ProcessorOriented = 2
+    CoralStationOriented = 3
