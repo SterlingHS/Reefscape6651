@@ -55,20 +55,20 @@ class Elevator(Subsystem):
         self.resetEncoder()
 
         # SYSID CODE
-        def sysidDrive(voltage: volts) -> None:
+        def sysidElevator(voltage: volts) -> None:
             ''' Drive to tune up drive system with SysId '''
             self.elevatorMotor1.setVoltage(voltage)
             print(f"Voltage: {voltage}")
 
         SysConfig = SysIdRoutine.Config(
             # This is the function that will be called to set the mechanism to a given state
-            rampRate=volts(1.0),
+            rampRate=volts(.5),
             stepVoltage=volts(7.0),
             timeout=10.0,
         )
 
         SysMechanism = SysIdRoutine.Mechanism(
-            sysidDrive, 
+            sysidElevator, 
             self.log, 
             self
         )

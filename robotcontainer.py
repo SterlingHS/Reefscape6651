@@ -25,7 +25,7 @@ class RobotContainer:
 
     def __init__(self):
         '''The container for the robot. Contains subsystems, OI devices, and commands.'''
-        self.swerveSubsystem = SwerveSubsystem()
+        #self.swerveSubsystem = SwerveSubsystem()
         self.elevator = Elevator()
 
         # The driver's controller
