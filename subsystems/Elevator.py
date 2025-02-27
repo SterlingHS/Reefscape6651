@@ -58,12 +58,11 @@ class Elevator(Subsystem):
         def sysidElevator(voltage: volts) -> None:
             ''' Drive to tune up drive system with SysId '''
             self.elevatorMotor1.setVoltage(voltage)
-            print(f"Voltage: {voltage}")
 
         SysConfig = SysIdRoutine.Config(
             # This is the function that will be called to set the mechanism to a given state
             rampRate=volts(.5),
-            stepVoltage=volts(7.0),
+            stepVoltage=volts(4.0),
             timeout=10.0,
         )
 
@@ -114,16 +113,8 @@ class Elevator(Subsystem):
     def log(self, sys_id_routine: SysIdRoutineLog) -> None:
         # Record a frame for the left motors.  Since these share an encoder, we consider
         # the entire group to be one motor.
-        status = self.elevatorMotor1.getAnalog()
-
-        sys_id_routine.motor("Elevator1"
-            ).voltage(status.getVoltage()
-            ).position(status.getPosition()
-            ).velocity(status.getVelocity())
-        
-        status = self.elevatorMotor2.getAnalog()
-
-        sys_id_routine.motor("Elevator2"
-            ).voltage(status.getVoltage()
-            ).position(status.getPosition()
-            ).velocity(status.getVelocity())
+                sys_id_routine.motor("Elevator1"
+            ).voltage(self.elevatorMotor1.getBusVoltage()*self.elevatorMotor1.getAppliedOutput()
+            ).position(self.elevatorMotor1.getEncoder().getPosition()
+            ).velocity(self.elevatorMotor1.getEncoder().getVelocity())
+                print(f"Voltage: {self.elevatorMotor1.getBusVoltage()*self.elevatorMotor1.getAppliedOutput()} - position: {self.elevatorMotor1.getEncoder().getPosition()} - velocity: {self.elevatorMotor1.getEncoder().getVelocity()}")
