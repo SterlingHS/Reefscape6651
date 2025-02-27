@@ -37,9 +37,9 @@ class Elevator(Subsystem):
         configRevMotor = SparkMaxConfig()  # Creates a new SparkMaxConfig object
         resetMode = rev.SparkBase.ResetMode(0) # Reset mode is set to Not Reset before Config
         persistMode = rev.SparkBase.PersistMode(1) # Persist mode is set to Save In Lasting Memory
-        configRevMotor.inverted(ElevatorConstants.ElevatorReversed1) # Inverts the motor if needed
+        configRevMotor.inverted(ElevatorConstants.ElevatorReversed2) # Inverts the motor if needed
         configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
-        configRevMotor.follow(self.elevatorMotor1, ElevatorConstants.ElevatorReversed2)
+        configRevMotor.follow(self.elevatorMotor1, ElevatorConstants.FollowerReversed)
 
         # Encoder configuration for position and velocity
         configRevMotor.encoder.positionConversionFactor(ElevatorConstants.kElevatorEncoderRot2Meter)
