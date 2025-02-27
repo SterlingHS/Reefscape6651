@@ -8,8 +8,8 @@ import commands2
 import commands2.button
 
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
-from commands.CoralDrop import DropCoral
-from commands.CoralDropSpeed import DropCoralSpeed
+from commands.CoralDrop import CoralDrop
+from commands.CoralDropSpeed import CoralDropSpeed
 from commands.ElevatorFloor import ElevatorFloor
 from commands.ElevatorMove import ElevatorMove
 from commands.ElevatorChange import ElevatorChange
@@ -102,7 +102,7 @@ class RobotContainer:
 
         # CORAL DROPPER
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(DropCoralSpeed(self.dropper,DropperConstants.DropSpeed))
+            self.driverController, wpilib.XboxController.Button.kRightBumper).whileTrue(CoralDropSpeed(self.dropper,DropperConstants.DropSpeed))
         
         # ELEVATOR
         commands2.button.JoystickButton(

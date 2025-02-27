@@ -84,7 +84,7 @@ class DriveConstants:
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
 
     # Drive enabler
-    DriveEnabled = True
+    DriveEnabled = False
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
@@ -130,17 +130,18 @@ class DropperConstants:
     LaserBottomCanID = 56
     DropperMotorID = 60
     DropperReversed = False
-    P = 0.6 
+    P = 0.0001 
     I = 0
-    D = 0.02
-    DropSpeed = 2
+    D = 0
+    F = 0.0021141649
+    DropSpeed = 180
     DropIntakeSpeed = 1
     DropTransitSpeed = 0.5
 
 class ElevatorConstants:
     ElevatorMotorID1 = 62 # Sparkmax with limit switches
     ElevatorMotorID2 = 61 # Follower
-    ElevatorReversed1 = False
+    ElevatorReversed1 = True
     ElevatorReversed2 = True
     MaxVelocityUp = 1
     MaxVelocityDown = -1
@@ -150,13 +151,13 @@ class ElevatorConstants:
     MaxAcceleration = 8000
 
     # Max and Min values for the elevator for Soft Limits
-    Max = 54
     Min = 0
+    Max = 54
 
     # PID Constants
-    P0 = .03
+    P0 = .01
     I0 = 0
-    D0 = .02
+    D0 = .01
     kF0 = 0.008
 
     P1 = .04

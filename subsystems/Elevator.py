@@ -29,19 +29,19 @@ class Elevator(Subsystem):
             ElevatorConstants.D0,
             slot=rev.ClosedLoopSlot.kSlot0
             )
-        configRevMotor.closedLoop.pid(
-            ElevatorConstants.P1,
-            ElevatorConstants.I1,
-            ElevatorConstants.D1,
-            slot=rev.ClosedLoopSlot.kSlot1
-            )
+        # configRevMotor.closedLoop.pid(
+        #     ElevatorConstants.P1,
+        #     ElevatorConstants.I1,
+        #     ElevatorConstants.D1,
+        #     slot=rev.ClosedLoopSlot.kSlot1
+        #     )
         #configRevMotor.closedLoopRampRate(rate=.5) # Time in seconds to go from 0 to full throttle.
         
         # For maxMotion
-        configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot0)
-        configRevMotor.closedLoop.maxMotion.maxAcceleration(ElevatorConstants.MaxAcceleration,slot=rev.ClosedLoopSlot.kSlot0)
-        configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot1)
-        configRevMotor.closedLoop.maxMotion.maxAcceleration(ElevatorConstants.MaxAcceleration,slot=rev.ClosedLoopSlot.kSlot1)
+        # configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot0)
+        # configRevMotor.closedLoop.maxMotion.maxAcceleration(ElevatorConstants.MaxAcceleration,slot=rev.ClosedLoopSlot.kSlot0)
+        # configRevMotor.closedLoop.maxMotion.maxVelocity(ElevatorConstants.MaxRPM,slot=rev.ClosedLoopSlot.kSlot1)
+        # configRevMotor.closedLoop.maxMotion.maxAcceleration(ElevatorConstants.MaxAcceleration,slot=rev.ClosedLoopSlot.kSlot1)
         
         #configRevMotor.closedLoop.outputRange(ElevatorConstants.MaxVelocityDown,ElevatorConstants.MaxVelocityUp,slot=rev.ClosedLoopSlot.kSlot0)
         
@@ -50,6 +50,7 @@ class Elevator(Subsystem):
         configRevMotor.softLimit.reverseSoftLimit(ElevatorConstants.Min)
         configRevMotor.softLimit.forwardSoftLimitEnabled(True)
         configRevMotor.softLimit.reverseSoftLimitEnabled(True)
+        configRevMotor.limitSwitch.reverseLimitSwitchEnabled(True)
 
         # Encoder configuration for position and velocity
         configRevMotor.encoder.positionConversionFactor(ElevatorConstants.kElevatorEncoderRot2Meter)
@@ -62,7 +63,7 @@ class Elevator(Subsystem):
         configRevMotor = SparkMaxConfig()  # Creates a new SparkMaxConfig object
         resetMode = rev.SparkBase.ResetMode(0) # Reset mode is set to Not Reset before Config
         persistMode = rev.SparkBase.PersistMode(1) # Persist mode is set to Save In Lasting Memory
-        configRevMotor.inverted(ElevatorConstants.ElevatorReversed1) # Inverts the motor if needed
+        configRevMotor.inverted(False) # Inverts the motor if needed
         configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
         configRevMotor.follow(self.elevatorMotor1, ElevatorConstants.ElevatorReversed2)
 
@@ -84,6 +85,9 @@ class Elevator(Subsystem):
 
         # Init floor
         self.floor = 1
+
+    def lowerSwitchOn(self):
+        return self.elevatorMotor1.getReverseLimitSwitch()
 
     def readFloor(self):
         return self.floor
@@ -117,10 +121,10 @@ class Elevator(Subsystem):
         if position < 0:
             position = 0
         # Calculate the turning output using the PID controller
-        if position < self.readEncoder():
-            self.RevController1.setReference(position, SparkLowLevel.ControlType.kMAXMotionPositionControl, arbFeedforward=0.001,slot=rev.ClosedLoopSlot.kSlot1)
-        else:
-            self.RevController1.setReference(position, SparkLowLevel.ControlType.kMAXMotionPositionControl, arbFeedforward=0.008, slot=rev.ClosedLoopSlot.kSlot0)
+        # if position < self.readEncoder():
+        self.RevController1.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
+        # else:
+        #     self.RevController1.setReference(position, SparkLowLevel.ControlType.kMAXMotionPositionControl, arbFeedforward=0.008, slot=rev.ClosedLoopSlot.kSlot0)
 
     def setElevatorVelocity(self, speed):
         ''' Sets the motor speed using PID controller'''
@@ -156,4 +160,6 @@ class Elevator(Subsystem):
     def periodic(self):
         if self.floor in [1,2,3,4]:
             self.setElevatorFloor(self.floor)
+        if self.lowerSwitchOn():
+            self.resetEncoder()
         return super().periodic()

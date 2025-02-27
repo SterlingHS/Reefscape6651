@@ -11,10 +11,10 @@ class CoralDropSpeed(Command):
         return super().initialize()
     
     def execute(self) -> None:
-        self.dropper.setDropperVelocityMax(self.speed)
+        self.dropper.setDropperVelocity(self.speed)
 
     def end(self, interrupted: bool) -> None:
-        self.dropper.setDropperVelocityMax(0)
+        self.dropper.setDropperVelocity(0)
         # self.dropper.stopMotor()
         return super().end(interrupted)
 
