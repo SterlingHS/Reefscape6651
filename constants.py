@@ -26,7 +26,8 @@ class DriveConstants:
     kFrontLeftAbsoluteEncoderPort = 13
     kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
     kFrontLeftAbsoluteEncoderReversed = False
-    kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
+    kFrontLeftForwardPIDk = [2.0084, 0, 0, 0.08517, 2.1436, 0.3437] # [P, I, D, kS, KV, kA]
+    #kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
 
     kFrontRightDriveMotorPort = 22
     kFrontRightTurningMotorPort = 21
@@ -35,7 +36,9 @@ class DriveConstants:
     kFrontRightAbsoluteEncoderPort = 23
     kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
     kFrontRightAbsoluteEncoderReversed = False
-    kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
+    kFrontRightForwardPIDk = [1.2013, 0, 0, 0.11318, 2.1258, 0.3308] # [P, I, D, kS, KV, kA]
+    # kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
+
 
     kBackLeftDriveMotorPort = 32
     kBackLeftTurningMotorPort = 31
@@ -44,7 +47,9 @@ class DriveConstants:
     kBackLeftAbsoluteEncoderPort = 33
     kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
     kBackLeftAbsoluteEncoderReversed = False
-    kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
+    kBackLeftForwardPIDk = [0.94239, 0, 0, 0.15683, 2.2217, 0.13994] # [P, I, D, kS, KV, kA]
+    # kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
+
 
     kBackRightDriveMotorPort = 42
     kBackRightTurningMotorPort = 41
@@ -53,7 +58,8 @@ class DriveConstants:
     kBackRightAbsoluteEncoderPort = 43
     kBackRightAbsoluteEncoderOffsetRad = 0.409157827
     kBackRightAbsoluteEncoderReversed = False
-    kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
+    kBackRightForwardPIDk = [0.40995, 0, 0, 0.15053, 2.2362, 0.084626] # [P, I, D, kS, KV, kA]
+    # kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
     kPhysicalMaxSpeedMetersPerSecond = 3 #5 MPS is about 11 miles per hour 
