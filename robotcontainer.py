@@ -26,7 +26,7 @@ class RobotContainer:
     def __init__(self):
         '''The container for the robot. Contains subsystems, OI devices, and commands.'''
         self.swerveSubsystem = SwerveSubsystem()
-        self.elevator = Elevator()
+        #self.elevator = Elevator()
 
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
@@ -56,13 +56,13 @@ class RobotContainer:
 
         # Sysid routine for the elevator
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kA).whileTrue(Elevator.sysIdQuasistatic(self.elevator, SysIdRoutine.Direction.kForward))
+            self.driverController, wpilib.XboxController.Button.kA).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kB).whileTrue(Elevator.sysIdQuasistatic(self.elevator, SysIdRoutine.Direction.kReverse))
+            self.driverController, wpilib.XboxController.Button.kB).whileTrue(SwerveSubsystem.sysIdQuasistatic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kX).whileTrue(Elevator.sysIdDynamic(self.elevator, SysIdRoutine.Direction.kForward))
+            self.driverController, wpilib.XboxController.Button.kX).whileTrue(SwerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kForward))
         commands2.button.JoystickButton(
-            self.driverController, wpilib.XboxController.Button.kY).whileTrue(Elevator.sysIdDynamic(self.elevator, SysIdRoutine.Direction.kReverse))
+            self.driverController, wpilib.XboxController.Button.kY).whileTrue(SwerveSubsystem.sysIdDynamic(self.swerveSubsystem, SysIdRoutine.Direction.kReverse))
 
 
         pass

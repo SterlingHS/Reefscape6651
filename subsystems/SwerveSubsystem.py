@@ -63,11 +63,15 @@ class SwerveSubsystem(Subsystem):
             self.frontRight.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
             self.backLeft.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
             self.backRight.driveMotor.set_control(phoenix6.controls.VoltageOut(voltage))
+            print(f"Voltage to motors: {voltage}")
 
         phoenix6.SignalLogger.set_path("sysid")
         SysConfig = SysIdRoutine.Config(
             # This is the function that will be called to set the mechanism to a given state
             # recordState = lambda state: phoenix6.SignalLogger.write_string("state", SysIdRoutineLog.stateEnumToString(state)),
+            rampRate = 1,
+            stepVoltage=4,
+            timeout=6
         )
 
         SysMechanism = SysIdRoutine.Mechanism(
