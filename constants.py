@@ -143,6 +143,14 @@ class DropperConstants:
     DropTransitSpeed = 0.5
 
 class ElevatorConstants:
+
+    # PID results - With Springs
+    # Ks = 0.12955
+    # Kv = 0.21955
+    # Ka = 0.022299
+    # Kg = 0.16265
+    # Kp = 0.021546
+
     ElevatorMotorID1 = 62 # Sparkmax with limit switches
     ElevatorMotorID2 = 61 # Follower
     ElevatorReversed1 = True
@@ -163,13 +171,14 @@ class ElevatorConstants:
     P0 = .025
     I0 = 0
     D0 = .01
-    kF0 = 0.0021141649
+    kF0 = 0 # For Elevator WITH Springs
+    # kF0 = 0.0021141649 # For Elevator WITHOUT Springs
 
     # PID for L4 - PID
     P1 = .015
     I1 = 0
-    D1 = .01
-    kF1 = 0.0021141649
+    kF0 = 0 # For Elevator WITH Springs
+    # kF0 = 0.0021141649 # For Elevator WITHOUT Springs
 
     # Encoder Constants Conversion
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
