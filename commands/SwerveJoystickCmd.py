@@ -20,7 +20,7 @@ import wpilib
 from wpilib import DriverStation
 
 
-signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number (Used?)
+signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number
 
 class SwerveJoystickCmd(Command):
     def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFunc):
@@ -162,6 +162,20 @@ class SwerveJoystickCmd(Command):
                     angle_to_coral_station = 306*pi/180
             
             self.turningPID.setSetpoint(angle_to_coral_station)
+            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())
+            # filter turningspeed so it is between 1 and -1
+            self.turningSpeed = max(min(self.turningSpeed, 1), -1)
+            self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
+            
+        # Mode 4: Reef AprilTag Oriented
+        elif self.swerveSub.getDrivingMode() == DrivingModes.ReefAprilTageOriented:
+            # Read closest april tag number
+            aprilTagNumber = self.swerveSub.getClosestAprilTag()
+            if aprilTagNumber == 0:
+                self.turningPID.setSetpoint(self.swerveSub.angleToReef())
+            else:
+                self.turningPID.setSetpoint(self.swerveSub.angleToReef(aprilTagNumber))
             self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())
             # filter turningspeed so it is between 1 and -1
             self.turningSpeed = max(min(self.turningSpeed, 1), -1)

@@ -130,9 +130,13 @@ class DropperConstants:
     LaserBottomCanID = 56
     DropperMotorID = 60
     DropperReversed = False
-    P = 0.0001 
+    P = 0.0002005 # 0.0001
     I = 0
     D = 0
+    kS = 0.52148
+    kV = 0.0010255
+    kA = 0.00012698
+    kG = 0.0022378
     F = 0.0021141649
     DropSpeed = 180
     DropIntakeSpeed = 1
@@ -155,15 +159,17 @@ class ElevatorConstants:
     Max = 54
 
     # PID Constants
-    P0 = .01
+    # PID for L1, L2 and L3 - PID Position
+    P0 = .025
     I0 = 0
     D0 = .01
-    kF0 = 0.008
+    kF0 = 0.0021141649
 
-    P1 = .04
+    # PID for L4 - PID
+    P1 = .015
     I1 = 0
-    D1 = .02
-    kF1 = 0.001
+    D1 = .01
+    kF1 = 0.0021141649
 
     # Encoder Constants Conversion
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38
@@ -214,7 +220,10 @@ class FieldOrientedConstants:
     BlueReefX = 4.489
     BlueReefY = 4.020
 
-# class ReefPositions: 
+class ReefPositions: 
+    # List of reef angles depending on the reef number
+    reefAngles = [126,234,270,0,0,300,0,60,120,180,240,54,306,180,180,90,240,180,120,60,0,300]
+
 #     # (x,y,angle) in meters and radians
 #     # First tuple is center
 #     # Second tuple is left reef (6 inches from center)
@@ -240,7 +249,9 @@ class DrivingModes(Enum):
     # Coral Station Far side Oriented
     #   Red1   - 126 degrees
     #   Blue13 - 306 degrees
+    # Mode 4 = Reef AprilTag Oriented
     FieldOriented = 0
     ReefOriented = 1
     ProcessorOriented = 2
     CoralStationOriented = 3
+    ReefAprilTageOriented = 4
