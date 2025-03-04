@@ -125,6 +125,10 @@ class SwerveSubsystem(Subsystem):
 
         self.limelightFront = Limelight("10.66.51.11")
 
+        # Init pose of Robot
+        self.OdoPose=self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
+        self.botPose=self.OdoPose
+
 ################################################################################################
 ############## Gyro Methods
 
@@ -329,8 +333,11 @@ class SwerveSubsystem(Subsystem):
     def periodic(self):
         ''' The code that runs periodically '''
         # Reads Odometer (location of robot (x,y))
-        self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
+        self.OdoPose=self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
         
+        # Identify which pose to use: limelight or odometer
+        
+
         # Reads limelight
         results = self.limelightFront.get_results()
 
