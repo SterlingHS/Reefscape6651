@@ -159,12 +159,10 @@ class ElevatorConstants:
     ElevatorMotorID2 = 61 # Follower
     ElevatorReversed1 = True
     ElevatorReversed2 = True
-    MaxVelocityUp = 1
-    MaxVelocityDown = -1
     
     # For maxMotion
-    MaxRPM = 8000
-    MaxAcceleration = 8000
+    MaxVelocity = 40
+    MaxAcceleration = 40
 
     # Max and Min values for the elevator for Soft Limits
     Min = 0

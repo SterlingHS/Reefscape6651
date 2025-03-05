@@ -85,7 +85,7 @@ class Elevator(Subsystem):
         ##############################################################################
         # Trapezoidal PID to control the elevator
         self.kDt = 0.02 # cycle time: 20ms = .020s
-        self.elevatorTrap = TrapezoidProfile(TrapezoidProfile.Constraints(ElevatorConstants.MaxVelocityUp, 
+        self.elevatorTrap = TrapezoidProfile(TrapezoidProfile.Constraints(ElevatorConstants.MaxVelocity, 
                                                                           ElevatorConstants.MaxAcceleration))
         self.elevatorFF = SimpleMotorFeedforwardMeters(kS=ElevatorConstants.kS, 
                                                        kV=ElevatorConstants.kV, 
@@ -127,21 +127,15 @@ class Elevator(Subsystem):
 
     def setElevatorPosition(self, position):
         ''' Sets the motor speed using PID controller'''
-        # Calculate the turning output using the PID controller
-        # if position - self.readEncoder() > 30:
-        #     self.RevController1.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot1)
-        # else:
-        #     self.RevController1.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
-        
-        goal = self.elevatorGoal(position, 0)
-        self.setpoint = self.elevatorTrap.calculate(self.kDt, self.setpoint, goal)
-        ff = self.elevatorFF.calculate(self.setpoint.velocity)
+        self.elevatorGoal=TrapezoidProfile.State(position,0)
+        self.elevatorSetpoint = self.elevatorTrap.calculate(self.kDt, self.elevatorSetpoint, self.elevatorGoal)
+        ff = self.elevatorFF.calculate(self.elevatorSetpoint.velocity)
 
-        self.RevController1.setReference(value=self.setpoint.position, 
+        self.RevController1.setReference(value=self.elevatorSetpoint.position, 
                                          ctrl=SparkLowLevel.ControlType.kPosition, 
                                          arbFeedforward=ff,
                                          arbFFUnits=rev.SparkClosedLoopController.ArbFFUnits.kVoltage, # ????
-                                         slot=rev.ClosedLoopSlot.kSlot1)
+                                         slot=rev.ClosedLoopSlot.kSlot0)
 
     def setElevatorVelocity(self, speed):
         ''' Sets the motor speed using PID controller'''
