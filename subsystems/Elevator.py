@@ -1,5 +1,7 @@
 from commands2 import Subsystem
 
+from wpimath.trajectory import TrapezoidProfile
+from wpimath.controller import SimpleMotorFeedforwardMeters
 from constants import ElevatorConstants
 from rev import SparkMax, SparkLowLevel, SparkMaxConfig, SparkBaseConfig
 import rev
@@ -80,6 +82,19 @@ class Elevator(Subsystem):
         # Init floor
         self.floor = 1
 
+        ##############################################################################
+        # Trapezoidal PID to control the elevator
+        self.kDt = 0.02 # cycle time: 20ms = .020s
+        self.elevatorTrap = TrapezoidProfile(TrapezoidProfile.Constraints(ElevatorConstants.MaxVelocityUp, 
+                                                                          ElevatorConstants.MaxAcceleration))
+        self.elevatorFF = SimpleMotorFeedforwardMeters(kS=ElevatorConstants.kS, 
+                                                       kV=ElevatorConstants.kV, 
+                                                       kA=ElevatorConstants.kA, 
+                                                       dt=self.kDt)
+        self.elevatorGoal = TrapezoidProfile.State(position=0,velocity=0)
+        self.elevatorSetpoint = TrapezoidProfile.State(position=0,velocity=0)
+        
+
     def lowerSwitchOn(self):
         return self.elevatorMotor1.getReverseLimitSwitch().get()
 
@@ -113,10 +128,20 @@ class Elevator(Subsystem):
     def setElevatorPosition(self, position):
         ''' Sets the motor speed using PID controller'''
         # Calculate the turning output using the PID controller
-        if position - self.readEncoder() > 30:
-            self.RevController1.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot1)
-        else:
-            self.RevController1.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
+        # if position - self.readEncoder() > 30:
+        #     self.RevController1.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot1)
+        # else:
+        #     self.RevController1.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
+        
+        goal = self.elevatorGoal(position, 0)
+        self.setpoint = self.elevatorTrap.calculate(self.kDt, self.setpoint, goal)
+        ff = self.elevatorFF.calculate(self.setpoint.velocity)
+
+        self.RevController1.setReference(value=self.setpoint.position, 
+                                         ctrl=SparkLowLevel.ControlType.kPosition, 
+                                         arbFeedforward=ff,
+                                         arbFFUnits=rev.SparkClosedLoopController.ArbFFUnits.kVoltage, # ????
+                                         slot=rev.ClosedLoopSlot.kSlot1)
 
     def setElevatorVelocity(self, speed):
         ''' Sets the motor speed using PID controller'''
@@ -150,8 +175,10 @@ class Elevator(Subsystem):
         self.floor = floor
 
     def periodic(self):
-        if self.floor in [1,2,3,4]:
-            self.setElevatorFloor(self.floor)
+        if self.floor not in [1,2,3,4]:
+            self.floor = 1
         if self.lowerSwitchOn():
             self.resetEncoder()
+        self.setElevatorFloor(self.floor)
+
         return super().periodic()

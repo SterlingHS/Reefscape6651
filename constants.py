@@ -62,9 +62,9 @@ class DriveConstants:
     # kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
-    kPhysicalMaxSpeedMetersPerSecond = 3 #5 MPS is about 11 miles per hour 
+    kPhysicalMaxSpeedMetersPerSecond = 5 #5 MPS is about 11 miles per hour 
 
-    kMaxTurnRateDegPerS = 300 
+    kMaxTurnRateDegPerS = 200 
     kMaxTurnAccelerationDegPerSSquared = 100 
 
     kMaxTurnRateRadPerS = math.radians(kMaxTurnRateDegPerS)
@@ -80,8 +80,8 @@ class DriveConstants:
         Translation2d(-kWheelBase/2, -kTrackWidth/2) #BR
     )
     #this ends up being the damp factor. Right now this is 4.5/9 meaning the max output of the motors should be 50%
-    kTeleDriveMaxSpeedMetersPerSecond = 3 #17*0.3048 #17 feet per second into meters
-    kTeleDriveMaxAngularRadiansPerSecond = 8.5 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
+    kTeleDriveMaxSpeedMetersPerSecond = .6 #17*0.3048 #17 feet per second into meters
+    kTeleDriveMaxAngularRadiansPerSecond = 1.2 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
     kTeleDriveMaxAccelerationUnitsPerSeconds = 3#kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
     kTeleDriveMaxAngularAccelerationUnitsPerSeconds = 0.8 #2*12*0.3048/2 #Transformed from MaxAcceleration
@@ -113,8 +113,6 @@ class OIConstants:
     kDriverYAxis = 1
     kDriverXAxis = 0
     kDriverRotAxis = 4
-    kDriverFieldOrientedButtonIdx = 3
-
 
 class AutoConstants:
     from constants import DriveConstants
@@ -151,11 +149,11 @@ class DropperConstants:
 class ElevatorConstants:
 
     # PID results - With Springs
-    # Ks = 0.12955
-    # Kv = 0.21955
-    # Ka = 0.022299
-    # Kg = 0.16265
-    # Kp = 0.021546
+    kS = 0.12955
+    kV = 0.21955
+    kA = 0.022299
+    kG = 0.16265
+    kP = 0.021546
 
     ElevatorMotorID1 = 62 # Sparkmax with limit switches
     ElevatorMotorID2 = 61 # Follower
@@ -183,8 +181,9 @@ class ElevatorConstants:
     # PID for L4 - PID
     P1 = .015
     I1 = 0
-    kF0 = 0 # For Elevator WITH Springs
-    # kF0 = 0.0021141649 # For Elevator WITHOUT Springs
+    D1 = .01
+    kF1 = 0 # For Elevator WITH Springs
+    # kF1 = 0.0021141649 # For Elevator WITHOUT Springs
 
     # Encoder Constants Conversion
     kElevatorEncoderRot2Meter = 1.0121457*52.5/92.38

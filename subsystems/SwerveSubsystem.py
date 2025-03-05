@@ -14,8 +14,8 @@ from constants import DriveConstants, FieldOrientedConstants, DrivingModes, Reef
 import wpilib
 import navx
 import phoenix6
-import limelight
-from limelight import Limelight
+#import limelight
+#from limelight import Limelight
 import json
 
 # Autonomous Pathplanner
@@ -123,7 +123,7 @@ class SwerveSubsystem(Subsystem):
         # Mode 2 = Processor Oriented
         # Mode 3 = Coral Station Oriented
 
-        self.limelightFront = Limelight("10.66.51.11")
+        #self.limelightFront = Limelight("10.66.51.11")
 
         # Init pose of Robot
         self.OdoPose=self.odometer.update(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()))
@@ -339,26 +339,26 @@ class SwerveSubsystem(Subsystem):
         
 
         # Reads limelight
-        results = self.limelightFront.get_results()
+        # results = self.limelightFront.get_results()
 
-        self.botpose = results.get("botpose", [])
-        self.botpose_wpiblue = results.get("botpose_orb_wpiblue	", [])
-        self.capture_latency = results.get("cl", 0)
-        self.timestamp = results.get("ts", 0)
-        self.validity = results.get("v", 0)
+        # self.botpose = results.get("botpose", [])
+        # self.botpose_wpiblue = results.get("botpose_orb_wpiblue	", [])
+        # self.capture_latency = results.get("cl", 0)
+        # self.timestamp = results.get("ts", 0)
+        # self.validity = results.get("v", 0)
 
-        # Sends data to dashboard
-        wpilib.SmartDashboard.putNumber("Pose X", self.getPose().X())
-        wpilib.SmartDashboard.putNumber("Pose Y", self.getPose().Y())
-        wpilib.SmartDashboard.putNumber("Pose Heading", self.getPose().rotation().degrees())
-        print(f"botpose - {self.botpose}")
-        print(f"type botpose - {type(self.botpose)}")
-        print(f"MT2 pose - {self.botpose_wpiblue}")
-        print(f"type MT2 pose - {type(self.botpose_wpiblue)}")
-        wpilib.SmartDashboard.putNumber("Botpose WPILib Blue", self.botpose_wpiblue)
-        wpilib.SmartDashboard.putNumber("Botpose", self.botpose)
-        print(f"Validity - {self.validity}")
-        print(f"Type validity - {type(self.validity)}")
+        # # Sends data to dashboard
+        # wpilib.SmartDashboard.putNumber("Pose X", self.getPose().X())
+        # wpilib.SmartDashboard.putNumber("Pose Y", self.getPose().Y())
+        # wpilib.SmartDashboard.putNumber("Pose Heading", self.getPose().rotation().degrees())
+        # print(f"botpose - {self.botpose}")
+        # print(f"type botpose - {type(self.botpose)}")
+        # print(f"MT2 pose - {self.botpose_wpiblue}")
+        # print(f"type MT2 pose - {type(self.botpose_wpiblue)}")
+        # wpilib.SmartDashboard.putNumber("Botpose WPILib Blue", self.botpose_wpiblue)
+        # wpilib.SmartDashboard.putNumber("Botpose", self.botpose)
+        # print(f"Validity - {self.validity}")
+        # print(f"Type validity - {type(self.validity)}")
 
         # Reads Absolute Encoders and sends them to Dashboard
         # absoluteEncoder = self.readAbsEncoders()
