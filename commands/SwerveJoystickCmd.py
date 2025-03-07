@@ -40,9 +40,11 @@ class SwerveJoystickCmd(Command):
         self.addRequirements(swerveSub)
 
         # PID to control turning speed of the robot
-        self.turningPID = PIDController(0.1, 0, 0) # P, I, D to be checked
+        self.turningPID = PIDController(0.5, 0, 0) # P, I, D to be checked
         self.turningPID.enableContinuousInput(-pi, pi) 
         self.turningPID.setTolerance(0.01) # around 0.5 degrees
+
+        self.lastAprilTag = 0
 
     def initialize(self) -> None:
         return super().initialize()
@@ -125,31 +127,32 @@ class SwerveJoystickCmd(Command):
             
         # Mode 1: Reef Oriented
         elif self.swerveSub.getDrivingMode() == DrivingModes.ReefOriented:
-            self.turningPID.setSetpoint(self.swerveSub.angleToReef())
+            angle = self.swerveSub.angleToReef()*180/pi
+            while angle < 0:
+                angle += 360
+            while angle > 360:
+                angle -= 360
+            self.turningPID.setSetpoint(angle)
 
             # Gets the current angle of the robot
-            robotDirection = self.swerveSub.getRotation2d().radians()
+            robotDirection = self.swerveSub.getRotation2d().degrees()
             # Converts it  to an angle between pi and -pi
-            while robotDirection > pi:
-                robotDirection -= 2*pi
-            while robotDirection < -pi:
-                robotDirection += 2*pi
-            self.turningSpeed = self.turningPID.calculate(robotDirection)
-            # filter turningspeed so it is between 1 and -1
-            self.turningSpeed = max(min(self.turningSpeed, 1), -1)
+            while robotDirection > 360:
+                robotDirection -= 360
+            while robotDirection < 0:
+                robotDirection += 360
+            self.turningSpeed = self.turningPID.calculate(robotDirection)*DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
             
         # Mode 2: Processor Oriented
         elif self.swerveSub.getDrivingMode() == DrivingModes.ProcessorOriented:
             if DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
-                angle_to_processor = 90*pi/180 # CHECK THIS ANGLE!!!
+                angle_to_processor = 90 # CHECK THIS ANGLE!!!
             else:
-                angle_to_processor = 270*pi/180 # CHECK THIS ANGLE!!!
+                angle_to_processor = 270 # CHECK THIS ANGLE!!!
             self.turningPID.setSetpoint(angle_to_processor)
-            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())
-            # filter turningspeed so it is between 1 and -1
-            self.turningSpeed = max(min(self.turningSpeed, 1), -1)
+            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().degrees())*DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
         
@@ -158,20 +161,18 @@ class SwerveJoystickCmd(Command):
             if DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
                 # Checks which coral is the closest
                 if self.swerveSub.getPose().Y() < 4.020: # 4.020m is the y coordinate of the middle of the field - CHECK THIS VALUE!!
-                    angle_to_coral_station = 126*pi/180  # CHECK THIS ANGLE!!! Could need to add/subtract 360 or 2pi
+                    angle_to_coral_station = 126         # CHECK THIS ANGLE!!! Could need to add/subtract 360 or 2pi
                 else:
-                    angle_to_coral_station = 234*pi/180  # CHECK THIS ANGLE!!!
+                    angle_to_coral_station = 234         # CHECK THIS ANGLE!!!
             else:
                 # Checks which coral is the closest
                 if self.swerveSub.getPose().Y() < 4.020:
-                    angle_to_coral_station = 54*pi/180
+                    angle_to_coral_station = 54
                 else:
-                    angle_to_coral_station = 306*pi/180
+                    angle_to_coral_station = 306
             
             self.turningPID.setSetpoint(angle_to_coral_station)
-            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())
-            # filter turningspeed so it is between 1 and -1
-            self.turningSpeed = max(min(self.turningSpeed, 1), -1)
+            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().degrees())*DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
             
@@ -179,20 +180,19 @@ class SwerveJoystickCmd(Command):
         elif self.swerveSub.getDrivingMode() == DrivingModes.ReefAprilTageOriented:
             # Read closest april tag number
             aprilTagNumber = self.swerveSub.getClosestAprilTag()
+        
             if aprilTagNumber == 0:
-                self.turningPID.setSetpoint(self.swerveSub.angleToReef())
+                #self.turningPID.setSetpoint(self.swerveSub.angleToReef())
+                aprilTagNumber = self.lastAprilTag
             else:
-                self.turningPID.setSetpoint(self.swerveSub.angleToReef(aprilTagNumber))
-            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())
-            # filter turningspeed so it is between 1 and -1
-            self.turningSpeed = max(min(self.turningSpeed, 1), -1)
+                self.lastAprilTag = aprilTagNumber
+            self.turningPID.setSetpoint(self.swerveSub.angleToAprilTag(aprilTagNumber))
+            print(f"Angle - {self.swerveSub.angleToAprilTag(aprilTagNumber)*180/3.1415}")
+            self.turningSpeed = self.turningPID.calculate(self.swerveSub.getRotation2d().radians())*DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
-
-        wpilib.SmartDashboard.putNumber("chassis vx",self.chassisSpeeds.vx)
-        wpilib.SmartDashboard.putNumber("chassis vy",self.chassisSpeeds.vy)
-        wpilib.SmartDashboard.putNumber("chassis vrot",self.chassisSpeeds.omega)
-        #wpilib.SmartDashboard.putNumber("chassis RobotAng", self.swerveSub.getRotation2d())
+        
+        # Updates the swerve drive modules
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
         self.swerveSub.setModuleStates(moduleStates)
 

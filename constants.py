@@ -90,7 +90,7 @@ class DriveConstants:
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
 
     # Drive enabler
-    DriveEnabled = False
+    DriveEnabled = True
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
