@@ -312,13 +312,15 @@ class SwerveSubsystem(Subsystem):
             return 0
         
     def angleToAprilTag(self, aprilTag):
-        ''' Returns the angle to the April Tag '''
+        ''' Returns the angle to the April Tag in degrees (0-360)'''
         # if alliance is blue
         if (DriverStation.getAlliance() == DriverStation.Alliance.kBlue and 17 <= aprilTag <= 22) or (DriverStation.getAlliance() == DriverStation.Alliance.kRed and 6 <= aprilTag <= 11):
             self.last_reef_angle = 180-ReefPositions.reefAngles[aprilTag-1]
-            if self.last_reef_angle < 360:
+            while self.last_reef_angle < 360:
                 self.last_reef_angle += 360
-        return self.last_reef_angle*pi/180
+            while self.last_reef_angle > 360:
+                self.last_reef_angle -= 360
+        return self.last_reef_angle
     
     def getClosestAprilTag(self):
         ''' Read limelight abd returns the closest April Tag '''
