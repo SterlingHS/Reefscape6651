@@ -88,36 +88,8 @@ class SwerveJoystickCmd(Command):
         wpilib.SmartDashboard.putNumber("Joystick y",self.ySpeed)
         wpilib.SmartDashboard.putNumber("Joystick rot",self.turningSpeed)
 
-        # Saves the last 3 values of the joystick to determine if the joystick is at 0
-        # if len(self.x_direction_states)<3:
-        #     self.x_direction_states.append(self.xSpeed)
-        # else:
-        #     self.x_direction_states.pop(0)
-        #     self.x_direction_states.append(self.xSpeed)
-
-        # if len(self.y_direction_states)<3:
-        #     self.y_direction_states.append(self.ySpeed)
-        # else:
-        #     self.y_direction_states.pop(0)
-        #     self.y_direction_states.append(self.ySpeed)
-
-        # If the joystick is at 0, reset the limiter and set the speed to 0
-        # if self.x_direction_states[0]==0 and self.x_direction_states[1]==0 and self.x_direction_states[2]==0:
-        #     self.XLimiter.reset(0)
-        #     self.xSpeed=0
-        # else: # TO BE CHECKED!!
         self.xSpeed = self.XLimiter.calculate(self.xSpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond)
-        
-        #self.xSpeed = self.xSpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond
-
-        # if self.y_direction_states[0]==0 and self.y_direction_states[1]==0 and self.y_direction_states[2]==0:
-        #     self.YLimiter.reset(0)
-        #     self.ySpeed=0
-        # else: # TO BE CHECKED!!
         self.ySpeed = self.YLimiter.calculate(self.ySpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond)
-        #self.ySpeed = self.ySpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond
-
-        # TO BE CHECKED!!
         self.turningSpeed *= DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
 
         #################################################################################

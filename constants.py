@@ -83,7 +83,7 @@ class DriveConstants:
     kTeleDriveMaxSpeedMetersPerSecond = .6 #17*0.3048 #17 feet per second into meters
     kTeleDriveMaxAngularRadiansPerSecond = 1.2 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
-    kTeleDriveMaxAccelerationUnitsPerSeconds = 3#kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
+    kTeleDriveMaxAccelerationUnitsPerSeconds = 3 #kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
     kTeleDriveMaxAngularAccelerationUnitsPerSeconds = 0.8 #2*12*0.3048/2 #Transformed from MaxAcceleration
 
     # For autonomous mode (PathPlanner)
