@@ -64,7 +64,8 @@ class SwerveJoystickCmd(Command):
         return x, y, rot
 
     def execute(self) -> None:
-
+        if DriveConstants.DriveEnabled == False:
+            return 0
         ################################################################################
         # Read joystick and filter and attenuate the values
         # Get the x, y, and rotation values from the joystick

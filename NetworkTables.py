@@ -75,3 +75,7 @@ class NetworkTables:
         # Algae Collector
         wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
 
+        # Dropper
+        wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())
+        wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserBottom())
+

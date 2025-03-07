@@ -33,3 +33,6 @@ robotpy_extras = [
 requires = [
     "limelightlib-python",
     "libgrapplefrc-py"]
+
+[tool.robotpy.pyfrc]
+isolated = true
