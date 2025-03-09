@@ -90,7 +90,7 @@ class DriveConstants:
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
 
     # Drive enabler
-    DriveEnabled = False
+    DriveEnabled = True
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
@@ -134,14 +134,14 @@ class DropperConstants:
     LaserBottomCanID = 56
     DropperMotorID = 60
     DropperReversed = False
-    P = 0.0002005 # 0.0001
+    P = 2.0297*10**-7 # 0.0002954
     I = 0
     D = 0
-    kS = 0.52148
-    kV = 0.0010255
-    kA = 0.00012698
-    kG = 0.0022378
-    F = 0.0021141649
+    F = 0.00109051254 # 1/917 NEO Kv
+    kS = 0.2332
+    kV = 0.001061
+    kA = 0.00012624
+
     DropSpeed = 180
     DropIntakeSpeed = 1
     DropTransitSpeed = 0.5

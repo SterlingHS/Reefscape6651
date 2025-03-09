@@ -341,6 +341,9 @@ class SwerveSubsystem(Subsystem):
             self.aprilTagNumber = self.fiducial[0]["fID"]
         else:
             self.aprilTagNumber = 0
+
+        status = self.limelightFront.get_status()
+        wpilib.SmartDashboard.putNumber("Limelight Temp", status.get("temp", 0)) 
         
 
     def updateOdometry(self):

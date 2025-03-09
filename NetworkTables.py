@@ -76,6 +76,6 @@ class NetworkTables:
         wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
 
         # Dropper
-        wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())
-        wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserBottom())
+        # wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())
+        # wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserBottom())
 
