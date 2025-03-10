@@ -24,45 +24,47 @@ class DriveConstants:
     kFrontLeftDriveMotorReversed = False
     kFrontLeftTurningMotorReversed = True
     kFrontLeftAbsoluteEncoderPort = 13
-    kFrontLeftAbsoluteEncoderOffsetRad = -1.270136
+    kFrontLeftAbsoluteEncoderOffsetRad = 1.894466 #-1.270136
     kFrontLeftAbsoluteEncoderReversed = False
     kFrontLeftForwardPIDk = [2.0084, 0, 0, 0.08517, 2.1436, 0.3437] # [P, I, D, kS, KV, kA]
     #kFrontLeftForwardPIDk = [0.16095, 0, 0, 0.072731, 2.1947, 0.033795] # [P, I, D, kS, KV, kA]
+    kFrontLeftTurningPIDk = [.5, 0, 0, 0.16923, 0.41276, 0.018337] # [P, I, D, kS, KV, kA]
 
     kFrontRightDriveMotorPort = 22
     kFrontRightTurningMotorPort = 21
     kFrontRightDriveMotorReversed = True
     kFrontRightTurningMotorReversed = True
     kFrontRightAbsoluteEncoderPort = 23
-    kFrontRightAbsoluteEncoderOffsetRad = 1.67050507
+    kFrontRightAbsoluteEncoderOffsetRad = -1.556990499 #1.67050507
     kFrontRightAbsoluteEncoderReversed = False
     kFrontRightForwardPIDk = [1.2013, 0, 0, 0.11318, 2.1258, 0.3308] # [P, I, D, kS, KV, kA]
     # kFrontRightForwardPIDk = [0.65477, 0, 0, 0.038577, 2.2129, 0.098999] # [P, I, D, kS, KV, kA]
-
+    kFrontRightTurningPIDk = [0.5, 0, 0, 0.15048, 0.41825, 0.025982] # [P, I, D, kS, KV, kA]
 
     kBackLeftDriveMotorPort = 32
     kBackLeftTurningMotorPort = 31
     kBackLeftDriveMotorReversed = False
     kBackLeftTurningMotorReversed = True
     kBackLeftAbsoluteEncoderPort = 33
-    kBackLeftAbsoluteEncoderOffsetRad = -0.3021942
+    kBackLeftAbsoluteEncoderOffsetRad = 2.80411688 #-0.3021942
     kBackLeftAbsoluteEncoderReversed = False
     kBackLeftForwardPIDk = [0.94239, 0, 0, 0.15683, 2.2217, 0.13994] # [P, I, D, kS, KV, kA]
     # kBackLeftForwardPIDk = [0.2359, 0, 0, 0.06964, 2.2443, 0.059663] # [P, I, D, kS, KV, kA]
-
+    kBackLeftTurningPIDk = [0.5, 0, 0, 0.16312, 0.41332, 0.024786] # [P, I, D, kS, KV, kA]
 
     kBackRightDriveMotorPort = 42
     kBackRightTurningMotorPort = 41
     kBackRightDriveMotorReversed = True
     kBackRightTurningMotorReversed = True
     kBackRightAbsoluteEncoderPort = 43
-    kBackRightAbsoluteEncoderOffsetRad = 0.409157827
+    kBackRightAbsoluteEncoderOffsetRad = -2.6675925901 #0.409157827
     kBackRightAbsoluteEncoderReversed = False
     kBackRightForwardPIDk = [0.40995, 0, 0, 0.15053, 2.2362, 0.084626] # [P, I, D, kS, KV, kA]
     # kBackRightForwardPIDk = [0.065547, 0, 0, 0.074308, 2.1954, 0.037429] # [P, I, D, kS, KV, kA]
+    kBackRightTurningPIDk = [.5, 0, 0, 0.16853, 0.41734, 0.019524] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
-    kPhysicalMaxSpeedMetersPerSecond = 5 #5 MPS is about 11 miles per hour 
+    kPhysicalMaxSpeedMetersPerSecond = 1 #5 MPS is about 11 miles per hour 
 
     kMaxTurnRateDegPerS = 200 
     kMaxTurnAccelerationDegPerSSquared = 100 
@@ -80,8 +82,8 @@ class DriveConstants:
         Translation2d(-kWheelBase/2, -kTrackWidth/2) #BR
     )
     #this ends up being the damp factor. Right now this is 4.5/9 meaning the max output of the motors should be 50%
-    kTeleDriveMaxSpeedMetersPerSecond = .6 #17*0.3048 #17 feet per second into meters
-    kTeleDriveMaxAngularRadiansPerSecond = 1.2 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
+    kTeleDriveMaxSpeedMetersPerSecond = .3 #17*0.3048 #17 feet per second into meters
+    kTeleDriveMaxAngularRadiansPerSecond = 1 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
     kTeleDriveMaxAccelerationUnitsPerSeconds = 3 #kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
     kTeleDriveMaxAngularAccelerationUnitsPerSeconds = 0.8 #2*12*0.3048/2 #Transformed from MaxAcceleration
@@ -90,7 +92,7 @@ class DriveConstants:
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
 
     # Drive enabler
-    DriveEnabled = True
+    DriveEnabled = False
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
@@ -112,11 +114,11 @@ class OIConstants:
     kDeadband = 0.05
     kDriverYAxis = 1
     kDriverXAxis = 0
-    kDriverRotAxis = 4
+    kDriverRotAxis = 5
 
 class AutoConstants:
     from constants import DriveConstants
-    kMaxSpeedMetersPerSecond = 5
+    kMaxSpeedMetersPerSecond = 1
     kMaxAccelerationMetersPerSecondSquared = 3
     kPThetaController = 1
     kThetaControllerConstraints = wpimath.trajectory.TrapezoidProfileRadians.Constraints(DriveConstants.kMaxTurnRateRadPerS, DriveConstants.kMaxTurnAccelerationRadPerSSquared)
@@ -161,8 +163,8 @@ class ElevatorConstants:
     ElevatorReversed2 = True
     
     # For maxMotion
-    MaxVelocity = 40
-    MaxAcceleration = 40
+    MaxVelocity = 200
+    MaxAcceleration = 200
 
     # Max and Min values for the elevator for Soft Limits
     Min = 0
@@ -170,7 +172,7 @@ class ElevatorConstants:
 
     # PID Constants
     # PID for L1, L2 and L3 - PID Position
-    P0 = .025
+    P0 = .1
     I0 = 0
     D0 = .01
     kF0 = 0 # For Elevator WITH Springs
@@ -188,7 +190,7 @@ class ElevatorConstants:
     kElevatorEncoderRPM2MeterPerSec = kElevatorEncoderRot2Meter/60
 
     # Position of different levels
-    L1 = 1
+    L1 = 0
     L2 = 14 # 11 inches
     L3 = 30 # 28 inches
     L4 = 54 # 52 inches, Max height 54 inches
@@ -212,13 +214,14 @@ class AlgaeCollectorConstants:
     ACStarReversed = False
     ACArmReversed = False
     Max = 0
-    P = 0.03
+    Min = -14
+    P = 0.04
     I = 0
     D = 0.005
-    starSpeed = 0.1
-    highPosition = -1
-    lowPosition = -12
-    algaeArmHeight = -11
+    starSpeed = 0.2
+    highPosition = 1 # It will reseted to 0 once it reaches the top
+    lowPosition = -13
+    algaeArmCollecting = -12
 
 class FieldOrientedConstants: 
     # Andymark Field

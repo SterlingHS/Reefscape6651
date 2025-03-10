@@ -32,6 +32,17 @@ class AlgaeCollector(Subsystem):
         configRevMotor.inverted(AlgaeCollectorConstants.ACArmReversed) # Inverts the motor if needed
         configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
 
+        # Soft Limits
+        configRevMotor.softLimit.forwardSoftLimit(AlgaeCollectorConstants.Max)
+        configRevMotor.softLimit.reverseSoftLimit(AlgaeCollectorConstants.Min)
+        configRevMotor.softLimit.forwardSoftLimitEnabled(True)
+        configRevMotor.softLimit.reverseSoftLimitEnabled(True)
+        configRevMotor.limitSwitch.reverseLimitSwitchEnabled(True)
+        configRevMotor.limitSwitch.reverseLimitSwitchType(rev.LimitSwitchConfig.Type.kNormallyClosed)
+        configRevMotor.limitSwitch.forwardLimitSwitchEnabled(True)
+        configRevMotor.limitSwitch.forwardLimitSwitchType(rev.LimitSwitchConfig.Type.kNormallyClosed)
+
+
         # PID configuration for position control
         configRevMotor.closedLoop.pid(
             AlgaeCollectorConstants.P, 
@@ -56,14 +67,7 @@ class AlgaeCollector(Subsystem):
 
         # Init Speed of the Star
         self.starSpeed = 0
-
-        # modes for the Arm
-        # mode 0 = Starting State
-        # mode 1 = Picking up algae
-        # mode 2 = Carry algae
-        # mode 3 = Dropping algae
-        self.mode = 0
-        
+    
     def resetArmEncoder(self):
         ''' Resets the encoder position '''
         self.ArmEncoder.setPosition(0)
@@ -128,18 +132,16 @@ class AlgaeCollector(Subsystem):
         ''' Gets the mode of the Arm'''
         return self.mode
 
+    def isArmUp(self):
+        ''' Returns True if the Arm is up'''
+        return self.ACArmMotor.getForwardLimitSwitch()
+
     def periodic(self):
         ''' Runs every loop '''
-        # Set the Arm to the desired height
-        if self.mode == 0:
-            self.setArmPosition(self.height)
-        elif self.mode == 1:
-            self.stopArmMotor()
-        elif self.mode == 2:
-            self.stopArmMotor()
-            self.starSpeed = 0
-        elif self.mode == 3:
-            self.stopArmMotor() #Maybe move arm down to lower position to push algae out
-            self.starSpeed = -AlgaeCollectorConstants.starSpeed
+        if self.isArmUp():
+            self.resetArmEncoder()
+            if self.height == 1:
+                self.height = 0
+        self.setArmPosition(self.height)
         self.setStarMotor(self.starSpeed)
         return super().periodic()

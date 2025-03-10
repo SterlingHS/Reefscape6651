@@ -45,14 +45,21 @@ class Dropper(Subsystem):
         # Init lasercan 
         self.lasercanTop = LaserCAN(DropperConstants.LaserTopCanID)
         self.lasercanBottom = LaserCAN(DropperConstants.LaserBottomCanID)
+        
 
     def getLaserTop(self):
         ''' Returns the distance from the laser on the top '''
-        return self.lasercanTop.get_measurement()
+        result = self.lasercanTop.get_measurement()
+        #print(result.status)
+        return 0
     
     def getLaserBottom(self):
         ''' Returns the distance from the laser on the bottom '''
-        return self.lasercanBottom.get_measurement()
+        result = self.lasercanTop.get_measurement()
+        if result is None:
+            return 1000
+        print(f"LaserBottom: {result} - type(result)")
+        return result
     
     def is_coral_top(self):
         ''' Returns true when coral is detect on the top of the dropper. '''

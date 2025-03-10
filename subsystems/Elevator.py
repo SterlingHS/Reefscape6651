@@ -5,6 +5,7 @@ from wpimath.controller import SimpleMotorFeedforwardMeters
 from constants import ElevatorConstants
 from rev import SparkMax, SparkLowLevel, SparkMaxConfig, SparkBaseConfig
 import rev
+import wpilib
 
 
 class Elevator(Subsystem):
@@ -126,15 +127,17 @@ class Elevator(Subsystem):
         self.elevatorMotor1.stopMotor()
 
     def setElevatorPosition(self, position):
-        ''' Sets the motor speed using PID controller'''
+        ''' Sets the motor speed using PID controller. Receives position in Inches [0,54]'''
         self.elevatorGoal=TrapezoidProfile.State(position,0)
         self.elevatorSetpoint = self.elevatorTrap.calculate(self.kDt, self.elevatorSetpoint, self.elevatorGoal)
         ff = self.elevatorFF.calculate(self.elevatorSetpoint.velocity)
-
+        wpilib.SmartDashboard.putNumber("ElePos",position)
+        wpilib.SmartDashboard.putNumber("EleSetPoint",self.elevatorSetpoint.position)
+        wpilib.SmartDashboard.putNumber("Eleposition", self.readEncoder())
         self.RevController1.setReference(value=self.elevatorSetpoint.position, 
                                          ctrl=SparkLowLevel.ControlType.kPosition, 
-                                         arbFeedforward=ff,
-                                         arbFFUnits=rev.SparkClosedLoopController.ArbFFUnits.kVoltage, # ????
+                                         #arbFeedforward=ff,
+                                         #arbFFUnits=rev.SparkClosedLoopController.ArbFFUnits.kVoltage, # ????
                                          slot=rev.ClosedLoopSlot.kSlot0)
 
     def setElevatorVelocity(self, speed):

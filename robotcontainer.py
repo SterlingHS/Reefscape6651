@@ -50,6 +50,7 @@ class RobotContainer:
 
         # The driver's controller
         self.driverController = wpilib.XboxController(OIConstants.kDriverControllerPort)
+        # self.droveer2 = wpilib.PS5Controller(OIConstants.kDriver2ControllerPort)
         # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
         
         # Set the default commands for the subsystems

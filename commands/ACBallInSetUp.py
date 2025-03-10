@@ -10,16 +10,14 @@ class ACBallInSetUp(Command):
         self.algaeC = algaeC
 
     def initialize(self) -> None:
-        self.algaeC.setArmHeight(AlgaeCollectorConstants.algaeArmHeight)
+        self.algaeC.setArmHeight(AlgaeCollectorConstants.algaeArmCollecting)
         self.algaeC.setStarSpeed(AlgaeCollectorConstants.starSpeed)
-        print("Ball In Setup")
         return super().initialize()
     
     def execute(self) -> None:
-        if self.algaeC.readArmEncoder() <= AlgaeCollectorConstants.algaeArmHeight:
+        if self.algaeC.readArmEncoder() <= AlgaeCollectorConstants.algaeArmCollecting:
             self.algaeC.stopArmMotor()
-            print(f"Ball In Setup - Stop Motor: {self.algaeC.readArmEncoder()} {AlgaeCollectorConstants.algaeArmHeight}")
-
+            
     def end(self, interrupted: bool) -> None:
         self.algaeC.stopArmMotor()
         self.algaeC.setStarSpeed(0)

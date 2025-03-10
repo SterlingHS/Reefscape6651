@@ -24,21 +24,16 @@ from wpilib import DriverStation
 
 signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number
 
-class SwerveJoystickCmd(Command):
-    def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFunc):
+class SwerveJoystickCmd2(Command):
+    def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFuncx, turningSpeedFuncy):
         Command.__init__(self)
 
         self.swerveSub = swerveSub
         self.xSpeedFunction = xSpeedFunc
         self.ySpeedFunction = ySpeedFunc
-        self.turningSpeedFunction = turningSpeedFunc
+        self.turningSpeedFunctionx = turningSpeedFuncx
+        self.turningSpeedFunctiony = turningSpeedFuncy
 
-        # the limiters are giving us lag. They don't allow us to slow down quick enough. When we dampen the modules this lag slows down. We need to allow 0 to bypass all of this and stop the modules
-        self.XLimiter = SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSeconds)
-        self.YLimiter = SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSeconds)
-
-        self.x_direction_states = [0,0,0]
-        self.y_direction_states = [0,0,0]
         self.addRequirements(swerveSub)
 
         # PID to control turning speed of the robot
@@ -56,13 +51,14 @@ class SwerveJoystickCmd(Command):
     def initialize(self) -> None:
         return super().initialize()
     
-    def joystick_attenuator(self, x: float, y: float, rot: float):
+    def joystick_attenuator(self, x: float, y: float, rotx: float, roty: float) -> tuple:
         # This function is used to scale the joystick inputs to make the robot easier to control
         # This done by cubing the joystick inputs
         x = pow(x, 3.)
         y = pow(y, 3.)
-        rot = pow(rot, 3.)
-        return x, y, rot
+        rotx = pow(rotx, 3.)
+        roty = pow(roty, 3.)
+        return x, y, rotx, roty
 
     def execute(self) -> None:
         if DriveConstants.DriveEnabled == False:
@@ -73,33 +69,37 @@ class SwerveJoystickCmd(Command):
         if DriveConstants.DriveEnabled == True: # Disable the drive for testing purposes (to avoid accidents)
             x = self.xSpeedFunction()
             y = self.ySpeedFunction()
-            rot = -self.turningSpeedFunction()
+            rotx = -self.turningSpeedFunctionx()
+            roty = -self.turningSpeedFunctiony()
         else:
             x = 0 
             y = 0 
-            rot = 0
+            rotx = 0
+            roty = 0
 
         # Apply a deadband to the joystick
         self.xSpeed = x if abs(x) > OIConstants.kDeadband else 0.0
         self.ySpeed = y if abs(y) > OIConstants.kDeadband else 0.0
-        self.turningSpeed = rot if abs(rot) > OIConstants.kDeadband else 0.0
+        self.turningSpeedx = rotx if abs(rotx) > OIConstants.kDeadband else 0.0
+        self.turningSpeedy = roty if abs(roty) > OIConstants.kDeadband else 0.0
 
-        self.xSpeed, self.ySpeed, self.turningSpeed = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeed)
+        self.xSpeed, self.ySpeed, self.turningSpeedx, self.turningSpeedy = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeedx, self.turningSpeedy)
+        if rotx != 0 or roty != 0:
+            angleDirectionChassis =  atan2(-self.turningSpeedx, self.turningSpeedy) - pi/2
+        else:
+            angleDirectionChassis = None
 
         joystickAngle = atan2(-self.xSpeed,self.ySpeed) - pi/2
         while joystickAngle<-pi:
             joystickAngle+=2*pi
         while joystickAngle>pi:
             joystickAngle-=2*pi
-        wpilib.SmartDashboard.putNumber("Angle Joystick",joystickAngle*180/pi)
+        wpilib.SmartDashboard.putNumber("Angle Joystick(x,y)",joystickAngle*180/pi)
+        wpilib.SmartDashboard.putNumber("Angle Chassis(x,y)",angleDirectionChassis*180/pi)
 
         wpilib.SmartDashboard.putNumber("Joystick x",self.xSpeed)
         wpilib.SmartDashboard.putNumber("Joystick y",self.ySpeed)
         wpilib.SmartDashboard.putNumber("Joystick rot",self.turningSpeed)
-
-        # self.xSpeed = self.XLimiter.calculate(self.xSpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond)
-        # self.ySpeed = self.YLimiter.calculate(self.ySpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond)
-        # self.turningSpeed *= DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
 
         #################################################################################
         # Select correct driving mode and apply the correct scaling
@@ -108,9 +108,18 @@ class SwerveJoystickCmd(Command):
 
         # Mode 0: Field Oriented
         if self.swerveSub.getDrivingMode() == DrivingModes.FieldOriented:
-
+            if joystickAngle is not None:
+                while joystickAngle < 0:
+                    joystickAngle += 360
+                while joystickAngle > 360:
+                    joystickAngle -= 360
+                self.turningGoal = TrapezoidProfile.State(position=joystickAngle, velocity=0)
+                self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
+                self.turningPID.setSetpoint(self.turningSetpoint.position)*DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
+            else:
+                self.turning
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    self.xSpeed, self.ySpeed, self.turningSpeed, Rotation2d(self.swerveSub.getHeading()*pi/180))
+                    self.xSpeed, self.ySpeed, self.turningPID, Rotation2d(self.swerveSub.getHeading()*pi/180))
             
         # Mode 1: Reef Oriented
         elif self.swerveSub.getDrivingMode() == DrivingModes.ReefOriented:
@@ -128,7 +137,7 @@ class SwerveJoystickCmd(Command):
                 robotDirection -= 360
             while robotDirection < 0:
                 robotDirection += 360
-            self.turningGoal = TrapezoidProfile.State(position=robotDirection, velocity=0)
+            self.turningGoal = TrapezoidProfile.State(position=angle, velocity=0)
             self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
             self.turningPID.setSetpoint(self.turningSetpoint.position)*DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(

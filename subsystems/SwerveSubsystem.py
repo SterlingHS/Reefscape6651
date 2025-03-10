@@ -42,7 +42,8 @@ class SwerveSubsystem(Subsystem):
             DriveConstants.kFrontLeftAbsoluteEncoderPort,
             DriveConstants.kFrontLeftAbsoluteEncoderOffsetRad,
             DriveConstants.kFrontLeftAbsoluteEncoderReversed,
-            DriveConstants.kFrontLeftForwardPIDk
+            DriveConstants.kFrontLeftForwardPIDk,
+            DriveConstants.kFrontLeftTurningPIDk
         )
         self.frontRight = SwerveModule(
             DriveConstants.kFrontRightDriveMotorPort,
@@ -52,7 +53,8 @@ class SwerveSubsystem(Subsystem):
             DriveConstants.kFrontRightAbsoluteEncoderPort,
             DriveConstants.kFrontRightAbsoluteEncoderOffsetRad,
             DriveConstants.kFrontRightAbsoluteEncoderReversed,
-            DriveConstants.kFrontRightForwardPIDk
+            DriveConstants.kFrontRightForwardPIDk,
+            DriveConstants.kFrontRightTurningPIDk
         )
         self.backLeft = SwerveModule(
             DriveConstants.kBackLeftDriveMotorPort,
@@ -62,7 +64,8 @@ class SwerveSubsystem(Subsystem):
             DriveConstants.kBackLeftAbsoluteEncoderPort,
             DriveConstants.kBackLeftAbsoluteEncoderOffsetRad,
             DriveConstants.kBackLeftAbsoluteEncoderReversed,
-            DriveConstants.kBackLeftForwardPIDk
+            DriveConstants.kBackLeftForwardPIDk,
+            DriveConstants.kBackLeftTurningPIDk
         )
         self.backRight = SwerveModule(
             DriveConstants.kBackRightDriveMotorPort,
@@ -72,7 +75,8 @@ class SwerveSubsystem(Subsystem):
             DriveConstants.kBackRightAbsoluteEncoderPort,
             DriveConstants.kBackRightAbsoluteEncoderOffsetRad,
             DriveConstants.kBackRightAbsoluteEncoderReversed,
-            DriveConstants.kBackRightForwardPIDk
+            DriveConstants.kBackRightForwardPIDk,
+            DriveConstants.kBackRightTurningPIDk
         )
         
         # Init variables for velocity
@@ -86,6 +90,8 @@ class SwerveSubsystem(Subsystem):
                                 wpimath.kinematics.SwerveModulePosition(self.backLeft.getDrivePosition(), Rotation2d(self.backLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backRight.getDrivePosition(), Rotation2d(self.backRight.getTurningPosition())),
                                 )
+        # swerveModulePositions = (swerveModulePositions[2], swerveModulePositions[3], 
+        #                          swerveModulePositions[0], swerveModulePositions[1])
         
         # self.gyro = navx.AHRS(navx.SPI.Port.kMXP)
         self.gyro = navx.AHRS.create_spi()
@@ -142,6 +148,9 @@ class SwerveSubsystem(Subsystem):
         # Init Limelight
         self.limelightFront = Limelight("10.66.51.11")
 
+        # Init DesiredStates of the Swerve Modules
+        self.desiredStates = [SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0))]
+
 ################################################################################################
 ############## Gyro Methods
 
@@ -149,17 +158,22 @@ class SwerveSubsystem(Subsystem):
         ''' Zero the gyro heading '''
         self.gyro.reset()
 
+    def offSetGyro(self, angleLimelight):
+        ''' Offsets gyro depending on Limelight feedback '''
+        offset = angleLimelight
+        self.gyro.setAngleAdjustment(offset)
+
     def getCompass(self)->float: 
         ''' Return heading in degrees for values between 0 and 360 (from Gyro)'''
-        return self.gyro.getFusedHeading()
+        return -self.gyro.getFusedHeading()
 
     def getHeading(self):
         ''' Return heading in degrees for values between 0 and 360 (from Gyro)'''
-        return self.gyro.getAngle() % 360
+        return -self.gyro.getAngle() % 360
 
     def getContinuousHeading(self):
         ''' Return heading in degrees (from Gyro)'''
-        return self.gyro.getAngle()
+        return -self.gyro.getAngle()
 
 ################################################################################################
 ############## Odometer Methods
@@ -244,6 +258,12 @@ class SwerveSubsystem(Subsystem):
         self.backLeft.setDesiredState(desiredStates[2])
         self.backRight.setDesiredState(desiredStates[3])
 
+        self.desiredStates = desiredStates
+
+    def getDesiredModuleStates(self):
+        ''' Returns the Desired state of the swerve modules '''
+        return self.desiredStates
+    
     def setChassisSpeeds(self, chassisSpeeds:ChassisSpeeds):
         ''' Sets the chassis speeds of the robot in Autonomous mode (PathPlanner)'''
         self.xvelocity = chassisSpeeds.vx

@@ -23,7 +23,7 @@ import rev
 class SwerveModule:
 
     def __init__(self, driveMotorID, turningMotorID, driveMotorReversed, turningMotorReversed,
-        absoluteEncoderID, absoluteEncoderOffset, absoluteEncoderReversed, drivePIDk):
+        absoluteEncoderID, absoluteEncoderOffset, absoluteEncoderReversed, drivePIDk, turningPIDk):
             ''' Constructor for SwerveModule '''
 
             self.absoluteEncoderOffsetRad = absoluteEncoderOffset
@@ -50,7 +50,7 @@ class SwerveModule:
             configRevMotor.encoder.positionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad)
             configRevMotor.encoder.velocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec)
             # PID configuration for position control
-            configRevMotor.closedLoop.pid(0.6, 0, 0.02, slot=rev.ClosedLoopSlot.kSlot0) # P, I, D
+            configRevMotor.closedLoop.pid(turningPIDk[0], 0, 0, slot=rev.ClosedLoopSlot.kSlot0) # P, I, D
             configRevMotor.closedLoop.positionWrappingEnabled(True) # Wraps the position input
             configRevMotor.closedLoop.positionWrappingInputRange(-pi, pi) # Sets the input range for the position
             # Sends the configuration to the motor
