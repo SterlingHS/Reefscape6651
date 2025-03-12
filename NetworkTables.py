@@ -67,10 +67,13 @@ class NetworkTables:
 
         # Algae Collector
         wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
+        wpilib.SmartDashboard.putBoolean("Arm Up", self.container.algaeC.isArmUp())
 
         # Dropper
         wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())
         wpilib.SmartDashboard.putNumber("Bottom sensor", self.container.dropper.getLaserBottom())
+        wpilib.SmartDashboard.putBoolean("Coral Top", self.container.dropper.is_coral_top())
+        wpilib.SmartDashboard.putBoolean("Coral Bottom", self.container.dropper.is_coral_bottom())
 
         # Drive system
         # Reads Encoders and sends them to Dashboard

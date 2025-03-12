@@ -33,10 +33,10 @@ class AlgaeCollector(Subsystem):
         configRevMotor.setIdleMode(SparkBaseConfig.IdleMode.kBrake) # Sets the idle mode to brake
 
         # Soft Limits
-        configRevMotor.softLimit.forwardSoftLimit(AlgaeCollectorConstants.Max)
-        configRevMotor.softLimit.reverseSoftLimit(AlgaeCollectorConstants.Min)
-        configRevMotor.softLimit.forwardSoftLimitEnabled(True)
-        configRevMotor.softLimit.reverseSoftLimitEnabled(True)
+        # configRevMotor.softLimit.forwardSoftLimit(AlgaeCollectorConstants.Max)
+        # configRevMotor.softLimit.reverseSoftLimit(AlgaeCollectorConstants.Min)
+        # configRevMotor.softLimit.forwardSoftLimitEnabled(False)
+        # configRevMotor.softLimit.reverseSoftLimitEnabled(False)
         configRevMotor.limitSwitch.reverseLimitSwitchEnabled(True)
         configRevMotor.limitSwitch.reverseLimitSwitchType(rev.LimitSwitchConfig.Type.kNormallyClosed)
         configRevMotor.limitSwitch.forwardLimitSwitchEnabled(True)
@@ -51,7 +51,7 @@ class AlgaeCollector(Subsystem):
             slot=rev.ClosedLoopSlot.kSlot0)
 
         # Sends the configuration to the motor
-        self.ACStarMotor.configure(configRevMotor,resetMode,persistMode)
+        self.ACArmMotor.configure(configRevMotor,resetMode,persistMode)
 
         # Init of Encoder to rotate wheel (on the NEO)
         self.ArmEncoder = self.ACArmMotor.getEncoder()
@@ -67,6 +67,10 @@ class AlgaeCollector(Subsystem):
 
         # Init Speed of the Star
         self.starSpeed = 0
+
+        # Init mode for Arm
+        self.mode = 0
+        self.stopMotorFlag = False
     
     def resetArmEncoder(self):
         ''' Resets the encoder position '''
@@ -111,7 +115,17 @@ class AlgaeCollector(Subsystem):
     def setArmPosition(self, position):
         ''' Sets the motor speed using PID controller'''
         # Calculate the turning output using the PID controller
-        self.ArmPIDController.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
+        actualPosition = self.readArmEncoder() 
+        if position == 0 and actualPosition > -1:
+            if self.stopMotorFlag == False:
+                self.stopArmMotor() # Stops the PID
+                self.stopMotorFlag = True
+            self.setArmMotor(.1)
+        elif position == 0 and self.isArmUp():
+            self.stopMotorFlag = False
+            self.ArmPIDController.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
+        else:
+            self.ArmPIDController.setReference(position, SparkLowLevel.ControlType.kPosition, slot=rev.ClosedLoopSlot.kSlot0)
 
     def toggleStar(self):
         ''' Toggles the Star'''
@@ -134,7 +148,7 @@ class AlgaeCollector(Subsystem):
 
     def isArmUp(self):
         ''' Returns True if the Arm is up'''
-        return self.ACArmMotor.getForwardLimitSwitch()
+        return self.ACArmMotor.getForwardLimitSwitch().get()
 
     def periodic(self):
         ''' Runs every loop '''
@@ -142,6 +156,7 @@ class AlgaeCollector(Subsystem):
             self.resetArmEncoder()
             if self.height == 1:
                 self.height = 0
-        self.setArmPosition(self.height)
+        if self.mode == 0:
+            self.setArmPosition(self.height)
         self.setStarMotor(self.starSpeed)
         return super().periodic()

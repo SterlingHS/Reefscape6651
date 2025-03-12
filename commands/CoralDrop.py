@@ -1,5 +1,6 @@
 from commands2 import Command
 from subsystems.Dropper import Dropper
+from constants import DropperConstants
 
 
 class CoralDrop(Command):
@@ -11,14 +12,14 @@ class CoralDrop(Command):
         return super().initialize()
     
     def execute(self) -> None:
-        self.dropper.setMotor(0.5)
+        self.dropper.setDropperVelocity(DropperConstants.DropSpeed)
 
     def end(self, interrupted: bool) -> None:
         self.dropper.stopMotor()
         return super().end(interrupted)
 
     def isFinished(self) -> bool:
-        return self.dropper.is_Coral_dropped()
+        return self.dropper.is_no_Coral_dropper()
 
 
     

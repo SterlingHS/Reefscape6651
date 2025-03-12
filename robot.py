@@ -13,6 +13,7 @@ import commands2.cmd
 import robotcontainer
 from wpilib.cameraserver import CameraServer
 from NetworkTables import NetworkTables
+from libgrapplefrc import can_bridge_tcp
 
 """
 The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -35,8 +36,9 @@ class MyRobot(commands2.TimedCommandRobot):
         initialization code.
         """
         self.autonomousCommand: typing.Optional[commands2.Command] = None
-        # self.cameraServer = CameraServer()
-        # self.cameraServer.launch()
+        self.cameraServer = CameraServer()
+        self.cameraServer.launch()
+        can_bridge_tcp()
 
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.

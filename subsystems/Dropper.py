@@ -49,17 +49,23 @@ class Dropper(Subsystem):
 
     def getLaserTop(self):
         ''' Returns the distance from the laser on the top '''
-        result = self.lasercanTop.get_measurement()
-        #print(result.status)
-        return 0
+        try: 
+            result = self.lasercanTop.get_measurement()
+            if not isinstance(result.distance_mm, int):
+                return 1000
+            return result.distance_mm
+        except: 
+            return 1000
     
     def getLaserBottom(self):
         ''' Returns the distance from the laser on the bottom '''
-        result = self.lasercanTop.get_measurement()
-        if result is None:
+        try: 
+            result = self.lasercanBottom.get_measurement()
+            if not isinstance(result.distance_mm, int):
+                return 1000
+            return result.distance_mm
+        except: 
             return 1000
-        print(f"LaserBottom: {result} - type(result)")
-        return result
     
     def is_coral_top(self):
         ''' Returns true when coral is detect on the top of the dropper. '''
@@ -71,11 +77,11 @@ class Dropper(Subsystem):
     
     def is_Coral_ready(self):
         ''' Returns true if coral is ready to be dropped '''
-        return not self.is_coral_top and self.is_coral_bottom
+        return not self.is_coral_top() and self.is_coral_bottom()
      
     def is_no_Coral_dropper(self):
         ''' Returns true if no coral in dropper '''
-        return not self.is_coral_top and not self.is_coral_bottom
+        return not self.is_coral_top() and not self.is_coral_bottom()
 
     def resetEncoder(self):
         ''' Resets the encoder position '''

@@ -11,6 +11,7 @@ class ACBallOutSetUp(Command):
         self.algaeC = algaeC
 
     def initialize(self) -> None:
+        self.algaeC.setMode(0)
         self.algaeC.setArmHeight(AlgaeCollectorConstants.algaeArmCollecting)
         self.algaeC.setStarSpeed(-AlgaeCollectorConstants.starSpeed)
         return super().initialize()

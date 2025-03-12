@@ -17,9 +17,9 @@ class CoralIntake(Command):
     
     def execute(self) -> None:
         if self.dropper.is_no_Coral_dropper():
-            self.dropper.setDropperVelocityMax(DropperConstants.DropIntakeSpeed)
+            self.dropper.setDropperVelocity(DropperConstants.DropIntakeSpeed)
         elif self.dropper.is_coral_top():
-            self.dropper.setDropperVelocityMax(DropperConstants.DropTransitSpeed)
+            self.dropper.setDropperVelocity(DropperConstants.DropTransitSpeed)
         else:
             self.dropper.stopMotor()
 

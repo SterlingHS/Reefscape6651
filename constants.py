@@ -92,7 +92,7 @@ class DriveConstants:
     kDriveBaseRadius = math.sqrt((kTrackWidth/2)**2+(kWheelBase/2)**2) # Diagonal distance from center to wheel
 
     # Drive enabler
-    DriveEnabled = False
+    DriveEnabled = True
 
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
@@ -114,7 +114,8 @@ class OIConstants:
     kDeadband = 0.05
     kDriverYAxis = 1
     kDriverXAxis = 0
-    kDriverRotAxis = 5
+    kDriverXRotAxis = 2
+    kDriverYRotAxis = 5
 
 class AutoConstants:
     from constants import DriveConstants
@@ -144,9 +145,9 @@ class DropperConstants:
     kV = 0.001061
     kA = 0.00012624
 
-    DropSpeed = 180
-    DropIntakeSpeed = 1
-    DropTransitSpeed = 0.5
+    DropSpeed = 400
+    DropIntakeSpeed = 200
+    DropTransitSpeed = 200
 
 class ElevatorConstants:
 
@@ -212,16 +213,16 @@ class AlgaeCollectorConstants:
     ACStarMotorID = 45
     ACArmMotorID = 46
     ACStarReversed = False
-    ACArmReversed = False
+    ACArmReversed = True
     Max = 0
     Min = -14
-    P = 0.04
+    P = 0.025
     I = 0
     D = 0.005
     starSpeed = 0.2
-    highPosition = 1 # It will reseted to 0 once it reaches the top
-    lowPosition = -13
-    algaeArmCollecting = -12
+    highPosition = 0 # It will reseted to 0 once it reaches the top
+    lowPosition = -15
+    algaeArmCollecting = -15
 
 class FieldOrientedConstants: 
     # Andymark Field
