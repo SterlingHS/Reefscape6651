@@ -37,17 +37,26 @@ class SwerveJoystickCmd2(Command):
         self.addRequirements(swerveSub)
 
         # PID to control turning speed of the robot
-        self.turningPID = PIDController(0.5, 0, 0) # P, I, D to be checked
-        self.turningPID.enableContinuousInput(-pi, pi) 
-        self.turningPID.setTolerance(0.5) # around 0.5 degrees
+        
+        self.turningPID = PIDController(0.01, 0, 0) # P, I, D to be checked
+        self.turningPID.enableContinuousInput(0, 360) 
+        self.turningPID.setTolerance(1) # around 0.5 degrees
 
         # Trapezoid profile to control stearing
-        self.turningTrap = TrapezoidProfile(TrapezoidProfile.Constraints(DriveConstants.kMaxTurnRateRadPerS, DriveConstants.kMaxTurnAccelerationRadPerSSquared)) # Max velocity and acceleration to be checked
+        self.turningTrap = TrapezoidProfile(TrapezoidProfile.Constraints(DriveConstants.kMaxTurnRateDegPerS, DriveConstants.kMaxTurnAccelerationDegPerSSquared)) # Max velocity and acceleration to be checked
         self.turningGoal = TrapezoidProfile.State(position=0, velocity=0)
         self.turningSetpoint = TrapezoidProfile.State(position=0, velocity=0)
 
         self.lastAprilTag = 0
         self.lastAngle = 0
+
+        wpilib.SmartDashboard.putNumber("P Steering", 0.01)
+
+        # Offset depending on Alliance color
+        if DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
+            self.angleOffset = 180
+        else:
+            self.angleOffset = 0
 
     def initialize(self) -> None:
         return super().initialize()
@@ -61,17 +70,15 @@ class SwerveJoystickCmd2(Command):
         roty = pow(roty, 3.)
         return x, y, rotx, roty
     
-    def angle_npi_pi(self, angle: float) -> float:
-        # This function is used to convert an angle to a value between -pi and pi
+    def angle_0_360(self, angle: float) -> float:
+        # This function is used to convert an angle to a value between -360 and 360
         while angle < 0:
-            angle += -pi
-        while angle > pi:
-            angle -= pi
+            angle += 360
+        while angle > 360:
+            angle -= 360
         return angle
 
     def execute(self) -> None:
-        if DriveConstants.DriveEnabled == False:
-            return 0
         ################################################################################
         # Read joystick and filter and attenuate the values
         # Get the x, y, and rotation values from the joystick
@@ -89,26 +96,32 @@ class SwerveJoystickCmd2(Command):
         # Apply a deadband to the joystick
         self.xSpeed = x if abs(x) > OIConstants.kDeadband else 0.0
         self.ySpeed = y if abs(y) > OIConstants.kDeadband else 0.0
-        self.turningSpeedx = rotx if abs(rotx) > OIConstants.kDeadband else 0.0
-        self.turningSpeedy = roty if abs(roty) > OIConstants.kDeadband else 0.0
+        self.turningSpeedx = rotx if abs(rotx) > OIConstants.kDeadbandRot else 0.0
+        self.turningSpeedy = roty if abs(roty) > OIConstants.kDeadbandRot else 0.0
 
+        # Calculates the andgle of the robot depending on the joystick
         self.xSpeed, self.ySpeed, self.turningSpeedx, self.turningSpeedy = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeedx, self.turningSpeedy)
-        if rotx != 0 or roty != 0:
-            angleDirectionChassis =  atan2(-self.turningSpeedx, self.turningSpeedy) - pi/2
-            angleDirectionChassis = self.angle_npi_pi(angleDirectionChassis)
+        if self.turningSpeedx != 0 or self.turningSpeedy != 0:
+            angleDirectionChassis =  -atan2(-self.turningSpeedx, self.turningSpeedy)*180/pi + self.angleOffset
+            angleDirectionChassis = self.angle_0_360(angleDirectionChassis)
             self.lastAngle = angleDirectionChassis
         else:
             angleDirectionChassis = self.lastAngle
+        
+        # Calculates the andgle of the robot depending on the joystick
+        if self.xSpeed==self.ySpeed==0:
+            joystickAngle = 0
+        else:
+            joystickAngle = atan2(-self.xSpeed,self.ySpeed)*180/pi - 90
+            joystickAngle = self.angle_0_360(joystickAngle)
 
-        joystickAngle = atan2(-self.xSpeed,self.ySpeed) - pi/2
-        joystickAngle = self.angle_npi_pi(joystickAngle)
-
-        wpilib.SmartDashboard.putNumber("Angle Joystick(x,y)",joystickAngle*180/pi)
-        wpilib.SmartDashboard.putNumber("Angle Chassis(x,y)",angleDirectionChassis*180/pi)
+        wpilib.SmartDashboard.putNumber("Angle Joystick(x,y)",joystickAngle)
+        wpilib.SmartDashboard.putNumber("Angle Chassis(x,y)",angleDirectionChassis)
 
         wpilib.SmartDashboard.putNumber("Joystick x",self.xSpeed)
         wpilib.SmartDashboard.putNumber("Joystick y",self.ySpeed)
-        wpilib.SmartDashboard.putNumber("Joystick rot",self.turningSpeed)
+        wpilib.SmartDashboard.putNumber("Joystick rotx",self.turningSpeedx)
+        wpilib.SmartDashboard.putNumber("Joystick roty",self.turningSpeedy)
 
         #################################################################################
         # Select correct driving mode and apply the correct scaling
@@ -118,22 +131,33 @@ class SwerveJoystickCmd2(Command):
         # Mode 0: Field Oriented
         if self.swerveSub.getDrivingMode() == DrivingModes.FieldOriented:
             
-            self.turningGoal = TrapezoidProfile.State(position=angleDirectionChassis, velocity=0)
-            self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
-            self.turningPID.setSetpoint(self.turningSetpoint.position)*DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
+            P = wpilib.SmartDashboard.getNumber("P Steering", 0.01)
+            self.turningPID.setP(P)
+
+            # self.turningGoal = TrapezoidProfile.State(position=angleDirectionChassis, velocity=0)
+            # self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
+            # self.turningPID.setSetpoint(self.turningSetpoint.position)
+
+            error = abs(angleDirectionChassis-self.swerveSub.getHeading())
+            wpilib.SmartDashboard.putNumber("Error", error)
+            self.turningPID.setSetpoint(angleDirectionChassis)
+            speedTheta = self.turningPID.calculate(self.swerveSub.getHeading())
+
+            wpilib.SmartDashboard.putNumber("Theta Speed", speedTheta)
+            wpilib.SmartDashboard.putNumber("Trap Setpoint", self.turningSetpoint.position)
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    self.xSpeed, self.ySpeed, self.turningPID, Rotation2d(self.swerveSub.getHeading()))
+                    self.xSpeed, self.ySpeed, speedTheta, Rotation2d(self.swerveSub.getHeading()*pi/180))
             
         # Mode 1: Reef Oriented
         elif self.swerveSub.getDrivingMode() == DrivingModes.ReefOriented:
             angle = self.swerveSub.angleToReef()
-            angle = self.angle_npi_pi(angle)
+            angle = self.angle_0_360(angle)
             self.turningPID.setSetpoint(angle)
 
             # Gets the current angle of the robot
             robotDirection = self.swerveSub.getRotation2d().degrees()
             # Converts it  to an angle between -pi and pi
-            robotDirection = self.angle_npi_pi(robotDirection)
+            robotDirection = self.angle_0_360(robotDirection)
 
             self.turningGoal = TrapezoidProfile.State(position=angle, velocity=0)
             self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
@@ -196,6 +220,10 @@ class SwerveJoystickCmd2(Command):
                     self.xSpeed, self.ySpeed, self.turningSpeed, self.swerveSub.getRotation2d())
         
         # Updates the swerve drive modules
+        wpilib.SmartDashboard.putNumber("Vx",self.xSpeed)
+        wpilib.SmartDashboard.putNumber("Vy",self.ySpeed)
+        wpilib.SmartDashboard.putNumber("VTheta",speedTheta)
+
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
         self.swerveSub.setModuleStates(moduleStates)
 

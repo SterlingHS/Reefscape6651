@@ -8,6 +8,7 @@ import commands2
 import commands2.button
 
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
+from commands.SwerveJoystickCmd2 import SwerveJoystickCmd2
 from commands.CoralDrop import CoralDrop
 from commands.CoralDropSpeed import CoralDropSpeed
 from commands.ElevatorFloor import ElevatorFloor
@@ -47,7 +48,7 @@ class RobotContainer:
         self.swerveSubsystem = SwerveSubsystem()
         self.dropper = Dropper()
         self.elevator = Elevator()
-        self.algaeR = AlgaeRemover()
+        #self.algaeR = AlgaeRemover()
         self.algaeC = AlgaeCollector()
 
         # The driver's controller
@@ -57,12 +58,21 @@ class RobotContainer:
         # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
         
         # Set the default commands for the subsystems
+        # self.swerveSubsystem.setDefaultCommand(
+        #    SwerveJoystickCmd(
+        #        self.swerveSubsystem,
+        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverYAxis),
+        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
+        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverXRotAxis)
+        #    )
+        # )
         self.swerveSubsystem.setDefaultCommand(
-           SwerveJoystickCmd(
+           SwerveJoystickCmd2(
                self.swerveSubsystem,
                lambda : self.driverController.getRawAxis(OIConstants.kDriverYAxis),
                lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
-               lambda : self.driverController.getRawAxis(OIConstants.kDriverXRotAxis)
+               lambda : self.driverController.getRawAxis(OIConstants.kDriverXRotAxis),
+               lambda : self.driverController.getRawAxis(OIConstants.kDriverYRotAxis)
            )
         )
 
@@ -129,11 +139,11 @@ class RobotContainer:
 
 
         # ALGAE REMOVER
-        commands2.button.POVButton(
-            self.driverController, 90).onTrue(ARArmChange(self.algaeR,0))
+        # commands2.button.POVButton(
+        #     self.driverController, 90).onTrue(ARArmChange(self.algaeR,0))
 
-        commands2.button.POVButton(
-            self.driverController, 270).onTrue(ARArmChange(self.algaeR,5))
+        # commands2.button.POVButton(
+        #     self.driverController, 270).onTrue(ARArmChange(self.algaeR,5))
         
 
     def getAutonomousCommand(self) -> commands2.Command:

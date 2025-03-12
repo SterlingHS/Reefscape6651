@@ -97,6 +97,11 @@ class SwerveSubsystem(Subsystem):
         self.gyro = navx.AHRS.create_spi()
         self.zeroHeading()
         sleep(1) # Wait for gyro to calibrate... NOT MORE THAN 2 SEC!! or get error.
+        if DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
+            self.gyroOffset = 0
+        else:
+            self.gyroOffset = 0
+        self.offSetGyro(self.gyroOffset)
 
         # Init SwerveDrive2PoseEstimator
         self.poseEstimator = SwerveDrive4PoseEstimator(
@@ -323,13 +328,10 @@ class SwerveSubsystem(Subsystem):
 ############## Reef Oriented Methods
 
     def angleToReef(self):
-        ''' Returns the angle in radians to the reef '''
+        ''' Returns the angle in degrees to the reef '''
         pose = self.getPose() # Current position of the robot
         # Calculates the angle to the reef in radians from curent location (pose)
-        try:
-            return atan2(self.reefLocationY  - pose.Y(), self.reefLocationX - pose.X()) # radians
-        except: # just in case we get an error from the division by zero
-            return 0
+        return atan2(self.reefLocationY  - pose.Y(), self.reefLocationX - pose.X())*180/pi # degrees
         
     def angleToAprilTag(self, aprilTag):
         ''' Returns the angle to the April Tag in degrees (0-360)'''

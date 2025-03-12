@@ -112,6 +112,7 @@ class OIConstants:
     kDriverControllerPort = 0
     kCodriverControllerPort = 1
     kDeadband = 0.05
+    kDeadbandRot = .5
     kDriverYAxis = 1
     kDriverXAxis = 0
     kDriverXRotAxis = 2

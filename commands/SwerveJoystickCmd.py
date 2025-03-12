@@ -43,15 +43,23 @@ class SwerveJoystickCmd(Command):
 
         # PID to control turning speed of the robot
         self.turningPID = PIDController(0.5, 0, 0) # P, I, D to be checked
-        self.turningPID.enableContinuousInput(-pi, pi) 
-        self.turningPID.setTolerance(0.01) # around 0.5 degrees
+        self.turningPID.enableContinuousInput(-180, 180) 
+        self.turningPID.setTolerance(1) # around 0.5 degrees
 
         # Trapezoid profile to control stearing
-        self.turningTrap = TrapezoidProfile(TrapezoidProfile.Constraints(360, 360)) # Max velocity and acceleration to be checked
+        self.turningTrap = TrapezoidProfile(TrapezoidProfile.Constraints(100, 100)) # Max velocity and acceleration to be checked
         self.turningGoal = TrapezoidProfile.State(position=0, velocity=0)
         self.turningSetpoint = TrapezoidProfile.State(position=0, velocity=0)
 
         self.lastAprilTag = 0
+
+    def angle_n180_180(self, angle: float) -> float:
+        # This function is used to convert an angle to a value between -pi and pi
+        while angle < -180:
+            angle += 360
+        while angle > pi:
+            angle -= 180
+        return angle
 
     def initialize(self) -> None:
         return super().initialize()
@@ -86,20 +94,17 @@ class SwerveJoystickCmd(Command):
 
         self.xSpeed, self.ySpeed, self.turningSpeed = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeed)
 
-        joystickAngle = atan2(-self.xSpeed,self.ySpeed) - pi/2
-        while joystickAngle<-pi:
-            joystickAngle+=2*pi
-        while joystickAngle>pi:
-            joystickAngle-=2*pi
-        wpilib.SmartDashboard.putNumber("Angle Joystick",joystickAngle*180/pi)
+        joystickAngle = atan2(-self.xSpeed,self.ySpeed)*180/pi - 90
+        joystickAngle = self.angle_n180_180(joystickAngle)
+        wpilib.SmartDashboard.putNumber("Angle Joystick",joystickAngle)
 
         wpilib.SmartDashboard.putNumber("Joystick x",self.xSpeed)
         wpilib.SmartDashboard.putNumber("Joystick y",self.ySpeed)
         wpilib.SmartDashboard.putNumber("Joystick rot",self.turningSpeed)
 
-        # self.xSpeed = self.XLimiter.calculate(self.xSpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond)
-        # self.ySpeed = self.YLimiter.calculate(self.ySpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond)
-        # self.turningSpeed *= DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
+        self.xSpeed = self.XLimiter.calculate(self.xSpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond)
+        self.ySpeed = self.YLimiter.calculate(self.ySpeed*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond)
+        self.turningSpeed *= DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
 
         #################################################################################
         # Select correct driving mode and apply the correct scaling
