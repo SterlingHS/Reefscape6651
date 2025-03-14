@@ -21,6 +21,7 @@ from commands.ACArmChange import ACArmChange
 from commands.ACBallCancel import ACBallCancel
 from commands.CoralIntake import CoralIntake
 from commands.CoralDrop import CoralDrop
+from commands.GyroReset import GyroReset
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
 from subsystems.Dropper import Dropper
@@ -136,6 +137,11 @@ class RobotContainer:
 
         commands2.button.POVButton(
             self.driverController, 180).onTrue(ElevatorChange(self.elevator,-1))
+        
+        # Swerve
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.PS5Controller.Button.kOptions).onTrue(GyroReset(self.swerveSubsystem)
+        )
 
 
         # ALGAE REMOVER

@@ -90,4 +90,3 @@ class NetworkTables:
         wpilib.SmartDashboard.putNumber("Desired BL", DesiredStates[2].angle.degrees())
         wpilib.SmartDashboard.putNumber("Desired BR", DesiredStates[3].angle.degrees())
 
-

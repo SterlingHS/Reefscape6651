@@ -85,7 +85,7 @@ class SwerveSubsystem(Subsystem):
         self.turningvelocity = 0
 
         # Init Swerve Position
-        swerveModulePositions = (wpimath.kinematics.SwerveModulePosition(self.frontLeft.getDrivePosition(), Rotation2d(self.frontLeft.getTurningPosition())),
+        self.swerveModulePositions = (wpimath.kinematics.SwerveModulePosition(self.frontLeft.getDrivePosition(), Rotation2d(self.frontLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.frontRight.getDrivePosition(), Rotation2d(self.frontRight.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backLeft.getDrivePosition(), Rotation2d(self.backLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backRight.getDrivePosition(), Rotation2d(self.backRight.getTurningPosition())),
@@ -97,22 +97,12 @@ class SwerveSubsystem(Subsystem):
         self.gyro = navx.AHRS.create_spi()
         self.zeroHeading()
         sleep(1) # Wait for gyro to calibrate... NOT MORE THAN 2 SEC!! or get error.
-        if DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
-            self.gyroOffset = 0
-        else:
-            self.gyroOffset = 0
-        self.offSetGyro(self.gyroOffset)
 
         # Init SwerveDrive2PoseEstimator
-        self.poseEstimator = SwerveDrive4PoseEstimator(
-                                    DriveConstants.kDriveKinematics, 
-                                    self.getRotation2d(), 
-                                    swerveModulePositions,
-                                    Pose2d(0, 0, Rotation2d(0)))
         self.odometer = wpimath.kinematics.SwerveDrive4Odometry(
                                     DriveConstants.kDriveKinematics,
                                     self.getRotation2d(),
-                                    swerveModulePositions)       
+                                    self.swerveModulePositions)       
 
         # Pathplanner Configuration
         config = RobotConfig.fromGUISettings() # RobotConfig, this should likely live in your Constants class
@@ -145,13 +135,14 @@ class SwerveSubsystem(Subsystem):
         self.last_reef_angle = 0
         self.drivingMode = DrivingModes.FieldOriented
         # Mode 0 = Field Oriented
-        # Mode 1 = Reef Oriented
+        # Mode 1 = Reef AprilTag Oriented
         # Mode 2 = Processor Oriented
         # Mode 3 = Coral Station Oriented
-        # Mode 4 = Reef AprilTag Oriented
 
         # Init Limelight
         self.limelightFront = Limelight("10.66.51.11")
+        self.listYaw = []
+        self.limelightInit = False
 
         # Init DesiredStates of the Swerve Modules
         self.desiredStates = [SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0))]
@@ -189,11 +180,15 @@ class SwerveSubsystem(Subsystem):
 
     def getPose(self):
         ''' Returns the pose of the robot '''
-        # Read limelight if available and update pose with the limelight pose
-        # if self.limelight.hasTarget():
-        #     self.odometer.addVisionMeasurement(self.limelight.getBotPose2d(), self.limelight.getTimestamp())
         return self.odometer.getPose()
 
+    def getPoseEstimator(self):
+        ''' Returns the pose of the robot using PoseEstimator '''
+        try:
+            return self.poseEstimator.getEstimatedPosition()
+        except:
+            return Pose2d(0,0,Rotation2d(0))
+    
     def resetOdometer(self, pose):
         ''' Resets the odometer to a specific pose '''
         self.odometer.resetPosition(self.getRotation2d(), (self.frontLeft.getSwerveModulePosition(), self.frontRight.getSwerveModulePosition(), self.backLeft.getSwerveModulePosition(), self.backRight.getSwerveModulePosition()), pose)
@@ -327,18 +322,12 @@ class SwerveSubsystem(Subsystem):
 ###############################################################################################
 ############## Reef Oriented Methods
 
-    def angleToReef(self):
-        ''' Returns the angle in degrees to the reef '''
-        pose = self.getPose() # Current position of the robot
-        # Calculates the angle to the reef in radians from curent location (pose)
-        return atan2(self.reefLocationY  - pose.Y(), self.reefLocationX - pose.X())*180/pi # degrees
-        
     def angleToAprilTag(self, aprilTag):
         ''' Returns the angle to the April Tag in degrees (0-360)'''
         # if alliance is blue
         if (DriverStation.getAlliance() == DriverStation.Alliance.kBlue and 17 <= aprilTag <= 22) or (DriverStation.getAlliance() == DriverStation.Alliance.kRed and 6 <= aprilTag <= 11):
-            self.last_reef_angle = 180-ReefPositions.reefAngles[aprilTag-1]
-            while self.last_reef_angle < 360:
+            self.last_reef_angle = ReefPositions.reefAngles[aprilTag-1]
+            while self.last_reef_angle < 0:
                 self.last_reef_angle += 360
             while self.last_reef_angle > 360:
                 self.last_reef_angle -= 360
@@ -352,21 +341,46 @@ class SwerveSubsystem(Subsystem):
 
     def readLimelight(self):
         ''' Read Limelight and returns the data '''
-        results = self.limelightFront.get_results()
-        self.botpose = results.get("botpose", [])
-        self.botpose_wpiblue = results.get("botpose_orb_wpiblue", [])
-        self.capture_latency = results.get("cl", 0)
-        self.timestamp = results.get("ts", 0)
-        self.validity = results.get("v", 0)
-        self.fiducial = results.get("Fiducial",[])
-        if self.fiducial != []:
-            self.aprilTagNumber = self.fiducial[0]["fID"]
-        else:
-            self.aprilTagNumber = 0
+        try:
+            results = self.limelightFront.get_results()
+            self.botpose = results.get("botpose_orb", [])
+            self.botpose_wpiblue = results.get("botpose_orb_wpiblue", [])
+            self.capture_latency = results.get("cl", 0)
+            self.timestamp = results.get("ts", 0)
+            self.validity = results.get("v", 0)
+            self.fiducial = results.get("Fiducial",[])
+            if self.fiducial != []:
+                self.aprilTagNumber = self.fiducial[0]["fID"]
+            else:
+                self.aprilTagNumber = 0
 
-        status = self.limelightFront.get_status()
-        wpilib.SmartDashboard.putNumber("Limelight Temp", status.get("temp", 0)) 
-        
+            status = self.limelightFront.get_status()
+            wpilib.SmartDashboard.putNumber("Limelight Temp", status.get("temp", 0)) 
+            self.yaw_pose = results.get("botpose",[])[5]
+            wpilib.SmartDashboard.putNumber("Yaw", self.yaw_pose)
+            try:
+                if len(self.listYaw) < 10 and isinstance(self.yaw_pose,float):
+                    if self.yaw_pose != 0:
+                        self.listYaw.append(self.yaw_pose)
+                    if len(self.listYaw) == 10:
+                        yaw = sum(self.listYaw)/len(self.listYaw)
+                        print(f"Yaw = {yaw}")
+                        self.offSetGyro(-yaw)
+                        if self.limelightInit == False:
+                            self.limelightInit = True
+                            self.poseEstimator = SwerveDrive4PoseEstimator(
+                                        DriveConstants.kDriveKinematics, 
+                                        self.getRotation2d(), 
+                                        self.swerveModulePositions,
+                                        Pose2d(
+                                            self.botpose_wpiblue[0], 
+                                            self.botpose_wpiblue[1], 
+                                            Rotation2d.fromDegrees(yaw)))
+            except:
+                print("Error reading limelight and saving yaw for calibration of NavX")
+        except:
+            print("Error reading Limelight")
+            self.validity = 0
 
     def updateOdometry(self):
         ''' Update the odometry using the Limelight and the botpose '''
@@ -389,8 +403,11 @@ class SwerveSubsystem(Subsystem):
                                         Pose2d(
                                             self.botpose_wpiblue[0], 
                                             self.botpose_wpiblue[1], 
-                                            Rotation2d.fromDegrees(self.botpose_wpiblue[2])
+                                            Rotation2d.fromDegrees(self.yaw_pose)
                                             ), self.timestamp)
+        wpilib.SmartDashboard.putNumber("PoseEstimator x",self.poseEstimator.getEstimatedPosition().x)
+        wpilib.SmartDashboard.putNumber("PoseEstimator y",self.poseEstimator.getEstimatedPosition().y)
+        wpilib.SmartDashboard.putNumber("PoseEstimator heading",self.poseEstimator.getEstimatedPosition().rotation().degrees())
    
 ##############################################################################################
 ############## Driving Modes
@@ -417,11 +434,9 @@ class SwerveSubsystem(Subsystem):
         self.readLimelight()
     
         # Update Odometry
-        self.updateOdometry()
+        if self.limelightInit == True:
+            self.updateOdometry()
             
-        wpilib.SmartDashboard.putNumber("PoseEstimator x",self.poseEstimator.getEstimatedPosition().x)
-        wpilib.SmartDashboard.putNumber("PoseEstimator y",self.poseEstimator.getEstimatedPosition().y)
-    
         # Sends data to dashboard
         wpilib.SmartDashboard.putNumber("Pose X", self.getPose().X())
         wpilib.SmartDashboard.putNumber("Pose Y", self.getPose().Y())

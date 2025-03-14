@@ -9,10 +9,13 @@ from commands2 import Command
 from wpimath.controller import PIDController
 from wpimath.trajectory import TrapezoidProfile
 from wpimath.kinematics import ChassisSpeeds
+from wpimath.geometry import Rotation2d
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
 
 from constants import DriveConstants
+
+from math import pi
 
 class SwerveJoystickCmd(Command):
     def __init__(self, swerveSub:SwerveSubsystem, GoalX, GoalY, GoalTheta):
@@ -71,7 +74,7 @@ class SwerveJoystickCmd(Command):
         ySpeed = self.yPID.calculate(self.swerveSub.getPose().translation().y)*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond
         
         self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, ySpeed, turningSpeed, self.swerveSub.getRotation2d().degrees())
+                xSpeed, ySpeed, turningSpeed, Rotation2d(self.swerveSub.getHeading()*pi/180))
     
         # Updates the swerve drive modules
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)

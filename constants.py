@@ -194,7 +194,7 @@ class ElevatorConstants:
     # Position of different levels
     L1 = 0
     L2 = 14 # 11 inches
-    L3 = 30 # 28 inches
+    L3 = 32 # 28 inches
     L4 = 54 # 52 inches, Max height 54 inches
     
 class AlgaeRemoverConstants:
@@ -222,8 +222,8 @@ class AlgaeCollectorConstants:
     D = 0.005
     starSpeed = 0.2
     highPosition = 0 # It will reseted to 0 once it reaches the top
-    lowPosition = -15
-    algaeArmCollecting = -15
+    lowPosition = -17
+    algaeArmCollecting = -17
 
 class FieldOrientedConstants: 
     # Andymark Field
@@ -232,10 +232,10 @@ class FieldOrientedConstants:
     # Welded Field
     # Centers: Blue (176.745, 158.50) and Red (514.13, 158.50)
     # Centers in meter: Blue (4.489, 4.026) and Red (13.059, 4.026)
-    RedReefX = 4.489 
-    RedReefY = 13.059
-    BlueReefX = 4.489
-    BlueReefY = 4.020
+    RedReefY = 4.489 
+    RedReefX = 13.059
+    BlueReefY = 4.489
+    BlueReefX = 4.020
 
 class ReefPositions: 
     # List of reef angles depending on the reef number
@@ -257,7 +257,7 @@ class ReefPositions:
 
 class DrivingModes(Enum):
     # Mode 0 = Field Oriented
-    # Mode 1 = Reef Oriented
+    # Mode 1 = Reef AprilTag Oriented
     # Mode 2 = Processor Oriented
     # Mode 3 = Coral Station Oriented
     # Coral Station Processor Oriented
@@ -266,9 +266,7 @@ class DrivingModes(Enum):
     # Coral Station Far side Oriented
     #   Red1   - 126 degrees
     #   Blue13 - 306 degrees
-    # Mode 4 = Reef AprilTag Oriented
     FieldOriented = 0
-    ReefOriented = 1
+    ReefAprilTageOriented = 1
     ProcessorOriented = 2
     CoralStationOriented = 3
-    ReefAprilTageOriented = 4
