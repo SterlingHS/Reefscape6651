@@ -11,7 +11,9 @@ import wpilib
 import commands2
 import commands2.cmd
 import robotcontainer
-from wpilib.cameraserver import CameraServer
+from cscore import CameraServer as CS
+from cscore import VideoMode
+import cv2
 from NetworkTables import NetworkTables
 from libgrapplefrc import can_bridge_tcp
 
@@ -36,8 +38,12 @@ class MyRobot(commands2.TimedCommandRobot):
         initialization code.
         """
         self.autonomousCommand: typing.Optional[commands2.Command] = None
-        self.cameraServer = CameraServer()
-        self.cameraServer.launch()
+        # Initialize camera
+        CS.enableLogging()
+        camera = CS.startAutomaticCapture("Top Camera", 0)
+        camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 160, 120, 60)
+        #self.output = CS.putVideo("Top Camera", 320, 240) Probably not needed
+
         can_bridge_tcp()
 
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
@@ -47,6 +53,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def robotPeriodic(self) -> None:
         self.shuffleboardinfo.updateShuffleboard()
+        # time, input_img = self.sink.grabFrame(input_img)
         return super().robotPeriodic()
 
     def disabledInit(self) -> None:
