@@ -50,6 +50,9 @@ class SwerveJoystickCmd2(Command):
         self.lastAprilTag = 0
         self.memTag = []
         self.lastAngle = 0
+        self.savingAngle = False
+        self.cyclesAngles = 0
+        self.lastMode = DrivingModes.FieldOriented
 
         # Offset depending on Alliance color
         if DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
@@ -81,6 +84,10 @@ class SwerveJoystickCmd2(Command):
         return angle
 
     def execute(self) -> None:
+        # Check driving mode
+        if self.lastMode != self.swerveSub.getDrivingMode():
+            self.lastAngle = self.swerveSub.getHeading()
+
         ################################################################################
         # Read joystick and filter and attenuate the values
         # Get the x, y, and rotation values from the joystick
@@ -124,26 +131,43 @@ class SwerveJoystickCmd2(Command):
 
         # Mode 0: Field Oriented
         if self.swerveSub.getDrivingMode() == DrivingModes.FieldOriented:
-            # Sets and calculates the setpoint for the turning PID
-            self.turningPID.setSetpoint(angleDirectionChassis)
-            speedTheta = self.turningPID.calculate(self.swerveSub.getHeading())
-            # Apply slew rate limiter to theta speed
-            speedTheta = self.thetaSpeedLimiter.calculate(speedTheta)
-            # Calculate the chassis speeds using field relative speeds
-            self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    self.xSpeed, self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+            if self.turningSpeedx == 0:
+                if self.savingAngle == True:
+                    if self.cyclesAngles < 25:
+                        self.cyclesAngles += 1
+                    else:
+                        self.cyclesAngles = 0
+                        self.savingAngle = False
+                        self.lastAngle = self.swerveSub.getHeading()
+                    self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                        self.xSpeed, self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+                    self.lastAngle = self.swerveSub.getHeading()
+                else:
+                    # Sets and calculates the setpoint for the turning PID
+                    self.turningPID.setSetpoint(self.lastAngle)
+                    speedTheta = self.turningPID.calculate(self.swerveSub.getHeading())
+                    # Apply slew rate limiter to theta speed
+                    speedTheta = self.thetaSpeedLimiter.calculate(speedTheta)
+                    # Calculate the chassis speeds using field relative speeds
+                    self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                            self.xSpeed, self.ySpeed, speedTheta, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+            else:
+                self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                        self.xSpeed, self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+                self.lastAngle = self.swerveSub.getHeading()
+                self.savingAngle = True
 
         # Mode 1: Reef AprilTag Oriented
         elif self.swerveSub.getDrivingMode() == DrivingModes.ReefAprilTageOriented:
             # Read closest april tag number
             aprilTagNumber = self.swerveSub.getClosestAprilTag()
 
-            # record the last 20 april tag numbers to avoid oscillation
+            # record the last 50 april tag numbers to avoid oscillation
             self.memTag.append(aprilTagNumber)
             if len(self.memTag) > 50:
                 self.memTag.pop(0)
 
-            # if the last 20 april tag numbers are the same, use that number
+            # if the last 50 april tag numbers are the same, use that number
             if len(set(self.memTag)) == 1:
                 aprilTagNumber = self.memTag[0]
         

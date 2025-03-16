@@ -14,9 +14,7 @@ from math import pi
 class NetworkTables:
     def __init__(self, robotContainer: RobotContainer):
         self.container = robotContainer
-        # wpilib.SmartDashboard.putNumber("Turning P", 0.2)
         
-
     def updateShuffleboard(self):
         """Updates shuffleboard values"""
         ##### Examples of how to use the Smart Dashboard
@@ -27,11 +25,11 @@ class NetworkTables:
         # Σ = "sigma grindset".capitalize()
 
         # Reads all absolute encoders and push values to Smart Dashboard
-        absoluteEncoder = self.container.swerveSubsystem.readAbsEncoders()
-        wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
-        wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
-        wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
-        wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
+        # absoluteEncoder = self.container.swerveSubsystem.readAbsEncoders()
+        # wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
+        # wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
+        # wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
+        # wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
         # wpilib.SmartDashboard.putNumber("X axis", self.container.driverController.getRawAxis(OIConstants.kDriverXAxis))
         # wpilib.SmartDashboard.putNumber("Y axis", self.container.driverController.getRawAxis(OIConstants.kDriverYAxis))
         # wpilib.SmartDashboard.putNumber("Rot axis", self.container.driverController.getRawAxis(OIConstants.kDriverRotAxis))
@@ -59,7 +57,7 @@ class NetworkTables:
         # wpilib.SmartDashboard.putNumber("Velocity Error", errorVelocity)
 
         wpilib.SmartDashboard.putNumber("Angle Gyro", self.container.swerveSubsystem.getHeading())
-        wpilib.SmartDashboard.putNumber("Angle Gyro (radians)", self.container.swerveSubsystem.getHeading()*pi/180)
+        # wpilib.SmartDashboard.putNumber("Angle Gyro (radians)", self.container.swerveSubsystem.getHeading()*pi/180)
 
         # Elevator
         wpilib.SmartDashboard.putNumber("Elevator Encoder", self.container.elevator.readEncoder())
@@ -67,26 +65,26 @@ class NetworkTables:
         wpilib.SmartDashboard.putBoolean("Elevator Limit Switch", self.container.elevator.lowerSwitchOn())
 
         # Algae Collector
-        wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
-        wpilib.SmartDashboard.putBoolean("Arm Up", self.container.algaeC.isArmUp())
+        # wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
+        # wpilib.SmartDashboard.putBoolean("Arm Up", self.container.algaeC.isArmUp())
 
         # Dropper
-        wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())
-        wpilib.SmartDashboard.putNumber("Bottom sensor", self.container.dropper.getLaserBottom())
-        wpilib.SmartDashboard.putBoolean("Coral Top", self.container.dropper.is_coral_top())
-        wpilib.SmartDashboard.putBoolean("Coral Bottom", self.container.dropper.is_coral_bottom())
+        # wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())
+        # wpilib.SmartDashboard.putNumber("Bottom sensor", self.container.dropper.getLaserBottom())
+        # wpilib.SmartDashboard.putBoolean("Coral Top", self.container.dropper.is_coral_top())
+        # wpilib.SmartDashboard.putBoolean("Coral Bottom", self.container.dropper.is_coral_bottom())
 
         # Drive system
         # Reads Encoders and sends them to Dashboard
-        turnings = self.container.swerveSubsystem.readTurnEncoders()
-        wpilib.SmartDashboard.putNumber("Turning FL", turnings[0]*180/pi)
-        wpilib.SmartDashboard.putNumber("Turning FR", turnings[1]*180/pi)
-        wpilib.SmartDashboard.putNumber("Turning BL", turnings[2]*180/pi)
-        wpilib.SmartDashboard.putNumber("Turning BR", turnings[3]*180/pi)
+        # turnings = self.container.swerveSubsystem.readTurnEncoders()
+        # wpilib.SmartDashboard.putNumber("Turning FL", turnings[0]*180/pi)
+        # wpilib.SmartDashboard.putNumber("Turning FR", turnings[1]*180/pi)
+        # wpilib.SmartDashboard.putNumber("Turning BL", turnings[2]*180/pi)
+        # wpilib.SmartDashboard.putNumber("Turning BR", turnings[3]*180/pi)
 
-        DesiredStates = self.container.swerveSubsystem.getDesiredModuleStates()
-        wpilib.SmartDashboard.putNumber("Desired FL", DesiredStates[0].angle.degrees())
-        wpilib.SmartDashboard.putNumber("Desired FR", DesiredStates[1].angle.degrees())
-        wpilib.SmartDashboard.putNumber("Desired BL", DesiredStates[2].angle.degrees())
-        wpilib.SmartDashboard.putNumber("Desired BR", DesiredStates[3].angle.degrees())
+        # DesiredStates = self.container.swerveSubsystem.getDesiredModuleStates()
+        # wpilib.SmartDashboard.putNumber("Desired FL", DesiredStates[0].angle.degrees())
+        # wpilib.SmartDashboard.putNumber("Desired FR", DesiredStates[1].angle.degrees())
+        # wpilib.SmartDashboard.putNumber("Desired BL", DesiredStates[2].angle.degrees())
+        # wpilib.SmartDashboard.putNumber("Desired BR", DesiredStates[3].angle.degrees())
 

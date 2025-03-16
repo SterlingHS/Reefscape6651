@@ -9,12 +9,12 @@ import commands2.button
 
 from commands.SwerveJoystickCmd import SwerveJoystickCmd
 from commands.SwerveJoystickCmd2 import SwerveJoystickCmd2
+from commands.DriveSwitchMode import DriveSwitchMode
 from commands.CoralDrop import CoralDrop
 from commands.CoralDropSpeed import CoralDropSpeed
 from commands.ElevatorFloor import ElevatorFloor
 from commands.ElevatorMove import ElevatorMove
 from commands.ElevatorChange import ElevatorChange
-from commands.ARArmChange import ARArmChange
 from commands.ACBallInSetUp import ACBallInSetUp
 from commands.ACBallOutSetUp import ACBallOutSetUp
 from commands.ACArmChange import ACArmChange
@@ -26,10 +26,9 @@ from commands.GyroReset import GyroReset
 from subsystems.SwerveSubsystem import SwerveSubsystem
 from subsystems.Dropper import Dropper
 from subsystems.Elevator import Elevator
-from subsystems.AlgaeRemover import AlgaeRemover
 from subsystems.AlgaeCollector import AlgaeCollector
 
-from constants import OIConstants
+from constants import DrivingModes, OIConstants
 from constants import DropperConstants
 
 from pathplannerlib.auto import PathPlannerAuto, AutoBuilder
@@ -49,24 +48,12 @@ class RobotContainer:
         self.swerveSubsystem = SwerveSubsystem()
         self.dropper = Dropper()
         self.elevator = Elevator()
-        #self.algaeR = AlgaeRemover()
         self.algaeC = AlgaeCollector()
 
         # The driver's controller
         self.driverController = wpilib.PS5Controller(OIConstants.kDriverControllerPort)
         # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
-
-        # self.codriverController = wpilib.XboxController(OIConstants.kCodriverControllerPort)
-        
-        # Set the default commands for the subsystems
-        # self.swerveSubsystem.setDefaultCommand(
-        #    SwerveJoystickCmd(
-        #        self.swerveSubsystem,
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverYAxis),
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
-        #        lambda : self.driverController.getRawAxis(OIConstants.kDriverXRotAxis)
-        #    )
-        # )
+  
         self.swerveSubsystem.setDefaultCommand(
            SwerveJoystickCmd2(
                self.swerveSubsystem,
@@ -142,15 +129,10 @@ class RobotContainer:
         commands2.button.JoystickButton(
             self.driverController, wpilib.PS5Controller.Button.kOptions).onTrue(GyroReset(self.swerveSubsystem)
         )
-
-
-        # ALGAE REMOVER
-        # commands2.button.POVButton(
-        #     self.driverController, 90).onTrue(ARArmChange(self.algaeR,0))
-
-        # commands2.button.POVButton(
-        #     self.driverController, 270).onTrue(ARArmChange(self.algaeR,5))
         
+        # Driving
+        commands2.button.POVButton(
+             self.driverController, 270).onTrue(DriveSwitchMode(self.swerveSubsystem))
 
     def getAutonomousCommand(self) -> commands2.Command:
         """

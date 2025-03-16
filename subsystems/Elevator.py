@@ -82,6 +82,7 @@ class Elevator(Subsystem):
 
         # Init floor
         self.floor = 1
+        self.stopMotorFlag = False
 
         ##############################################################################
         # Trapezoidal PID to control the elevator
@@ -126,19 +127,28 @@ class Elevator(Subsystem):
         ''' Stops the motor '''
         self.elevatorMotor1.stopMotor()
 
-    def setElevatorPosition(self, position):
+    def setElevatorPosition(self, goal):
         ''' Sets the motor speed using PID controller. Receives position in Inches [0,54]'''
-        self.elevatorGoal=TrapezoidProfile.State(position,0)
-        self.elevatorSetpoint = self.elevatorTrap.calculate(self.kDt, self.elevatorSetpoint, self.elevatorGoal)
-        ff = self.elevatorFF.calculate(self.elevatorSetpoint.velocity)
-        wpilib.SmartDashboard.putNumber("ElePos",position)
-        wpilib.SmartDashboard.putNumber("EleSetPoint",self.elevatorSetpoint.position)
-        wpilib.SmartDashboard.putNumber("Eleposition", self.readEncoder())
-        self.RevController1.setReference(value=self.elevatorSetpoint.position, 
-                                         ctrl=SparkLowLevel.ControlType.kPosition, 
-                                         #arbFeedforward=ff,
-                                         #arbFFUnits=rev.SparkClosedLoopController.ArbFFUnits.kVoltage, # ????
-                                         slot=rev.ClosedLoopSlot.kSlot0)
+        # Read the state of the elevator
+        currentPosition = self.readEncoder()
+        # Checks if the elevator is almost at L1 (3 inches above L1)
+        if currentPosition < ElevatorConstants.L1+3 and goal == 0 and self.lowerSwitchOn() == False:
+            if self.stopMotorFlag == False: # Stop PID by stopping motors
+                self.stopMotor()
+                self.stopMotorFlag = True
+            else:
+                self.setMotor(-0.2) # Keep going down until reach limit switch
+        elif goal == 0 and self.lowerSwitchOn(): # If the limit switch is pressed, stop the motor
+            self.stopMotorFlag = False
+        else:
+            # Sets and calculates the elevator position using trapezoidal profile
+            self.elevatorGoal=TrapezoidProfile.State(goal,0)
+            self.elevatorSetpoint = self.elevatorTrap.calculate(self.kDt, self.elevatorSetpoint, self.elevatorGoal)
+
+            # send info to the PID controller
+            self.RevController1.setReference(value=self.elevatorSetpoint.position, 
+                                            ctrl=SparkLowLevel.ControlType.kPosition, 
+                                            slot=rev.ClosedLoopSlot.kSlot0)
 
     def setElevatorVelocity(self, speed):
         ''' Sets the motor speed using PID controller'''
@@ -172,10 +182,13 @@ class Elevator(Subsystem):
         self.floor = floor
 
     def periodic(self):
-        if self.floor not in [1,2,3,4]:
-            self.floor = 1
+        # Resets the encoder if the lower limit switch is pressed
         if self.lowerSwitchOn():
             self.resetEncoder()
+        # Filters the floor to be between 1 and 4
+        if self.floor not in [1,2,3,4]:
+            self.floor = 1
+        # Sets the elevator to the current floor
         self.setElevatorFloor(self.floor)
 
         return super().periodic()

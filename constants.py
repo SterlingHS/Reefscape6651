@@ -21,7 +21,7 @@ class DriveConstants:
 
     kFrontLeftDriveMotorPort = 12
     kFrontLeftTurningMotorPort = 11
-    kFrontLeftDriveMotorReversed = False
+    kFrontLeftDriveMotorReversed = True
     kFrontLeftTurningMotorReversed = True
     kFrontLeftAbsoluteEncoderPort = 13
     kFrontLeftAbsoluteEncoderOffsetRad = 1.894466 #-1.270136
@@ -32,7 +32,7 @@ class DriveConstants:
 
     kFrontRightDriveMotorPort = 22
     kFrontRightTurningMotorPort = 21
-    kFrontRightDriveMotorReversed = True
+    kFrontRightDriveMotorReversed = False
     kFrontRightTurningMotorReversed = True
     kFrontRightAbsoluteEncoderPort = 23
     kFrontRightAbsoluteEncoderOffsetRad = -1.556990499 #1.67050507
@@ -43,7 +43,7 @@ class DriveConstants:
 
     kBackLeftDriveMotorPort = 32
     kBackLeftTurningMotorPort = 31
-    kBackLeftDriveMotorReversed = False
+    kBackLeftDriveMotorReversed = True
     kBackLeftTurningMotorReversed = True
     kBackLeftAbsoluteEncoderPort = 33
     kBackLeftAbsoluteEncoderOffsetRad = 2.80411688 #-0.3021942
@@ -54,7 +54,7 @@ class DriveConstants:
 
     kBackRightDriveMotorPort = 42
     kBackRightTurningMotorPort = 41
-    kBackRightDriveMotorReversed = True
+    kBackRightDriveMotorReversed = False
     kBackRightTurningMotorReversed = True
     kBackRightAbsoluteEncoderPort = 43
     kBackRightAbsoluteEncoderOffsetRad = -2.6675925901 #0.409157827
@@ -165,8 +165,8 @@ class ElevatorConstants:
     ElevatorReversed2 = True
     
     # For maxMotion
-    MaxVelocity = 200
-    MaxAcceleration = 200
+    MaxVelocity = 1200
+    MaxAcceleration = 1200
 
     # Max and Min values for the elevator for Soft Limits
     Min = 0
@@ -174,7 +174,7 @@ class ElevatorConstants:
 
     # PID Constants
     # PID for L1, L2 and L3 - PID Position
-    P0 = .1
+    P0 = .05
     I0 = 0
     D0 = .01
     kF0 = 0 # For Elevator WITH Springs
@@ -220,10 +220,10 @@ class AlgaeCollectorConstants:
     P = 0.025
     I = 0
     D = 0.005
-    starSpeed = 0.2
+    starSpeed = 0.4
     highPosition = 0 # It will reseted to 0 once it reaches the top
-    lowPosition = -17
-    algaeArmCollecting = -17
+    lowPosition = -16
+    algaeArmCollecting = -16
 
 class FieldOrientedConstants: 
     # Andymark Field

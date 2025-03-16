@@ -8,6 +8,7 @@ from wpimath.controller import PIDController
 import wpimath.kinematics
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 from wpimath.estimator import SwerveDrive4PoseEstimator
+from ntcore import NetworkTableInstance
 
 from commands2 import Subsystem
 from constants import DriveConstants, FieldOrientedConstants, DrivingModes, ReefPositions
@@ -90,9 +91,7 @@ class SwerveSubsystem(Subsystem):
                                 wpimath.kinematics.SwerveModulePosition(self.backLeft.getDrivePosition(), Rotation2d(self.backLeft.getTurningPosition())),
                                 wpimath.kinematics.SwerveModulePosition(self.backRight.getDrivePosition(), Rotation2d(self.backRight.getTurningPosition())),
                                 )
-        # swerveModulePositions = (swerveModulePositions[2], swerveModulePositions[3], 
-        #                          swerveModulePositions[0], swerveModulePositions[1])
-        
+              
         # self.gyro = navx.AHRS(navx.SPI.Port.kMXP)
         self.gyro = navx.AHRS.create_spi()
         self.zeroHeading()
@@ -140,9 +139,24 @@ class SwerveSubsystem(Subsystem):
         # Mode 3 = Coral Station Oriented
 
         # Init Limelight
-        self.limelightFront = Limelight("10.66.51.11")
+        self.inst = NetworkTableInstance.getDefault() # Initialize the NetworkTable for Limelight
+        self.inst.setServerTeam(6651)
+        self.inst.startDSClient() # Start the NetworkTable client
+
+        # Get the Limelight table and set the camera mode to 1 (vision processing)
+        tableLL = self.inst.getTable("limelight") # Get the Limelight table
+        # Set IMU to 1
+        tableLL.getEntry("imumode").setInteger(1) # Set the camera mode to 1 (vision processing)
+        tableLL.getEntry("stddevs").setDoubleArray([])
+        
+        # table = self.inst.getTable("limelight")       Replacing for Networktable
+        # self.botpose = table.getEntry("botpose_orb")
+                                     
+
+        # self.limelightFront = Limelight("10.66.51.11")
+        # self.limelightFront.enable_websocket()
         self.listYaw = []
-        self.limelightInit = False
+        self.PoseEstimatorInit = False
 
         # Init DesiredStates of the Swerve Modules
         self.desiredStates = [SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0))]
@@ -326,12 +340,16 @@ class SwerveSubsystem(Subsystem):
         ''' Returns the angle to the April Tag in degrees (0-360)'''
         # if alliance is blue
         if (DriverStation.getAlliance() == DriverStation.Alliance.kBlue and 17 <= aprilTag <= 22) or (DriverStation.getAlliance() == DriverStation.Alliance.kRed and 6 <= aprilTag <= 11):
-            self.last_reef_angle = ReefPositions.reefAngles[aprilTag-1]
-            while self.last_reef_angle < 0:
-                self.last_reef_angle += 360
-            while self.last_reef_angle > 360:
-                self.last_reef_angle -= 360
-        return self.last_reef_angle
+            try:
+                self.last_reef_angle = ReefPositions.reefAngles[int(aprilTag)-1]
+                while self.last_reef_angle < 0:
+                    self.last_reef_angle += 360
+                while self.last_reef_angle > 360:
+                    self.last_reef_angle -= 360
+                return self.last_reef_angle
+            except:
+                print(f"AprilTage error - {aprilTag}")
+        return 0
     
     def getClosestAprilTag(self):
         ''' Read limelight abd returns the closest April Tag '''
@@ -341,46 +359,61 @@ class SwerveSubsystem(Subsystem):
 
     def readLimelight(self):
         ''' Read Limelight and returns the data '''
-        try:
-            results = self.limelightFront.get_results()
-            self.botpose = results.get("botpose_orb", [])
-            self.botpose_wpiblue = results.get("botpose_orb_wpiblue", [])
-            self.capture_latency = results.get("cl", 0)
-            self.timestamp = results.get("ts", 0)
-            self.validity = results.get("v", 0)
-            self.fiducial = results.get("Fiducial",[])
-            if self.fiducial != []:
-                self.aprilTagNumber = self.fiducial[0]["fID"]
-            else:
-                self.aprilTagNumber = 0
+        ##################################################################
+        # Using the NetworkTable to read Limelight data
+        table = self.inst.getTable("limelight")
+        # Get the latest values from Limelight
+        self.botpose = table.getEntry("botpose").getDoubleArray([0,0,0,0,0,0])
+        self.botpose_wpiblue = table.getEntry("botpose_orb_wpiblue").getDoubleArray([0,0,0,0,0,0])
+        self.capture_latency = table.getEntry("cl").getDouble(0)
+        self.timestamp = table.getEntry("ts").getDouble(0)
+        self.validity = table.getEntry("tv").getDouble(0)
+        self.aprilTagNumber = table.getEntry("tid").getDouble(0)
 
-            status = self.limelightFront.get_status()
-            wpilib.SmartDashboard.putNumber("Limelight Temp", status.get("temp", 0)) 
-            self.yaw_pose = results.get("botpose",[])[5]
-            wpilib.SmartDashboard.putNumber("Yaw", self.yaw_pose)
+        # Get the status of the Limelight
+        status = table.getEntry("hw").getDoubleArray([0,0,0,0])
+        # print(f"Status - {status}")
+        wpilib.SmartDashboard.putNumber("Limelight CPU Temp",status[1])
+        wpilib.SmartDashboard.putNumber("Limelight Temp",status[3]) 
+
+        ##################################################################
+        # Check if the PoseEstimator has been initialized
+        if self.PoseEstimatorInit == True:
+            # Read yaw from limelight's posewpiblue
+            self.yaw_lime = self.botpose_wpiblue[5] if self.botpose_wpiblue else 0
+            wpilib.SmartDashboard.putNumber("Yaw", self.yaw_lime)
+        else: # Read yaw and set the gyro offset for calibration
             try:
-                if len(self.listYaw) < 10 and isinstance(self.yaw_pose,float):
-                    if self.yaw_pose != 0:
-                        self.listYaw.append(self.yaw_pose)
-                    if len(self.listYaw) == 10:
-                        yaw = sum(self.listYaw)/len(self.listYaw)
-                        print(f"Yaw = {yaw}")
-                        self.offSetGyro(-yaw)
-                        if self.limelightInit == False:
-                            self.limelightInit = True
-                            self.poseEstimator = SwerveDrive4PoseEstimator(
-                                        DriveConstants.kDriveKinematics, 
-                                        self.getRotation2d(), 
-                                        self.swerveModulePositions,
-                                        Pose2d(
-                                            self.botpose_wpiblue[0], 
-                                            self.botpose_wpiblue[1], 
-                                            Rotation2d.fromDegrees(yaw)))
+                self.yaw_lime = self.botpose[5]
+                wpilib.SmartDashboard.putNumber("Yaw", self.yaw_lime)
+                # Save the yaw for calibration of NavX on a list
+                if len(self.listYaw) < 10: #and isinstance(self.yaw_lime,float): 
+                    if self.yaw_lime != 0:
+                        self.listYaw.append(self.yaw_lime)
+                    # If we have 10 values, calculate the average and set the gyro offset
+                if len(self.listYaw) == 10:
+                    yaw = sum(self.listYaw)/len(self.listYaw) # Average the yaw values
+                    print(f"Yaw = {yaw}")
+                    self.offSetGyro(-yaw) # Set the gyro offset
+                    # Initialize the pose estimator if it hasn't been done yet
+                    if self.PoseEstimatorInit == False:
+                        # Sets tghe flag to True to indicate that the PoseEstimator has been initialized
+                        self.PoseEstimatorInit = True
+                        # Initialize the pose estimator with the current pose from the Limelight
+                        self.poseEstimator = SwerveDrive4PoseEstimator(
+                                    DriveConstants.kDriveKinematics, 
+                                    self.getRotation2d(), 
+                                    self.swerveModulePositions,
+                                    Pose2d(
+                                        self.botpose_wpiblue[0], 
+                                        self.botpose_wpiblue[1], 
+                                        Rotation2d.fromDegrees(yaw)))
+                        # push the yaw to the limelight
+                        table.getEntry("robot_orientation_set").setDoubleArray([yaw,0,0,0,0,0]) # Set the orientation to the Limelight    
+                        # Set IMU to 2
+                        table.getEntry("imumode").setInteger(3) # Set the camera mode to 2 (robot orientation)
             except:
-                print("Error reading limelight and saving yaw for calibration of NavX")
-        except:
-            print("Error reading Limelight")
-            self.validity = 0
+                pass 
 
     def updateOdometry(self):
         ''' Update the odometry using the Limelight and the botpose '''
@@ -403,7 +436,7 @@ class SwerveSubsystem(Subsystem):
                                         Pose2d(
                                             self.botpose_wpiblue[0], 
                                             self.botpose_wpiblue[1], 
-                                            Rotation2d.fromDegrees(self.yaw_pose)
+                                            Rotation2d.fromDegrees(self.botpose_wpiblue[5])
                                             ), self.timestamp)
         wpilib.SmartDashboard.putNumber("PoseEstimator x",self.poseEstimator.getEstimatedPosition().x)
         wpilib.SmartDashboard.putNumber("PoseEstimator y",self.poseEstimator.getEstimatedPosition().y)
@@ -434,7 +467,7 @@ class SwerveSubsystem(Subsystem):
         self.readLimelight()
     
         # Update Odometry
-        if self.limelightInit == True:
+        if self.PoseEstimatorInit == True:
             self.updateOdometry()
             
         # Sends data to dashboard
@@ -471,27 +504,3 @@ class SwerveSubsystem(Subsystem):
         # wpilib.SmartDashboard.putNumber("Heading", self.getHeading())
         # wpilib.SmartDashboard.putNumber("Continuous Heading", self.getContinuousHeading())
         
-    # TEST MOTORS INDEPENDENTLY
-    def moveFLTMotor(self):
-        self.frontLeft.turningMotor.set(0.6)
-
-    def moveFLDMotor(self):
-        self.frontLeft.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
-
-    def moveFRTMotor(self):
-        self.frontRight.turningMotor.set(0.6)
-
-    def moveFRDMotor(self):
-        self.frontRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
-
-    def moveBLTMotor(self):
-        self.backLeft.turningMotor.set(0.6)
-
-    def moveBLDMotor(self):
-        self.backLeft.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))
-
-    def moveBRTMotor(self):
-        self.backRight.turningMotor.set(0.6)
-
-    def moveBRDMotor(self):
-        self.backRight.driveMotor.set_control(phoenix6.controls.DutyCycleOut(0.5))

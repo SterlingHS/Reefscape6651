@@ -1,20 +1,20 @@
 # Changes the position of the Algae Remover arm
 
 from commands2 import Command
-from subsystems.AlgaeRemover import AlgaeRemover
+from subsystems.SwerveSubsystem import SwerveSubsystem
+from constants import DrivingModes
 
-class ARArmChange(Command):
-    def __init__(self, algaeR:AlgaeRemover, changeHeight:int):
+class DriveChangeMode(Command):
+    def __init__(self, swerveSubsystem:SwerveSubsystem, driveMode):
         Command.__init__(self)
-        self.algaeR = algaeR
-        self.changeHeight = changeHeight
+        self.swerveS = swerveSubsystem
+        self.driveMode = driveMode
 
     def initialize(self) -> None:
         return super().initialize()
     
     def execute(self) -> None:
-        # self.elevator.setElevatorFloor(self.floor)
-        self.algaeR.setArmHeight(self.changeHeight)
+        self.swerveS.setDrivingMode(self.driveMode)
 
     def end(self, interrupted: bool) -> None:
         return super().end(interrupted)
