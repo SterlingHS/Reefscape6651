@@ -114,8 +114,8 @@ class SwerveSubsystem(Subsystem):
             self.getChassisSpeed, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             lambda speeds, feedforwards: self.setChassisSpeeds(speeds), # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also outputs individual module feedforwards
             PPHolonomicDriveController( # PPHolonomicController is the built in path following controller for holonomic drive trains
-                PIDConstants(5.0, 0.0, 0.0), # Translation PID constants
-                PIDConstants(5.0, 0.0, 0.0) # Rotation PID constants
+                PIDConstants(3, 0.0, 0.0), # Translation PID constants
+                PIDConstants(3, 0.0, 0.0) # Rotation PID constants
             ),
             config, # The robot configuration
             self.shouldFlipPath, # Supplier to control path flipping based on alliance color
@@ -469,6 +469,14 @@ class SwerveSubsystem(Subsystem):
         # Update Odometry
         if self.PoseEstimatorInit == True:
             self.updateOdometry()
+        self.odometer.update(self.getRotation2d(),
+                             (
+                                        self.frontLeft.getSwerveModulePosition(), 
+                                        self.frontRight.getSwerveModulePosition(), 
+                                        self.backLeft.getSwerveModulePosition(), 
+                                        self.backRight.getSwerveModulePosition()
+                                    )
+                                )
             
         # Sends data to dashboard
         wpilib.SmartDashboard.putNumber("Pose X", self.getPose().X())
@@ -503,4 +511,8 @@ class SwerveSubsystem(Subsystem):
 
         # wpilib.SmartDashboard.putNumber("Heading", self.getHeading())
         # wpilib.SmartDashboard.putNumber("Continuous Heading", self.getContinuousHeading())
+
+        wpilib.SmartDashboard.putNumber("OdoX", self.odometer.getPose().X())
+        wpilib.SmartDashboard.putNumber("OdoY", self.odometer.getPose().Y())
+        wpilib.SmartDashboard.putNumber("OdoT", self.odometer.getPose().rotation().degrees())
         

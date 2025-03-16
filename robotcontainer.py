@@ -81,10 +81,12 @@ class RobotContainer:
         # #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
         try:
-            self.sendableChooser.addOption("Test", PathPlannerAuto("TestDrive"))
+            self.sendableChooser.addOption("Test", PathPlannerAuto("Test1"))
+            self.sendableChooser.addOption("Simple1mBack", PathPlannerAuto("Simple1mback"))
         except:
             print("##########################################################################")
             print("AutoTest not found")
+        wpilib.SmartDashboard.putData("Auto Chooser", self.sendableChooser)
 
         # Configure the button bindings
         self.configureButtonBindings()
@@ -140,5 +142,4 @@ class RobotContainer:
         there's more at the door
         :returns: the command to run in autonomous
         """
-        return PathPlannerAuto('TestDrive')
         return self.sendableChooser.getSelected()

@@ -112,9 +112,9 @@ class SwerveModule:
         angle = self.absoluteEncoder.get_absolute_position().value # Output is from -0.5 to 0.5
         angle = angle * 2*pi # Output is from -pi to pi
         angle-=self.absoluteEncoderOffsetRad # Offset
-        if angle > pi: # Makes the output be between -pi and pi
+        while angle > pi: # Makes the output be between -pi and pi
             angle -= 2*pi
-        if angle < -pi:
+        while angle < -pi:
             angle += 2*pi  
         direction = -1.0 if self.absoluteEncoderReversed else 1.0 # Reverses the output if needed
         return angle*direction
@@ -135,7 +135,7 @@ class SwerveModule:
     
     def getSwerveModulePosition(self):
         ''' Returns the position of the swerve module '''
-        return wpimath.kinematics.SwerveModulePosition(-self.getDrivePosition(), Rotation2d(self.getTurningPosition()))
+        return wpimath.kinematics.SwerveModulePosition(self.getDrivePosition(), Rotation2d(self.getTurningPosition()))
 
     def stop(self):
         ''' Stops the swerve module '''
