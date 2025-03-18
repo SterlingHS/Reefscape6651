@@ -18,8 +18,8 @@ class CoralDropAuto(SequentialCommandGroup):
     def __init__(self, elevator:Elevator, dropper:Dropper, floor:int):
         super().__init__(
                 ElevatorFloor(elevator, floor), # Sends elevator to the correct floor
-                CoralDrop(dropper),            # Drops coral until it is not on the dropper
+                CoralDrop(dropper),             # Drops coral until it is not on the dropper
                 waitcommand.WaitCommand(1),     # Waits for coral to be dropped
-                ElevatorFloor(elevator, 1)      # Sends elevator back to level 1
+                ElevatorFloor(elevator, 1),     # Sends elevator back to level 1
         )
     

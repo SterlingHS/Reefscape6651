@@ -181,6 +181,18 @@ class Elevator(Subsystem):
     def setPeriodicFloor(self, floor:int):
         self.floor = floor
 
+    def isReachedFloor(self, floor:int):
+        ''' Checks if the elevator is at the desired floor '''
+        height = self.readEncoder()
+        if floor == 1:
+            return height < ElevatorConstants.L1+3
+        elif floor == 2:
+            return height > ElevatorConstants.L2-2
+        elif floor == 3:
+            return height > ElevatorConstants.L3-2
+        elif floor == 4:
+            return height > ElevatorConstants.L4-2
+
     def periodic(self):
         # Resets the encoder if the lower limit switch is pressed
         if self.lowerSwitchOn():

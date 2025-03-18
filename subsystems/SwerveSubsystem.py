@@ -1,10 +1,9 @@
 from subsystems.SwerveModule import SwerveModule
 
-from math import cos, sin, atan2, pi
+from math import cos, sin, pi
 
 import wpimath
 from wpimath.geometry import Rotation2d, Pose2d
-from wpimath.controller import PIDController
 import wpimath.kinematics
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
 from wpimath.estimator import SwerveDrive4PoseEstimator
@@ -15,17 +14,12 @@ from constants import DriveConstants, FieldOrientedConstants, DrivingModes, Reef
 
 import wpilib
 import navx
-import phoenix6
-import limelight
-from limelight import Limelight
-import json
 
 # Autonomous Pathplanner
 from pathplannerlib.auto import AutoBuilder
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import RobotConfig, PIDConstants
-from wpilib import DriverStation
-
+from wpilib import DriverStation, Timer
 
 # For NavX to calibrate
 from time import sleep
@@ -149,12 +143,6 @@ class SwerveSubsystem(Subsystem):
         tableLL.getEntry("imumode").setInteger(1) # Set the camera mode to 1 (vision processing)
         tableLL.getEntry("stddevs").setDoubleArray([])
         
-        # table = self.inst.getTable("limelight")       Replacing for Networktable
-        # self.botpose = table.getEntry("botpose_orb")
-                                     
-
-        # self.limelightFront = Limelight("10.66.51.11")
-        # self.limelightFront.enable_websocket()
         self.listYaw = []
         self.PoseEstimatorInit = False
 
@@ -432,12 +420,19 @@ class SwerveSubsystem(Subsystem):
 
         if self.validity != 0: # add condition to check if distance is less than 2 meters
             if self.gyro.getRate() < 720: # if the robot is spinning too fast, ignore the vision measurement
+                # Change STD DEVS depending on the distance to the target
+                # if self.botpose_wpiblue[0] < 2: # if the distance is less than 2 meters
+                #     self.inst.getTable("limelight").getEntry("stdev_mt2").setDoubleArray([0.7, 0.7, 0.7, 0.7, 0.7, 0.7])
+                # else:
+                #     self.inst.getTable("limelight").getEntry("stdev_mt2").setDoubleArray([0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
                 self.poseEstimator.addVisionMeasurement(
                                         Pose2d(
                                             self.botpose_wpiblue[0], 
                                             self.botpose_wpiblue[1], 
                                             Rotation2d.fromDegrees(self.botpose_wpiblue[5])
-                                            ), self.timestamp)
+                                            ), 
+                                        Timer.getFPGATimestamp() - (self.botpose[6]/1000.0), # Time since the vision measurement was taken
+                                        )
         wpilib.SmartDashboard.putNumber("PoseEstimator x",self.poseEstimator.getEstimatedPosition().x)
         wpilib.SmartDashboard.putNumber("PoseEstimator y",self.poseEstimator.getEstimatedPosition().y)
         wpilib.SmartDashboard.putNumber("PoseEstimator heading",self.poseEstimator.getEstimatedPosition().rotation().degrees())
@@ -470,13 +465,13 @@ class SwerveSubsystem(Subsystem):
         if self.PoseEstimatorInit == True:
             self.updateOdometry()
         self.odometer.update(self.getRotation2d(),
-                             (
-                                        self.frontLeft.getSwerveModulePosition(), 
-                                        self.frontRight.getSwerveModulePosition(), 
-                                        self.backLeft.getSwerveModulePosition(), 
-                                        self.backRight.getSwerveModulePosition()
-                                    )
-                                )
+                            (
+                                self.frontLeft.getSwerveModulePosition(), 
+                                self.frontRight.getSwerveModulePosition(), 
+                                self.backLeft.getSwerveModulePosition(), 
+                                self.backRight.getSwerveModulePosition()
+                            )
+                        )
             
         # Sends data to dashboard
         wpilib.SmartDashboard.putNumber("Pose X", self.getPose().X())

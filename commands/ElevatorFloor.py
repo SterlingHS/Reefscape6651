@@ -20,7 +20,7 @@ class ElevatorFloor(Command):
         return super().end(interrupted)
 
     def isFinished(self) -> bool:
-        return super().isFinished()
+        return self.elevator.isReachedFloor(self.floor)
 
 
     

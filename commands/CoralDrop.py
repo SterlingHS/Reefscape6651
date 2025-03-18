@@ -19,7 +19,7 @@ class CoralDrop(Command):
         return super().end(interrupted)
 
     def isFinished(self) -> bool:
-        return self.dropper.is_no_Coral_dropper()
+        return not self.dropper.is_coral_bottom()
 
 
     

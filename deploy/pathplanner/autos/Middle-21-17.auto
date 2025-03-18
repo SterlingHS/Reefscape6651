@@ -1,0 +1,73 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid-21L"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DropAuto"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "21L-LowCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAuto"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LowCoral-17R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DropAuto"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "17R-LowCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAuto"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LowCoral-17L"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DropAuto"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
