@@ -11,20 +11,20 @@
         "x": 2.227576326069079,
         "y": 1.3743315044202302
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": "LowCorral"
     },
     {
       "anchor": {
-        "x": 3.526693260063559,
-        "y": 2.6663003177966096
+        "x": 3.692782432154605,
+        "y": 2.972324732730263
       },
       "prevControl": {
-        "x": 2.9064311943768817,
-        "y": 1.982707852747268
+        "x": 3.072520366467928,
+        "y": 2.2887322676809214
       },
       "nextControl": null,
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": "17L"
     }
   ],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -126.0
+    "rotation": 54.0
   },
   "useDefaultConstraints": true
 }

@@ -3,15 +3,15 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8079422800164466,
-        "y": 2.515218313116776
+        "x": 3.9749691611842106,
+        "y": 2.8112362510279603
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2561164614066898,
-        "y": 2.052181472247228
+        "x": 3.423143342574454,
+        "y": 2.3481994101584123
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": "17R"
     },
     {
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -126.0
+    "rotation": 54.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }
