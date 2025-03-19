@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LowStart-20L"
+            "pathName": "Out_to_18"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "20L-LowCoral"
+            "pathName": "18L-HighCoral"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LowCoral-17R"
+            "pathName": "HighCoral-18R"
           }
         },
         {

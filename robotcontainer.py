@@ -72,21 +72,21 @@ class RobotContainer:
             waitcommand.WaitCommand(.25).andThen(
             ElevatorFloor(self.elevator, 1))))
         
-        #IntakeAuto =  CoralIntake(self.dropper)
+        IntakeAuto =  CoralIntake(self.dropper, self.elevator)
         
         # autocommands4 = commands2.WaitCommand(8).andThen(autocommands3)
         
         # Register Named Commands
         NamedCommands.registerCommand('DropAuto', DropAuto)
-        #NamedCommands.registerCommand('IntakeAuto', IntakeAuto)
+        NamedCommands.registerCommand('IntakeAuto', IntakeAuto)
 
         self.sendableChooser = SendableChooser()
         # #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
         try:
-            self.sendableChooser.addOption("Test", PathPlannerAuto("Test1"))
+            self.sendableChooser.addOption("LowStart-20", PathPlannerAuto("LowStart-20-17"))
+            self.sendableChooser.addOption("Mid-21-17", PathPlannerAuto("Mid-21-17"))
             self.sendableChooser.addOption("SimpleMid", PathPlannerAuto("SimpleMid"))
-            self.sendableChooser.addOption("Simple1mBack", PathPlannerAuto("Simple1mback"))
         except:
             print("##########################################################################")
             print("AutoTest not found")

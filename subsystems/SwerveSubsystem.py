@@ -425,6 +425,7 @@ class SwerveSubsystem(Subsystem):
                 #     self.inst.getTable("limelight").getEntry("stdev_mt2").setDoubleArray([0.7, 0.7, 0.7, 0.7, 0.7, 0.7])
                 # else:
                 #     self.inst.getTable("limelight").getEntry("stdev_mt2").setDoubleArray([0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
+                # self.poseEstimator.setVisionMeasurementStdDevs(...)
                 self.poseEstimator.addVisionMeasurement(
                                         Pose2d(
                                             self.botpose_wpiblue[0], 
@@ -433,6 +434,7 @@ class SwerveSubsystem(Subsystem):
                                             ), 
                                         Timer.getFPGATimestamp() - (self.botpose[6]/1000.0), # Time since the vision measurement was taken
                                         )
+            
         wpilib.SmartDashboard.putNumber("PoseEstimator x",self.poseEstimator.getEstimatedPosition().x)
         wpilib.SmartDashboard.putNumber("PoseEstimator y",self.poseEstimator.getEstimatedPosition().y)
         wpilib.SmartDashboard.putNumber("PoseEstimator heading",self.poseEstimator.getEstimatedPosition().rotation().degrees())
