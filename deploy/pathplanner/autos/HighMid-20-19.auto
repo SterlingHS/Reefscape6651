@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LowStart-20L"
+            "pathName": "HighMid-20L"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "20L-LowCoral"
+            "pathName": "20L-HighCoral"
           }
         },
         {
@@ -31,7 +31,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LowCoral-17R"
+            "pathName": "HighCoral-19L"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DropAuto"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "19L-HighCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAuto"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HighCoral-19R"
           }
         },
         {

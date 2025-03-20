@@ -84,8 +84,9 @@ class RobotContainer:
         # #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
         try:
-            self.sendableChooser.addOption("LowStart-20", PathPlannerAuto("LowStart-20-17"))
+            self.sendableChooser.addOption("LowStart-22", PathPlannerAuto("LowStart-22-17"))
             self.sendableChooser.addOption("Mid-21-17", PathPlannerAuto("Mid-21-17"))
+            self.sendableChooser.addOption("TopStart-18", PathPlannerAuto("TopStart-18"))
             self.sendableChooser.addOption("SimpleMid", PathPlannerAuto("SimpleMid"))
         except:
             print("##########################################################################")
