@@ -65,8 +65,8 @@ class NetworkTables:
         wpilib.SmartDashboard.putBoolean("Elevator Limit Switch", self.container.elevator.lowerSwitchOn())
 
         # Algae Collector
-        # wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
-        # wpilib.SmartDashboard.putBoolean("Arm Up", self.container.algaeC.isArmUp())
+        wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
+        wpilib.SmartDashboard.putBoolean("Arm Up", self.container.algaeC.isArmUp())
 
         # Dropper
         wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())

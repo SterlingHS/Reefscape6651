@@ -72,9 +72,16 @@ class AlgaeCollector(Subsystem):
         self.mode = 0
         self.stopMotorFlag = False
     
+        # flag off upper switch working correctly
+        self.flagUpper = True
+
     def resetArmEncoder(self):
         ''' Resets the encoder position '''
         self.ArmEncoder.setPosition(0)
+
+    def setArmEncoder(self, value):
+        ''' Set the arm encoder to a value '''
+        self.ArmEncoder.setPosition(value)
 
     def readArmEncoder(self):
         ''' Reads the encoder position '''
@@ -149,14 +156,23 @@ class AlgaeCollector(Subsystem):
     def isArmUp(self):
         ''' Returns True if the Arm is up'''
         return self.ACArmMotor.getForwardLimitSwitch().get()
+    
+    def isArmDown(self):
+        ''' Returns True if the Arm is up'''
+        return self.ACArmMotor.getReverseLimitSwitch().get()
 
     def periodic(self):
         ''' Runs every loop '''
-        if self.isArmUp():
+        if self.isArmUp():# and self.flagUpper == True:
             self.resetArmEncoder()
             if self.height == 1:
                 self.height = 0
+
+        # if self.isArmDown():
+        #     self.setArmEncoder(-17)
+        #     self.height = -17
         if self.mode == 0:
             self.setArmPosition(self.height)
         self.setStarMotor(self.starSpeed)
         return super().periodic()
+

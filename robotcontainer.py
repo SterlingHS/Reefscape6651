@@ -85,9 +85,12 @@ class RobotContainer:
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
         try:
             self.sendableChooser.addOption("LowStart-22", PathPlannerAuto("LowStart-22-17"))
-            self.sendableChooser.addOption("Mid-21-17", PathPlannerAuto("Mid-21-17"))
             self.sendableChooser.addOption("TopStart-18", PathPlannerAuto("TopStart-18"))
             self.sendableChooser.addOption("SimpleMid", PathPlannerAuto("SimpleMid"))
+            self.sendableChooser.addOption("BottomStart-18", PathPlannerAuto("BottomStart-18"))
+            self.sendableChooser.addOption("Middle-21-19", PathPlannerAuto("Middle-21-19"))
+            self.sendableChooser.addOption("HighMid-20-19", PathPlannerAuto("HighMid-20-19"))
+            self.sendableChooser.addOption("Mid-21-17", PathPlannerAuto("Middle-21-17"))
         except:
             print("##########################################################################")
             print("AutoTest not found")

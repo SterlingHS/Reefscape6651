@@ -103,7 +103,7 @@ class SwerveSubsystem(Subsystem):
         print(config)
         # For Autonomous Pathplanner
         AutoBuilder.configure(
-            self.getPose, # Robot pose supplier
+            self.getPose,  #self.getPoseEstimator, # Robot pose supplier
             self.resetOdometer, # Method to reset odometry (will be called if your auto has a starting pose)
             self.getChassisSpeed, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             lambda speeds, feedforwards: self.setChassisSpeeds(speeds), # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also outputs individual module feedforwards
@@ -382,6 +382,11 @@ class SwerveSubsystem(Subsystem):
                 if len(self.listYaw) == 10:
                     yaw = sum(self.listYaw)/len(self.listYaw) # Average the yaw values
                     print(f"Yaw = {yaw}")
+                    if wpilib.DriverStation.Alliance.kRed:
+                        if yaw < 0 :
+                            yaw = yaw + 180
+                        elif yaw > 0:
+                            yaw = yaw - 180
                     self.offSetGyro(-yaw) # Set the gyro offset
                     # Initialize the pose estimator if it hasn't been done yet
                     if self.PoseEstimatorInit == False:
