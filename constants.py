@@ -194,7 +194,7 @@ class ElevatorConstants:
     # Position of different levels
     L1 = 0
     L2 = 14 # 11 inches
-    L3 = 32 # 28 inches
+    L3 = 30 # 28 inches
     L4 = 54 # 52 inches, Max height 54 inches
     
 class AlgaeRemoverConstants:

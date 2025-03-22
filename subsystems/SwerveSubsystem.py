@@ -108,8 +108,8 @@ class SwerveSubsystem(Subsystem):
             self.getChassisSpeed, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             lambda speeds, feedforwards: self.setChassisSpeeds(speeds), # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also outputs individual module feedforwards
             PPHolonomicDriveController( # PPHolonomicController is the built in path following controller for holonomic drive trains
-                PIDConstants(3, 0.0, 0.0), # Translation PID constants
-                PIDConstants(3, 0.0, 0.0) # Rotation PID constants
+                PIDConstants(3, 0.0, 0.5), # Translation PID constants
+                PIDConstants(3, 0.0, 0.5) # Rotation PID constants
             ),
             config, # The robot configuration
             self.shouldFlipPath, # Supplier to control path flipping based on alliance color
