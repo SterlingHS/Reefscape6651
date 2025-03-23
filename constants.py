@@ -64,7 +64,7 @@ class DriveConstants:
     kBackRightTurningPIDk = [.5, 0, 0, 0.16853, 0.41734, 0.019524] # [P, I, D, kS, KV, kA]
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
-    kPhysicalMaxSpeedMetersPerSecond = 1 #5 MPS is about 11 miles per hour 
+    kPhysicalMaxSpeedMetersPerSecond = 1.5 #5 MPS is about 11 miles per hour 
 
     kMaxTurnRateDegPerS = 200 
     kMaxTurnAccelerationDegPerSSquared = 100 
@@ -82,7 +82,7 @@ class DriveConstants:
         Translation2d(-kWheelBase/2, -kTrackWidth/2) #BR
     )
     #this ends up being the damp factor. Right now this is 4.5/9 meaning the max output of the motors should be 50%
-    kTeleDriveMaxSpeedMetersPerSecond = .3 #17*0.3048 #17 feet per second into meters
+    kTeleDriveMaxSpeedMetersPerSecond = .45 #17*0.3048 #17 feet per second into meters
     kTeleDriveMaxAngularRadiansPerSecond = 1 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
     kTeleDriveMaxAccelerationUnitsPerSeconds = 3 #kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
