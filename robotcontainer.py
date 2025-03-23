@@ -17,6 +17,7 @@ from commands.ACBallCancel import ACBallCancel
 from commands.CoralIntake import CoralIntake
 from commands.CoralDrop import CoralDrop
 from commands.CoralDropAuto import CoralDropAuto
+from commands.SwerveToggleTurbo import SwerveToggleTurbo
 from commands.GyroReset import GyroReset
 from commands.ElevatorFloor import ElevatorFloor
 
@@ -148,6 +149,9 @@ class RobotContainer:
         # Driving
         commands2.button.POVButton(
              self.driverController, 270).onTrue(DriveSwitchMode(self.swerveSubsystem))
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.PS5Controller.Button.kL2).onTrue(SwerveToggleTurbo(self.swerveSubsystem))
+        
 
     def getAutonomousCommand(self) -> commands2.Command:
         """

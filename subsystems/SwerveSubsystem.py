@@ -149,6 +149,9 @@ class SwerveSubsystem(Subsystem):
         # Init DesiredStates of the Swerve Modules
         self.desiredStates = [SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0)),SwerveModuleState(0, Rotation2d(0))]
 
+        # Init TurboMode
+        self.turboMode = False
+
 ################################################################################################
 ############## Gyro Methods
 
@@ -254,12 +257,21 @@ class SwerveSubsystem(Subsystem):
 
     def setModuleStates(self,desiredStates):
         ''' Sets swerve system to go in a specific direction and speed '''
-        desiredStates = wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond)
+        # Calculate the attainable max speed based on the current mode (turbo or not)
+        attainableMaxSpeed = DriveConstants.kPhysicalMaxSpeedMetersPerSecond * (.75 if self.turboMode else 1)
+        
+        # Desaturate the wheel speeds to ensure they don't exceed the max speed
+        desiredStates = wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
+            desiredStates, 
+            attainableMaxSpeed)
+        
+        # Set the desired state for each swerve module
         self.frontLeft.setDesiredState(desiredStates[0])
         self.frontRight.setDesiredState(desiredStates[1])
         self.backLeft.setDesiredState(desiredStates[2])
         self.backRight.setDesiredState(desiredStates[3])
 
+        # Store the desired states for later use (e.g. for PathPlanner)
         self.desiredStates = desiredStates
 
     def getDesiredModuleStates(self):
@@ -320,6 +332,18 @@ class SwerveSubsystem(Subsystem):
     def getAngularVelocity(self):
         ''' Returns the angular velocity of the robot '''
         return self.turningvelocity
+
+    def getTurboMode(self):
+        ''' Returns the turbo mode '''
+        return self.turboMode
+    
+    def setTurboMode(self, mode):
+        ''' Sets the turbo mode '''
+        self.turboMode = mode
+
+    def toggleTurboMode(self):
+        ''' Toggle the turbo mode '''
+        self.turboMode = not self.turboMode
 
 ###############################################################################################
 ############## Reef Oriented Methods

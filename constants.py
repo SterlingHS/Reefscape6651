@@ -82,7 +82,7 @@ class DriveConstants:
         Translation2d(-kWheelBase/2, -kTrackWidth/2) #BR
     )
     #this ends up being the damp factor. Right now this is 4.5/9 meaning the max output of the motors should be 50%
-    kTeleDriveMaxSpeedMetersPerSecond = .45 #17*0.3048 #17 feet per second into meters
+    kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond #.45 #17*0.3048 #17 feet per second into meters
     kTeleDriveMaxAngularRadiansPerSecond = 1 # 17 ft/sec * (2pi radians / (2pi* 2 ft)) #Transformed 17 feet/sec into radians/sec
 
     kTeleDriveMaxAccelerationUnitsPerSeconds = 3 #kTeleDriveMaxSpeedMetersPerSecond #Taken from MaxSpeedDrive
