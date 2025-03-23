@@ -240,6 +240,31 @@ class SwerveSubsystem(Subsystem):
         self.backLeft.stop()
         self.backRight.stop()
 
+    def moveLeft(self, speed):
+        ''' Moves all motors left at a certain speed '''
+        # gets the angle of orientation for the left side of the robot
+        angle = self.getHeading() - 90
+        while angle < 0:
+            angle += 360
+
+        leftState = SwerveModuleState(speed, Rotation2d.fromDegrees(angle))
+        self.frontLeft.setDesiredState(leftState)
+        self.frontRight.setDesiredState(leftState)
+        self.backLeft.setDesiredState(leftState)
+        self.backRight.setDesiredState(leftState)
+    
+    def moveRight(self, speed):
+        ''' Moves all motors right at a certain speed '''
+         # gets the angle of orientation for the left side of the robot
+        angle = self.getHeading() + 90
+        while angle > 0:
+            angle -= 360
+        rightState = SwerveModuleState(speed, Rotation2d.fromDegrees(angle))
+        self.frontLeft.setDesiredState(rightState)
+        self.frontRight.setDesiredState(rightState)
+        self.backLeft.setDesiredState(rightState)
+        self.backRight.setDesiredState(rightState)
+
     def moveStraight(self, speed):
         ''' Moves all motors straight forward at a certain speed '''
         straightState = SwerveModuleState(speed, Rotation2d(0))

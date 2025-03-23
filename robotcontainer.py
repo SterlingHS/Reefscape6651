@@ -58,7 +58,9 @@ class RobotContainer:
                lambda : self.driverController.getRawAxis(OIConstants.kDriverYAxis),
                lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
                lambda : self.driverController.getRawAxis(OIConstants.kDriverXRotAxis),
-               lambda : self.driverController.getRawAxis(OIConstants.kDriverYRotAxis)
+               lambda : self.driverController.getRawAxis(OIConstants.kDriverYRotAxis),
+               lambda : self.driverController.getRawButton(OIConstants.kDriverMoveRight)),
+               lambda : self.driverController.getRawButton(OIConstants.kDriverMoveLeft)
            )
         )
 

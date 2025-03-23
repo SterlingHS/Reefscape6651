@@ -65,6 +65,7 @@ class DriveConstants:
 
     #THIS IS IN METERS PER SECOND. This means at 100% speed how fast is the robot going. I suggest we run tests to figure this out. We can use the navx to display the speed in meters per second and give the robot max power without the limiters.
     kPhysicalMaxSpeedMetersPerSecond = 1.5 #5 MPS is about 11 miles per hour 
+    kModeSidewaysSpeedMetersPerSecond = 0.3
 
     kMaxTurnRateDegPerS = 200 
     kMaxTurnAccelerationDegPerSSquared = 100 
@@ -117,6 +118,8 @@ class OIConstants:
     kDriverXAxis = 0
     kDriverXRotAxis = 2
     kDriverYRotAxis = 5
+    kDriverMoveRight = 8 # To be checked
+    kDriverMoveLeft = 9
 
 class AutoConstants:
     from constants import DriveConstants

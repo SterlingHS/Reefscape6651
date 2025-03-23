@@ -25,7 +25,7 @@ from wpilib import DriverStation
 signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number
 
 class SwerveJoystickCmd2(Command):
-    def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFuncx, turningSpeedFuncy):
+    def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFuncx, turningSpeedFuncy, moveRight, moveLeft):
         Command.__init__(self)
 
         self.swerveSub = swerveSub
@@ -33,6 +33,8 @@ class SwerveJoystickCmd2(Command):
         self.ySpeedFunction = ySpeedFunc
         self.turningSpeedFunctionx = turningSpeedFuncx
         self.turningSpeedFunctiony = turningSpeedFuncy
+        self.moveRight = moveRight
+        self.moveLeft = moveLeft
 
         self.addRequirements(swerveSub)
 
@@ -84,6 +86,12 @@ class SwerveJoystickCmd2(Command):
         return angle
 
     def execute(self) -> None:
+        # Check if the robot needs to shift sideways
+        if self.moveRight and self.xSpeed == 0 and self.ySpeed == 0:
+            self.swerveSub.moveRight(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
+        elif self.moveLeft and self.xSpeed == 0 and self.ySpeed == 0:
+            self.swerveSub.moveLeft(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
+
         # Check driving mode
         if self.lastMode != self.swerveSub.getDrivingMode():
             self.lastAngle = self.swerveSub.getHeading()

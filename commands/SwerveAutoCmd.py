@@ -57,6 +57,10 @@ class SwerveJoystickCmd(Command):
         return super().initialize()
 
     def execute(self) -> None:
+        # Check if robot needs to shift sideways
+        if ...:
+            # moves the robot sideways in robot oriented mode
+            pass
 
         # PID to control the stearing the robot should be facing
         self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
