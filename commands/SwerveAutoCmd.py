@@ -17,7 +17,7 @@ from constants import DriveConstants
 
 from math import pi
 
-class SwerveJoystickCmd(Command):
+class SwerveAutoCmd(Command):
     def __init__(self, swerveSub:SwerveSubsystem, GoalX, GoalY, GoalTheta):
         Command.__init__(self)
 
@@ -28,28 +28,20 @@ class SwerveJoystickCmd(Command):
         self.addRequirements(swerveSub)
 
         # PID to control turning speed of the robot
-        self.turningPID = PIDController(0.5, 0, 0) # P, I, D to be checked
+        self.turningPID = PIDController(0.01, 0, 0) # P, I, D to be checked
         self.turningPID.enableContinuousInput(0, 360) 
-        self.turningPID.setTolerance(0.01) # around 0.5 degrees
+        self.turningPID.setTolerance(1) # around 0.5 degrees
 
         # PID to control the x and y position of the robot
-        self.xPID = PIDController(0.5, 0, 0) # P, I, D to be checked
+        self.xPID = PIDController(0.01, 0, 0) # P, I, D to be checked
         self.xPID.setTolerance(0.01) # 1 cm.
-        self.yPID = PIDController(0.5, 0, 0) # P, I, D to be checked
+        self.yPID = PIDController(0.01, 0, 0) # P, I, D to be checked
         self.yPID.setTolerance(0.01) # 1 cm.
 
         # Trapezoid profile to control x, y and stearing
         self.turningTrap = TrapezoidProfile(TrapezoidProfile.Constraints(DriveConstants.kMaxTurnRateDegPerS, DriveConstants.kMaxTurnAccelerationDegPerSSquared)) # Max velocity and acceleration to be checked
-        self.turningGoal = TrapezoidProfile.State(position=self.GoalTheta, velocity=0)
-        self.turningSetpoint = TrapezoidProfile.State(position=self.swerveSub.getRotation2d().degrees(), velocity=0)
-
         self.xTrap = TrapezoidProfile(TrapezoidProfile.Constraints(DriveConstants.kTeleDriveMaxSpeedMetersPerSecond, DriveConstants.kTeleDriveMaxAccelerationUnitsPerSeconds)) # Max velocity and acceleration to be checked
-        self.xGoal = TrapezoidProfile.State(position=0, velocity=0)
-        self.xSetpoint = TrapezoidProfile.State(position=self.swerveSub.getPose().X(), velocity=self.swerveSub.getXVelocity())   
-
         self.yTrap = TrapezoidProfile(TrapezoidProfile.Constraints(DriveConstants.kTeleDriveMaxSpeedMetersPerSecond, DriveConstants.kTeleDriveMaxAccelerationUnitsPerSeconds)) # Max velocity and acceleration to be checked
-        self.yGoal = TrapezoidProfile.State(position=0, velocity=0)
-        self.ySetpoint = TrapezoidProfile.State(position=self.swerveSub.getPose().Y(), velocity=0)
 
         self.chassisSpeeds = ChassisSpeeds()
 
@@ -57,10 +49,13 @@ class SwerveJoystickCmd(Command):
         return super().initialize()
 
     def execute(self) -> None:
-        # Check if robot needs to shift sideways
-        if ...:
-            # moves the robot sideways in robot oriented mode
-            pass
+        # Get the current setpoint for the robot
+        self.turningGoal = TrapezoidProfile.State(position=self.GoalTheta, velocity=0)
+        self.turningSetpoint = TrapezoidProfile.State(position=self.swerveSub.getRotation2d().degrees(), velocity=0)
+        self.xGoal = TrapezoidProfile.State(position=self.GoalX, velocity=0)
+        self.xSetpoint = TrapezoidProfile.State(position=self.swerveSub.getPose().X(), velocity=self.swerveSub.getXVelocity())   
+        self.yGoal = TrapezoidProfile.State(position=self.GoalY, velocity=0)
+        self.ySetpoint = TrapezoidProfile.State(position=self.swerveSub.getPose().Y(), velocity=self.swerveSub.getYVelocity())
 
         # PID to control the stearing the robot should be facing
         self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
@@ -92,9 +87,5 @@ class SwerveJoystickCmd(Command):
 
     def isFinished(self) -> bool:
         # check if we have arrived to the Goal
-        if self.xPID.atSetpoint() and self.yPID.atSetpoint() and self.turningPID.atSetpoint():
-            return True
-        else:
-            return False
-
+        return self.xPID.atSetpoint() and self.yPID.atSetpoint() and self.turningPID.atSetpoint()
     

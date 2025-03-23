@@ -1,4 +1,4 @@
-1. Turbo mode
+1. Turbo mode (done)
     - Left trigger switches between normal and turbo mode
     - Create self.turboMode
         - False for Normal mode
@@ -8,7 +8,7 @@
         - self.SwitchTurboMode
     - Use flag to change max speed in SwerveSubsystem
 
-2. Create slow shifting mode
+2. Create slow shifting mode (done)
 Method to move the robot right and left to aim for the reef precisely
 
 3. Finish autoDriveCmd
