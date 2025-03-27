@@ -2,6 +2,7 @@ import subsystems.SwerveSubsystem
 from subsystems.SwerveSubsystem import SwerveSubsystem
 import robotcontainer
 import wpilib
+from wpilib import Field2d
 from constants import ModuleConstants, OIConstants, AutoConstants, DriveConstants
 from robotcontainer import RobotContainer
 import ntcore
@@ -41,12 +42,12 @@ class NetworkTables:
         # wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
         # wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
         
-        # # Reads Distance Travelled and sends them to Dashboard
-        # forwards = self.container.swerveSubsystem.readForwardEncoders()
-        # wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
-        # wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
-        # wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
-        # wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
+        # Reads Distance Travelled and sends them to Dashboard
+        forwards = self.container.swerveSubsystem.readForwardEncoders()
+        wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
+        wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
+        wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
+        wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
 
         # Reads the velocity of the robot and the dedesired velocity
         # velocity = self.container.swerveSubsystem.getVelocity()
@@ -87,4 +88,24 @@ class NetworkTables:
         # wpilib.SmartDashboard.putNumber("Desired FR", DesiredStates[1].angle.degrees())
         # wpilib.SmartDashboard.putNumber("Desired BL", DesiredStates[2].angle.degrees())
         # wpilib.SmartDashboard.putNumber("Desired BR", DesiredStates[3].angle.degrees())
+
+        # Pose SmartDashBoard
+        field = Field2d()
+        poseEstimator = self.container.swerveSubsystem.getPoseEstimator()
+        field.setRobotPose(poseEstimator)
+        wpilib.SmartDashboard.putData("poseEstimator", field)
+        wpilib.SmartDashboard.putNumber("Estimator X", poseEstimator.X())
+        wpilib.SmartDashboard.putNumber("Estimator Y", poseEstimator.Y())
+        angle = poseEstimator.rotation().degrees()
+        wpilib.SmartDashboard.putNumber("Est Theta", angle)
+
+        odometer = self.container.swerveSubsystem.getPose()
+        # field.setRobotPose(odometer)
+        # wpilib.SmartDashboard.putNumberArray("odometer", odometer)
+        wpilib.SmartDashboard.putNumber("Odometer X", odometer.X())
+        wpilib.SmartDashboard.putNumber("Odometer Y", odometer.Y())
+        angle = odometer.rotation().degrees()
+        wpilib.SmartDashboard.putNumber("Odo Theta", angle)
+
+
 

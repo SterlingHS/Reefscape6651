@@ -25,7 +25,7 @@ from wpilib import DriverStation
 signum = lambda x : (x>0)-(x<0) # Function to get the sign of a number
 
 class SwerveJoystickCmd2(Command):
-    def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFuncx, turningSpeedFuncy, moveRight, moveLeft):
+    def __init__(self, swerveSub:SwerveSubsystem, xSpeedFunc, ySpeedFunc, turningSpeedFuncx, turningSpeedFuncy, moveRightFunc, moveLeftFunc):
         Command.__init__(self)
 
         self.swerveSub = swerveSub
@@ -33,8 +33,8 @@ class SwerveJoystickCmd2(Command):
         self.ySpeedFunction = ySpeedFunc
         self.turningSpeedFunctionx = turningSpeedFuncx
         self.turningSpeedFunctiony = turningSpeedFuncy
-        self.moveRight = moveRight
-        self.moveLeft = moveLeft
+        self.moveRightFunc = moveRightFunc
+        self.moveLeftFunc = moveLeftFunc
 
         self.addRequirements(swerveSub)
 
@@ -86,12 +86,6 @@ class SwerveJoystickCmd2(Command):
         return angle
 
     def execute(self) -> None:
-        # Check if the robot needs to shift sideways
-        if self.moveRight and self.xSpeed == 0 and self.ySpeed == 0:
-            self.swerveSub.moveRight(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
-        elif self.moveLeft and self.xSpeed == 0 and self.ySpeed == 0:
-            self.swerveSub.moveLeft(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
-
         # Check driving mode
         if self.lastMode != self.swerveSub.getDrivingMode():
             self.lastAngle = self.swerveSub.getHeading()
@@ -104,6 +98,9 @@ class SwerveJoystickCmd2(Command):
             y = self.ySpeedFunction()
             rotx = -self.turningSpeedFunctionx()
             roty = -self.turningSpeedFunctiony()
+            self.moveRight = self.moveRightFunc()
+            self.moveLeft = self.moveLeftFunc()
+
         else:
             x = 0 
             y = 0 
@@ -115,6 +112,14 @@ class SwerveJoystickCmd2(Command):
         self.ySpeed = y if abs(y) > OIConstants.kDeadband else 0.0
         self.turningSpeedx = rotx if abs(rotx) > OIConstants.kDeadbandRot else 0.0
         self.turningSpeedy = roty if abs(roty) > OIConstants.kDeadbandRot else 0.0
+
+        # Check if the robot needs to shift sideways
+        if self.moveRight and self.xSpeed == 0 and self.ySpeed == 0:
+            self.swerveSub.moveRight(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
+            return 0
+        if self.moveLeft and self.xSpeed == 0 and self.ySpeed == 0:
+            self.swerveSub.moveLeft(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
+            return 0
 
         # Calculates the andgle of the robot depending on the joystick
         self.xSpeed, self.ySpeed, self.turningSpeedx, self.turningSpeedy = self.joystick_attenuator(self.xSpeed, self.ySpeed, self.turningSpeedx, self.turningSpeedy)

@@ -8,6 +8,7 @@ import commands2
 import commands2.button
 from commands2 import waitcommand
 
+from commands.SwerveAutoCmd import SwerveAutoCmd
 from commands.SwerveJoystickCmd2 import SwerveJoystickCmd2
 from commands.DriveSwitchMode import DriveSwitchMode
 from commands.ElevatorChange import ElevatorChange
@@ -59,8 +60,8 @@ class RobotContainer:
                lambda : self.driverController.getRawAxis(OIConstants.kDriverXAxis),
                lambda : self.driverController.getRawAxis(OIConstants.kDriverXRotAxis),
                lambda : self.driverController.getRawAxis(OIConstants.kDriverYRotAxis),
-               lambda : self.driverController.getRawButton(OIConstants.kDriverMoveRight),
-               lambda : self.driverController.getRawButton(OIConstants.kDriverMoveLeft)
+               lambda : self.driverController.getSquareButton(),
+               lambda : self.driverController.getCircleButton()
            )
         )
 
@@ -79,6 +80,7 @@ class RobotContainer:
         WaitSimpleMid = waitcommand.WaitCommand(10).andThen(PathPlannerAuto("SimpleMid"))
         WaitHighMid2019 = waitcommand.WaitCommand(10).andThen(PathPlannerAuto("HighMid-20-19"))
         WaitLowStart2217 = waitcommand.WaitCommand(10).andThen(PathPlannerAuto("LowStart-22-17"))
+        SwerveAutoTest = SwerveAutoCmd(self.swerveSubsystem, 0, 5.6, 0)
         # autocommands4 = commands2.WaitCommand(8).andThen(autocommands3)
         
         # Register Named Commands
@@ -99,6 +101,7 @@ class RobotContainer:
             self.sendableChooser.addOption("Wait-SimpleMid", WaitSimpleMid)
             self.sendableChooser.addOption("Wait-HighMid2019", WaitHighMid2019)
             self.sendableChooser.addOption("Wait-LowStart2217", WaitLowStart2217)
+            self.sendableChooser.addOption("TestAutoCMD", SwerveAutoTest)
         except:
             print("##########################################################################")
             print("AutoTest not found")
@@ -154,6 +157,9 @@ class RobotContainer:
         commands2.button.JoystickButton(
             self.driverController, wpilib.PS5Controller.Button.kL2).onTrue(SwerveToggleTurbo(self.swerveSubsystem))
         
+        # Test SwerveAutoCMD
+        commands2.button.JoystickButton(
+            self.driverController, wpilib.PS5Controller.Button.kR2).whileTrue(SwerveAutoCmd(self.swerveSubsystem, 0, 5.6, 0))
 
     def getAutonomousCommand(self) -> commands2.Command:
         """

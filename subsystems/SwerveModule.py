@@ -124,18 +124,15 @@ class SwerveModule:
         self.driveMotor.set_position(0)
         self.turningEncoder.setPosition(self.getAbsoluteEncoderRad())
 
-    def getSwerveModulePosition(self):
-        ''' Returns the position of the swerve module '''
-        return wpimath.kinematics.SwerveModulePosition(self.getDrivePosition(), Rotation2d(self.getTurningPosition()))
-
-
     def getState(self):
         ''' Returns the state of the swerve module '''
         return SwerveModuleState(self.getDriveVelocity(), Rotation2d(self.getTurningPosition()))
     
     def getSwerveModulePosition(self):
         ''' Returns the position of the swerve module '''
-        return wpimath.kinematics.SwerveModulePosition(self.getDrivePosition(), Rotation2d(self.getTurningPosition()))
+        return wpimath.kinematics.SwerveModulePosition(
+            self.getDrivePosition(), 
+            Rotation2d(self.getTurningPosition()))
 
     def stop(self):
         ''' Stops the swerve module '''

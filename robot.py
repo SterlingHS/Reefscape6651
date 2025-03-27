@@ -8,6 +8,7 @@
 import typing
 
 import wpilib
+from wpilib import DataLogManager
 import commands2
 import commands2.cmd
 import robotcontainer
@@ -42,8 +43,11 @@ class MyRobot(commands2.TimedCommandRobot):
         CS.enableLogging()
         camera = CS.startAutomaticCapture("Top Camera", 0)
         camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 160, 120, 60)
-        #self.output = CS.putVideo("Top Camera", 320, 240) Probably not needed
-
+        
+        # Start Log File
+        DataLogManager.start()
+        
+        # For LaserCAN
         can_bridge_tcp()
 
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
@@ -53,7 +57,6 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def robotPeriodic(self) -> None:
         self.shuffleboardinfo.updateShuffleboard()
-        # time, input_img = self.sink.grabFrame(input_img)
         return super().robotPeriodic()
 
     def disabledInit(self) -> None:
@@ -88,7 +91,6 @@ class MyRobot(commands2.TimedCommandRobot):
     def teleopPeriodic(self) -> None:
         """This function is called periodically during operator control"""
         self.shuffleboardinfo.updateShuffleboard()
-        #self.container.blinkinSubsystem.updatePWM()
 
     def testInit(self) -> None:
         # Cancels all running commands at the start of test mode
