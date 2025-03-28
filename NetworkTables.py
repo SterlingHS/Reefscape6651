@@ -107,5 +107,9 @@ class NetworkTables:
         angle = odometer.rotation().degrees()
         wpilib.SmartDashboard.putNumber("Odo Theta", angle)
 
+        wpilib.SmartDashboard.putNumber("Real Velocity X", self.container.swerveSubsystem.getRealVelocityX())
+        wpilib.SmartDashboard.putNumber("Real Velocity Y", self.container.swerveSubsystem.getRealVelocityY())
+        wpilib.SmartDashboard.putNumber("Real Velocity", self.container.swerveSubsystem.getVelocity)
+
 
 

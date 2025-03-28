@@ -9,7 +9,7 @@ from commands2 import Command
 from wpimath.controller import PIDController
 from wpimath.trajectory import TrapezoidProfile
 from wpimath.kinematics import ChassisSpeeds
-from wpimath.geometry import Rotation2d
+from wpimath.geometry import Rotation2d, Pose2d
 
 from subsystems.SwerveSubsystem import SwerveSubsystem
 
@@ -18,13 +18,11 @@ from constants import DriveConstants
 from math import pi
 
 class SwerveAutoCmd(Command):
-    def __init__(self, swerveSub:SwerveSubsystem, GoalX, GoalY, GoalTheta):
+    def __init__(self, swerveSub:SwerveSubsystem, GoalPose:Pose2d):
         Command.__init__(self)
 
         self.swerveSub = swerveSub
-        self.GoalX = GoalX
-        self.GoalY = GoalY
-        self.GoalTheta = GoalTheta
+        self.GoalPose = GoalPose # This can be used to pass in a Pose2d object instead of separate values
         self.addRequirements(swerveSub)
 
         # PID to control turning speed of the robot
@@ -49,17 +47,16 @@ class SwerveAutoCmd(Command):
         pose = self.swerveSub.getPoseEstimator()
         self.x = pose.X()
         self.y = pose.Y()
-        self.theta = pose.rotation().degrees()
-        self.theta = self.theta % 360 # Normalize the angle to be between 0 and 360
+        self.theta = pose.rotation().degrees() % 360 # Normalize the angle to be between 0 and 360
 
     def initialize(self) -> None:
          # Get the current setpoint for the robot
-        self.turningGoal = TrapezoidProfile.State(position=self.GoalTheta, velocity=0)
+        self.turningGoal = TrapezoidProfile.State(position=self.GoalPose.rotation().degrees() , velocity=0)
         self.turningSetpoint = TrapezoidProfile.State(position=self.theta, velocity=0)
-        self.xGoal = TrapezoidProfile.State(position=self.GoalX, velocity=0)
-        self.xSetpoint = TrapezoidProfile.State(position=self.x, velocity=self.swerveSub.getXVelocity())   
-        self.yGoal = TrapezoidProfile.State(position=self.GoalY, velocity=0)
-        self.ySetpoint = TrapezoidProfile.State(position=self.y, velocity=self.swerveSub.getYVelocity())
+        self.xGoal = TrapezoidProfile.State(position=self.GoalPose.X(), velocity=0)
+        self.xSetpoint = TrapezoidProfile.State(position=self.x, velocity=self.swerveSub.getRealVelocityX())   
+        self.yGoal = TrapezoidProfile.State(position=self.GoalPose.Y(), velocity=0)
+        self.ySetpoint = TrapezoidProfile.State(position=self.y, velocity=self.swerveSub.getRealVelocityY())
         return super().initialize()
 
     def execute(self) -> None:
@@ -68,8 +65,7 @@ class SwerveAutoCmd(Command):
         pose = self.swerveSub.getPoseEstimator()
         self.x = pose.X()
         self.y = pose.Y()
-        self.theta = pose.rotation().degrees()
-        self.theta = self.theta % 360 # Normalize the angle to be between 0 and 360
+        self.theta = pose.rotation().degrees() % 360 # Normalize the angle to be between 0 and 360
 
         # PID to control the stearing the robot should be facing
         # self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
@@ -105,9 +101,9 @@ class SwerveAutoCmd(Command):
     
     def isFinished(self) -> bool:
         # check if we have arrived to the Goal
-        errorx = abs(self.GoalX - self.x)
-        errory = abs(self.GoalY - self.y)
-        errorTheta = abs(self.GoalTheta - self.theta)
+        errorx = abs(self.GoalPose.X() - self.x)
+        errory = 0 #abs(self.GoalPose.Y() - self.y)
+        errorTheta = 0 #abs(self.GoalPose.rotation().degrees() - self.theta)
         condition = errorx < .1 and errory < .1 and errorTheta < .1 
         # print(f"condition - {condition}")
         return condition

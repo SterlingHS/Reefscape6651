@@ -33,6 +33,7 @@ from constants import DropperConstants
 from pathplannerlib.auto import PathPlannerAuto, NamedCommands, AutoBuilder
 
 from wpilib import SendableChooser
+from wpimath.geometry import Pose2d, Rotation2d
 from math import pi
 
 class RobotContainer:
@@ -72,6 +73,12 @@ class RobotContainer:
 
         autocommand0: commands2.cmd.Command = None
 
+        #Poses for Autonomous
+        Pose22L = Pose2d(7.159, 2.809, Rotation2d.fromDegrees(120)) # Pose for Left 22
+        Pose17L = Pose2d(3.693, 2.972, Rotation2d.fromDegrees(240)) # Pose for Right 17
+        Pose17R = Pose2d(3.975, 2.811, Rotation2d.fromDegrees(240)) # Pose for Left 17
+        PoseCoralRight = Pose2d(1.629, 0.683, Rotation2d.fromDegrees(234)) # Pose for Right Coral
+
         DropAuto = ElevatorFloor(self.elevator, 4).andThen(
             CoralDrop(self.dropper).andThen(
             waitcommand.WaitCommand(.25).andThen(
@@ -88,6 +95,19 @@ class RobotContainer:
         NamedCommands.registerCommand('DropAuto', DropAuto)
         NamedCommands.registerCommand('IntakeAuto', IntakeAuto)
 
+        # Autonomous with SwerveAutoCmd
+        Right22h17 =    SwerveAutoCmd(Pose22L).andThen(
+                        DropAuto.andThen(
+                        SwerveAutoCmd(PoseCoralRight).andThen(
+                        IntakeAuto.andThen(
+                        SwerveAutoCmd(Pose17L).andThen(
+                        DropAuto.andThen(
+                        SwerveAutoCmd(PoseCoralRight).andThen(
+                        IntakeAuto.andThen(
+                        SwerveAutoCmd(Pose17R).andThen(
+                        DropAuto
+                        ))))))))) # PathPlannerAuto("Right-22-17")
+
         self.sendableChooser = SendableChooser()
         # #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
         self.sendableChooser.setDefaultOption("Nothing", autocommand0)
@@ -103,6 +123,7 @@ class RobotContainer:
             self.sendableChooser.addOption("Wait-HighMid2019", WaitHighMid2019)
             self.sendableChooser.addOption("Wait-LowStart2217", WaitLowStart2217)
             self.sendableChooser.addOption("TestAutoCMD", SwerveAutoTest)
+            self.sendableChooser.addOption("AutoSwv-Right-22-17", Right22h17)
         except:
             print("##########################################################################")
             print("AutoTest not found")
@@ -159,7 +180,7 @@ class RobotContainer:
         
         # Test SwerveAutoCMD
         commands2.button.JoystickButton(
-            self.driverController, wpilib.PS5Controller.Button.kR2).whileTrue(SwerveAutoCmd(self.swerveSubsystem, 0, 5.6, 0))
+            self.driverController, wpilib.PS5Controller.Button.kR2).whileTrue(SwerveAutoCmd(self.swerveSubsystem, 5.6, 0, 0))
         
 
     def getAutonomousCommand(self) -> commands2.Command:

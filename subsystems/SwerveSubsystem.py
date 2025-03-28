@@ -77,9 +77,9 @@ class SwerveSubsystem(Subsystem):
         )
         
         # Init variables for velocity
-        self.xvelocity = 0
-        self.yvelocity = 0
-        self.turningvelocity = 0
+        self.desiredVelocityX = 0
+        self.desiredVelocityY = 0
+        self.desiredVelocityHeading = 0
 
         # Init Swerve Position
         self.swerveModulePositions = (wpimath.kinematics.SwerveModulePosition(self.frontLeft.getDrivePosition(), Rotation2d(self.frontLeft.getTurningPosition())),
@@ -325,9 +325,9 @@ class SwerveSubsystem(Subsystem):
     
     def setChassisSpeeds(self, chassisSpeeds:ChassisSpeeds):
         ''' Sets the chassis speeds of the robot in Autonomous mode (PathPlanner)'''
-        self.xvelocity = chassisSpeeds.vx
-        self.yvelocity = chassisSpeeds.vy
-        self.turningvelocity = chassisSpeeds.omega
+        self.desiredVelocityX = chassisSpeeds.vx
+        self.desiredVelocityY = chassisSpeeds.vy
+        self.desiredVelocityHeading = chassisSpeeds.omega
 
         chassisSpeeds.vx = -chassisSpeeds.vx
         chassisSpeeds.vy = -chassisSpeeds.vy
@@ -336,7 +336,7 @@ class SwerveSubsystem(Subsystem):
 
     def getChassisSpeed(self):
         ''' Returns the chassis speeds of the robot in Autonomous mode (PathPlanner)'''
-        return ChassisSpeeds(self.getXVelocity(), self.getYVelocity(), self.getAngularVelocity())
+        return ChassisSpeeds(self.getdesiredVelocityX(), self.getdesiredVelocityY(), self.getAngularVelocity())
     
     def shouldFlipPath(self):
         ''' Used for Autonomoud mode (PathPlanner) - Boolean supplier that controls when the path will be mirrored for the red alliance.
@@ -347,39 +347,45 @@ class SwerveSubsystem(Subsystem):
 ################################################################################################
 ############## Velocity Methods
 
-    def getXVelocity(self):
-        ''' Returns the X velocity of the robot '''
-        return self.xvelocity
+    def getDesiredVelocityX(self):
+        ''' Returns the X desired velocity of the robot '''
+        return self.desiredVelocityX
 
-    def getYVelocity(self):
-        ''' Returns the Y velocity of the robot '''
-        return self.yvelocity
+    def getDesiredVelocityY(self):
+        ''' Returns the Y desired velocity of the robot '''
+        return self.desiredVelocityY
     
     def getDesiredVelocity(self):
         ''' Returns the velocity of the robot '''
-        return (self.getXVelocity()**2 + self.getYVelocity()**2)**0.5
+        return (self.getDesiredVelocityX()**2 + self.getDesiredVelocityY()**2)**0.5
     
+    def getRealVelocityX(self):
+        ''' Returns the real X velocity of the robot based on the encoders in m/s. '''
+        FLx = self.frontLeft.getDriveVelocity()*cos(self.frontLeft.getTurningPosition())
+        FRx = self.frontRight.getDriveVelocity()*cos(self.frontRight.getTurningPosition())
+        BLx = self.backLeft.getDriveVelocity()*cos(self.backLeft.getTurningPosition())
+        BRx = self.backRight.getDriveVelocity()*cos(self.backRight.getTurningPosition())
+        return (FLx+FRx+BLx+BRx)/4
+    
+    def getRealVelocityY(self):
+        ''' Returns the real Y velocity of the robot based on the encoder in m/s. '''
+        FLy = self.frontLeft.getDriveVelocity()*sin(self.frontLeft.getTurningPosition())
+        FRy = self.frontRight.getDriveVelocity()*sin(self.frontRight.getTurningPosition())
+        BLy = self.backLeft.getDriveVelocity()*sin(self.backLeft.getTurningPosition())
+        BRy = self.backRight.getDriveVelocity()*sin(self.backRight.getTurningPosition())
+        return (FLy+FRy+BLy+BRy)/4
+
     def getVelocity(self):
         ''' Returns the desired velocity of the robot '''
         # Reads the velocity of each module and averages them
         # for the x axis and the y axis
         # then finds the hypothenuse of the two
         # to get the velocity of the robot
-        FLx = self.frontLeft.getDriveVelocity()*cos(self.frontLeft.getTurningPosition())
-        FRx = self.frontRight.getDriveVelocity()*cos(self.frontRight.getTurningPosition())
-        BLx = self.backLeft.getDriveVelocity()*cos(self.backLeft.getTurningPosition())
-        BRx = self.backRight.getDriveVelocity()*cos(self.backRight.getTurningPosition())
-        xvelocity = (FLx+FRx+BLx+BRx)/4
-        FLy = self.frontLeft.getDriveVelocity()*sin(self.frontLeft.getTurningPosition())
-        FRy = self.frontRight.getDriveVelocity()*sin(self.frontRight.getTurningPosition())
-        BLy = self.backLeft.getDriveVelocity()*sin(self.backLeft.getTurningPosition())
-        BRy = self.backRight.getDriveVelocity()*sin(self.backRight.getTurningPosition())
-        yvelocity = (FLy+FRy+BLy+BRy)/4
-        return (xvelocity**2 + yvelocity**2)**0.5
+        return (self.getRealVelocityX()**2 + self.getRealVelocityY()**2)**0.5
         
     def getAngularVelocity(self):
         ''' Returns the angular velocity of the robot '''
-        return self.turningvelocity
+        return self.desiredVelocityHeading
 
     def getTurboMode(self):
         ''' Returns the turbo mode '''
@@ -595,7 +601,7 @@ class SwerveSubsystem(Subsystem):
         # wpilib.SmartDashboard.putNumber("OdoX", self.odometer.getPose().X())
         # wpilib.SmartDashboard.putNumber("OdoY", self.odometer.getPose().Y())
         # wpilib.SmartDashboard.putNumber("OdoT", self.odometer.getPose().rotation().degrees())
-        wpilib.SmartDashboard.putNumber("VX",self.xvelocity)
-        wpilib.SmartDashboard.putNumber("VY",self.yvelocity)
-        wpilib.SmartDashboard.putNumber("VTheta",self.turningvelocity)
+        wpilib.SmartDashboard.putNumber("VX",self.desiredVelocityX)
+        wpilib.SmartDashboard.putNumber("VY",self.desiredVelocityY)
+        wpilib.SmartDashboard.putNumber("VTheta",self.desiredVelocityHeading)
         
