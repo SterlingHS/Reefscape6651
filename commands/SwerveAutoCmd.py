@@ -45,7 +45,21 @@ class SwerveAutoCmd(Command):
 
         self.chassisSpeeds = ChassisSpeeds()
 
+        # Reads the position of the robot
+        pose = self.swerveSub.getPoseEstimator()
+        self.x = pose.X()
+        self.y = pose.Y()
+        self.theta = pose.rotation().degrees()
+        self.theta = self.theta % 360 # Normalize the angle to be between 0 and 360
+
     def initialize(self) -> None:
+         # Get the current setpoint for the robot
+        self.turningGoal = TrapezoidProfile.State(position=self.GoalTheta, velocity=0)
+        self.turningSetpoint = TrapezoidProfile.State(position=self.theta, velocity=0)
+        self.xGoal = TrapezoidProfile.State(position=self.GoalX, velocity=0)
+        self.xSetpoint = TrapezoidProfile.State(position=self.x, velocity=self.swerveSub.getXVelocity())   
+        self.yGoal = TrapezoidProfile.State(position=self.GoalY, velocity=0)
+        self.ySetpoint = TrapezoidProfile.State(position=self.y, velocity=self.swerveSub.getYVelocity())
         return super().initialize()
 
     def execute(self) -> None:
@@ -55,38 +69,29 @@ class SwerveAutoCmd(Command):
         self.x = pose.X()
         self.y = pose.Y()
         self.theta = pose.rotation().degrees()
-        if self.theta < 0:
-            self.theta += 360
-
-        # Get the current setpoint for the robot
-        self.turningGoal = TrapezoidProfile.State(position=self.GoalTheta, velocity=0)
-        self.turningSetpoint = TrapezoidProfile.State(position=self.theta, velocity=0)
-        self.xGoal = TrapezoidProfile.State(position=self.GoalX, velocity=0)
-        self.xSetpoint = TrapezoidProfile.State(position=self.x, velocity=self.swerveSub.getXVelocity())   
-        self.yGoal = TrapezoidProfile.State(position=self.GoalY, velocity=0)
-        self.ySetpoint = TrapezoidProfile.State(position=self.y, velocity=self.swerveSub.getYVelocity())
+        self.theta = self.theta % 360 # Normalize the angle to be between 0 and 360
 
         # PID to control the stearing the robot should be facing
         # self.turningSetpoint = self.turningTrap.calculate(.02, self.turningSetpoint, self.turningGoal)
         # self.turningPID.setSetpoint(self.turningSetpoint.position)
-        # turningSpeed = self.turningPID.calculate(self.theta)*DriveConstants.kTeleDriveMaxAngularRadiansPerSecond
+        # turningSpeed = self.turningPID.calculate(self.theta)
         
         # PID to control the x position of the robot
         self.xSetpoint = self.xTrap.calculate(.02, self.xSetpoint, self.xGoal)
         self.xPID.setSetpoint(self.xSetpoint.position)
-        xSpeed = self.xPID.calculate(self.x)*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond
+        xSpeed = self.xPID.calculate(self.x)
         print(f"Position = {self.xSetpoint.position} -- xSpeed = {xSpeed}")
 
         # PID to control the y position of the robot
         # self.ySetpoint = self.yTrap.calculate(.02, self.ySetpoint, self.yGoal)
         # self.yPID.setSetpoint(self.ySetpoint.position)
-        # ySpeed = self.yPID.calculate(self.y)*DriveConstants.kTeleDriveMaxSpeedMetersPerSecond
-        
+        # ySpeed = self.yPID.calculate(self.y)
+
         self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 xSpeed, 
                 0, #ySpeed, 
                 0, #turningSpeed, 
-                Rotation2d(self.theta))
+                Rotation2d(self.theta*pi/180))
     
         # Updates the swerve drive modules
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)

@@ -253,21 +253,37 @@ class SwerveSubsystem(Subsystem):
 
     def moveRight(self, speed):
         ''' Moves all motors to the right at a certain speed '''
-        angle = self.getHeading()-90
+        angle = (self.getHeading()-90)%360
         speedx = speed*cos(angle*pi/180)
         speedy = speed*sin(angle*pi/180)
-        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedx, speedy, 0,Rotation2d(self.getHeading()*pi/180))
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedx, speedy, 0, Rotation2d(self.getHeading()*pi/180))
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds)
         self.setModuleStates(moduleStates)
     
     def moveLeft(self, speed):
         ''' Moves all motors to the left at a certain speed '''
-        angle = self.getHeading()+90
+        angle = (self.getHeading()+90)%360
         speedx = speed*cos(angle*pi/180)
         speedy = speed*sin(angle*pi/180)
-        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedx, speedy, 0 ,Rotation2d(self.getHeading()*pi/180))
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedx, speedy, 0 , Rotation2d(self.getHeading()*pi/180))
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds)
         self.setModuleStates(moduleStates)
+
+    def moveRight2(self, speed):
+        ''' Moves all motors straight to the right at a certain speed '''
+        RightState = SwerveModuleState(speed, Rotation2d.fromDegrees(-90))
+        self.frontLeft.setDesiredState(RightState)
+        self.frontRight.setDesiredState(RightState)
+        self.backLeft.setDesiredState(RightState)
+        self.backRight.setDesiredState(RightState)
+
+    def moveLeft2(self, speed):
+        ''' Moves all motors straight the the left at a certain speed '''
+        LeftState = SwerveModuleState(speed, Rotation2d.fromDegrees(90))
+        self.frontLeft.setDesiredState(LeftState)
+        self.frontRight.setDesiredState(LeftState)
+        self.backLeft.setDesiredState(LeftState)
+        self.backRight.setDesiredState(LeftState)
 
     def moveStraight(self, speed):
         ''' Moves all motors straight forward at a certain speed '''

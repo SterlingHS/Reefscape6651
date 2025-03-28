@@ -115,10 +115,10 @@ class SwerveJoystickCmd2(Command):
 
         # Check if the robot needs to shift sideways
         if self.moveRight and self.xSpeed == 0 and self.ySpeed == 0:
-            self.swerveSub.moveRight(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
+            self.swerveSub.moveRight2(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
             return 0
         if self.moveLeft and self.xSpeed == 0 and self.ySpeed == 0:
-            self.swerveSub.moveLeft(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
+            self.swerveSub.moveLeft2(DriveConstants.kModeSidewaysSpeedMetersPerSecond)
             return 0
 
         # Calculates the andgle of the robot depending on the joystick
