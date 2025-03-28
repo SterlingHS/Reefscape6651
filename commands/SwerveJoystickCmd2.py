@@ -230,11 +230,6 @@ class SwerveJoystickCmd2(Command):
             self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     self.xSpeed, self.ySpeed, self.turningSpeed, Rotation2d(self.swerveSub.getHeading()*pi/180))
                     
-        # Updates the swerve drive modules
-        wpilib.SmartDashboard.putNumber("Vx",self.xSpeed)
-        wpilib.SmartDashboard.putNumber("Vy",self.ySpeed)
-        # wpilib.SmartDashboard.putNumber("VTheta",speedTheta)
-
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
         self.swerveSub.setModuleStates(moduleStates)
 

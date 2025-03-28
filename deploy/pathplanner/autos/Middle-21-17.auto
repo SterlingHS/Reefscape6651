@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Mid-21L"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "DropAuto"

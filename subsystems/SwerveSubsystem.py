@@ -19,6 +19,8 @@ import navx
 from pathplannerlib.auto import AutoBuilder
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import RobotConfig, PIDConstants
+from wpimath.geometry import Pose2d, Rotation2d
+
 from wpilib import DriverStation, Timer
 
 # For NavX to calibrate
@@ -103,7 +105,7 @@ class SwerveSubsystem(Subsystem):
         print(config)
         # For Autonomous Pathplanner
         AutoBuilder.configure(
-            self.getPose, #self.getPoseEstimator, # Robot pose supplier
+            self.getPose,#self.getPoseEstimator, # Robot pose supplier
             self.resetOdometer, # Method to reset odometry (will be called if your auto has a starting pose)
             self.getChassisSpeed, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             lambda speeds, feedforwards: self.setChassisSpeeds(speeds), # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also outputs individual module feedforwards
@@ -205,6 +207,7 @@ class SwerveSubsystem(Subsystem):
                                      self.backLeft.getSwerveModulePosition(), 
                                      self.backRight.getSwerveModulePosition()), 
                                      pose)
+        pass
         
     def resetEncoder(self):
         ''' Resets all the encoders - 
@@ -248,29 +251,23 @@ class SwerveSubsystem(Subsystem):
         self.backLeft.stop()
         self.backRight.stop()
 
-    def moveLeft(self, speed):
-        ''' Moves all motors left at a certain speed '''
-        # gets the angle of orientation for the left side of the robot
-        angle = self.getHeading() - 90
-        angle = angle % 360 # Makes the angle be between 0 and 360
-
-        leftState = SwerveModuleState(speed, Rotation2d.fromDegrees(angle))
-        self.frontLeft.setDesiredState(leftState)
-        self.frontRight.setDesiredState(leftState)
-        self.backLeft.setDesiredState(leftState)
-        self.backRight.setDesiredState(leftState)
-    
     def moveRight(self, speed):
-        ''' Moves all motors right at a certain speed '''
-         # gets the angle of orientation for the left side of the robot
-        angle = self.getHeading() + 90
-        angle = angle % 360 # Makes the angle be between 0 and 360
-
-        rightState = SwerveModuleState(speed, Rotation2d.fromDegrees(angle))
-        self.frontLeft.setDesiredState(rightState)
-        self.frontRight.setDesiredState(rightState)
-        self.backLeft.setDesiredState(rightState)
-        self.backRight.setDesiredState(rightState)
+        ''' Moves all motors to the right at a certain speed '''
+        angle = self.getHeading()-90
+        speedx = speed*cos(angle*pi/180)
+        speedy = speed*sin(angle*pi/180)
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedx, speedy, 0,Rotation2d(self.getHeading()*pi/180))
+        moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds)
+        self.setModuleStates(moduleStates)
+    
+    def moveLeft(self, speed):
+        ''' Moves all motors to the left at a certain speed '''
+        angle = self.getHeading()+90
+        speedx = speed*cos(angle*pi/180)
+        speedy = speed*sin(angle*pi/180)
+        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedx, speedy, 0 ,Rotation2d(self.getHeading()*pi/180))
+        moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds)
+        self.setModuleStates(moduleStates)
 
     def moveStraight(self, speed):
         ''' Moves all motors straight forward at a certain speed '''
@@ -290,7 +287,7 @@ class SwerveSubsystem(Subsystem):
     def setModuleStates(self,desiredStates):
         ''' Sets swerve system to go in a specific direction and speed '''
         # Calculate the attainable max speed based on the current mode (turbo or not)
-        attainableMaxSpeed = DriveConstants.kPhysicalMaxSpeedMetersPerSecond * (.75 if self.turboMode else 1)
+        attainableMaxSpeed = DriveConstants.kPhysicalMaxSpeedMetersPerSecond * (.50 if self.turboMode else 1)
         
         # Desaturate the wheel speeds to ensure they don't exceed the max speed
         desiredStates = wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
@@ -315,6 +312,9 @@ class SwerveSubsystem(Subsystem):
         self.xvelocity = chassisSpeeds.vx
         self.yvelocity = chassisSpeeds.vy
         self.turningvelocity = chassisSpeeds.omega
+
+        chassisSpeeds.vx = -chassisSpeeds.vx
+        chassisSpeeds.vy = -chassisSpeeds.vy
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds)
         self.setModuleStates(moduleStates)
 
@@ -397,6 +397,10 @@ class SwerveSubsystem(Subsystem):
             return self.aprilTagNumber
         return 0
 
+    def isPoseInitialized(self):
+        ''' Returns if the Pose Estimator has been initialized '''
+        return not self.PoseEstimatorInit
+
     def readLimelight(self):
         ''' Read Limelight and returns the data '''
         ##################################################################
@@ -409,6 +413,8 @@ class SwerveSubsystem(Subsystem):
         self.timestamp = table.getEntry("ts").getDouble(0)
         self.validity = table.getEntry("tv").getDouble(0)
         self.aprilTagNumber = table.getEntry("tid").getDouble(0)
+        self.cl = table.getEntry("cl").getDouble(0)
+        self.tl = table.getEntry("tl").getDouble(0)
 
         # Get the status of the Limelight
         status = table.getEntry("hw").getDoubleArray([0,0,0,0])
@@ -453,10 +459,10 @@ class SwerveSubsystem(Subsystem):
                                     self.botpose_wpiblue[0], 
                                     self.botpose_wpiblue[1], 
                                     Rotation2d.fromDegrees(yaw)))
-                    # self.odometer.resetPose( Pose2d(
-                    #                 self.botpose_wpiblue[0], 
-                    #                 self.botpose_wpiblue[1], 
-                    #                 Rotation2d.fromDegrees(yaw)))
+                    self.odometer.resetPose( Pose2d(
+                                    self.botpose_wpiblue[0], 
+                                    self.botpose_wpiblue[1], 
+                                    Rotation2d.fromDegrees(yaw)))
                     self.poseEstimator.setVisionMeasurementStdDevs((0.1,0.1,0.1))
                     print(f"{self.botpose_wpiblue[0]} - {self.botpose_wpiblue[1]} - {self.botpose_wpiblue[5]}")
                     # push the yaw to the limelight
@@ -480,6 +486,9 @@ class SwerveSubsystem(Subsystem):
                                     )
                                 )
         
+        wpilib.SmartDashboard.putNumber("before X", self.poseEstimator.getEstimatedPosition().X())
+        wpilib.SmartDashboard.putNumber("before Y", self.poseEstimator.getEstimatedPosition().Y())
+        wpilib.SmartDashboard.putNumber("before Theta", self.poseEstimator.getEstimatedPosition().rotation().degrees())
 
         if self.validity == 1: # add condition to check if distance is less than 2 meters
             if self.gyro.getRate() < 720: # if the robot is spinning too fast, ignore the vision measurement
@@ -490,7 +499,7 @@ class SwerveSubsystem(Subsystem):
                                             self.botpose_wpiblue[1], 
                                             Rotation2d.fromDegrees(self.botpose_wpiblue[5])
                                             ), 
-                                        Timer.getFPGATimestamp() - (self.botpose[6]/1000.0), # Time since the vision measurement was taken
+                                        Timer.getFPGATimestamp() - (self.cl + self.tl), # Time since the vision measurement was taken
                                         )
             
         wpilib.SmartDashboard.putNumber("Validity",self.validity)
@@ -570,4 +579,7 @@ class SwerveSubsystem(Subsystem):
         # wpilib.SmartDashboard.putNumber("OdoX", self.odometer.getPose().X())
         # wpilib.SmartDashboard.putNumber("OdoY", self.odometer.getPose().Y())
         # wpilib.SmartDashboard.putNumber("OdoT", self.odometer.getPose().rotation().degrees())
+        wpilib.SmartDashboard.putNumber("VX",self.xvelocity)
+        wpilib.SmartDashboard.putNumber("VY",self.yvelocity)
+        wpilib.SmartDashboard.putNumber("VTheta",self.turningvelocity)
         

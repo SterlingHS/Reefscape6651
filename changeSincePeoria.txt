@@ -20,5 +20,6 @@ Method PID based that drives to a specific pose
 
 
 POSSIBLE ERRORS:
-1. Angles in radians
+1. All encoders go the same direction (check total distance travelled for EACH encoder)
 2. TimeStamp for PoseEstimator
+3. CHECK MAX SPEED!!!

@@ -131,7 +131,7 @@ class SwerveModule:
     def getSwerveModulePosition(self):
         ''' Returns the position of the swerve module '''
         return wpimath.kinematics.SwerveModulePosition(
-            self.getDrivePosition(), 
+            -self.getDrivePosition(), 
             Rotation2d(self.getTurningPosition()))
 
     def stop(self):

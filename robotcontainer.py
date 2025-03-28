@@ -30,9 +30,10 @@ from subsystems.AlgaeCollector import AlgaeCollector
 from constants import DrivingModes, OIConstants
 from constants import DropperConstants
 
-from pathplannerlib.auto import PathPlannerAuto, NamedCommands
+from pathplannerlib.auto import PathPlannerAuto, NamedCommands, AutoBuilder
 
 from wpilib import SendableChooser
+from math import pi
 
 class RobotContainer:
     '''
@@ -75,7 +76,7 @@ class RobotContainer:
             CoralDrop(self.dropper).andThen(
             waitcommand.WaitCommand(.25).andThen(
             ElevatorFloor(self.elevator, 1))))
-        
+
         IntakeAuto =  CoralIntake(self.dropper, self.elevator)
         WaitSimpleMid = waitcommand.WaitCommand(10).andThen(PathPlannerAuto("SimpleMid"))
         WaitHighMid2019 = waitcommand.WaitCommand(10).andThen(PathPlannerAuto("HighMid-20-19"))
@@ -105,7 +106,6 @@ class RobotContainer:
         except:
             print("##########################################################################")
             print("AutoTest not found")
-        wpilib.SmartDashboard.putData("Auto Chooser", self.sendableChooser)
 
         # Configure the button bindings
         self.configureButtonBindings()
@@ -160,6 +160,7 @@ class RobotContainer:
         # Test SwerveAutoCMD
         commands2.button.JoystickButton(
             self.driverController, wpilib.PS5Controller.Button.kR2).whileTrue(SwerveAutoCmd(self.swerveSubsystem, 0, 5.6, 0))
+        
 
     def getAutonomousCommand(self) -> commands2.Command:
         """
