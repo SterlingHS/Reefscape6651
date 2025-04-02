@@ -14,11 +14,8 @@ from constants import DriveConstants, FieldOrientedConstants, DrivingModes, Reef
 
 import wpilib
 import navx
+from libgrapplefrc import LaserCAN
 
-# Autonomous Pathplanner
-from pathplannerlib.auto import AutoBuilder
-from pathplannerlib.controller import PPHolonomicDriveController
-from pathplannerlib.config import RobotConfig, PIDConstants
 from wpimath.geometry import Pose2d, Rotation2d
 
 from wpilib import DriverStation, Timer
@@ -99,25 +96,6 @@ class SwerveSubsystem(Subsystem):
                                     self.getRotation2d(),
                                     self.swerveModulePositions)       
 
-        # Pathplanner Configuration
-        config = RobotConfig.fromGUISettings() # RobotConfig, this should likely live in your Constants class
-        print("Pathplanner Configuration")
-        print(config)
-        # For Autonomous Pathplanner
-        AutoBuilder.configure(
-            self.getPose,#self.getPoseEstimator, # Robot pose supplier
-            self.resetOdometer, # Method to reset odometry (will be called if your auto has a starting pose)
-            self.getChassisSpeed, # ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            lambda speeds, feedforwards: self.setChassisSpeeds(speeds), # Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also outputs individual module feedforwards
-            PPHolonomicDriveController( # PPHolonomicController is the built in path following controller for holonomic drive trains
-                PIDConstants(5, 0, 0), # Translation PID constants
-                PIDConstants(5, 0, 0) # Rotation PID constants
-            ),
-            config, # The robot configuration
-            self.shouldFlipPath, # Supplier to control path flipping based on alliance color
-            self # Reference to this subsystem to set requirements
-        )
-
         # Init reef depending on Allliance
         if DriverStation.getAlliance() == DriverStation.Alliance.kBlue:
             self.reefLocationX = FieldOrientedConstants.BlueReefX
@@ -143,7 +121,6 @@ class SwerveSubsystem(Subsystem):
         tableLL = self.inst.getTable("limelight") # Get the Limelight table
         # Set IMU to 1
         tableLL.getEntry("imumode").setInteger(1) # Set the camera mode to 1 (vision processing)
-        tableLL.getEntry("stddevs").setDoubleArray([])
         
         self.listYaw = []
         self.PoseEstimatorInit = False
@@ -156,6 +133,14 @@ class SwerveSubsystem(Subsystem):
 
         # Init TurboMode
         self.turboMode = False
+
+        # Init to calculate Instant Velocity
+        self.lastTime = Timer.getFPGATimestamp()
+        self.lastPosition = self.getPose()
+        self.updateLL = True
+
+        # Init lasercan 
+        self.lasercanForward = LaserCAN(DriveConstants.LaserTopCanID)
 
 ################################################################################################
 ############## Gyro Methods
@@ -181,6 +166,24 @@ class SwerveSubsystem(Subsystem):
         ''' Return heading in degrees (from Gyro)'''
         return -self.gyro.getAngle()
     
+    def getGyroRotationVelocity(self):
+        ''' Return the rotation velocity of the robot in degrees per second '''
+        return -self.gyro.getRate()
+    
+################################################################################################
+############## LserCAN Methods
+
+    def getLaserForward(self):
+        ''' Returns the distance from the laser on the top '''
+        try:
+            result = self.lasercanForward.get_measurement()
+            if not isinstance(result.distance_mm, int):
+                return 1000
+            return result.distance_mm
+        except:
+            return 1000
+       
+
 ################################################################################################
 ############## Odometer Methods
 
@@ -192,12 +195,12 @@ class SwerveSubsystem(Subsystem):
         ''' Returns the pose of the robot '''
         return self.odometer.getPose()
 
-    def getPoseEstimator(self):
-        ''' Returns the pose of the robot using PoseEstimator '''
-        try:
-            return self.poseEstimator.getEstimatedPosition()
-        except:
-            return Pose2d(0,0,Rotation2d(0))
+    # def getPoseEstimator(self):
+    #     ''' Returns the pose of the robot using PoseEstimator '''
+    #     try:
+    #         return self.poseEstimator.getEstimatedPosition()
+    #     except:
+    #         return Pose2d(0,0,Rotation2d(0))
     
     def resetOdometer(self, pose):
         ''' Resets the odometer to a specific pose '''
@@ -300,10 +303,17 @@ class SwerveSubsystem(Subsystem):
         moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
         self.setModuleStates(moduleStates)
 
+    def moveStraightZero(self, speed):
+        ''' Moves all motors straight forward at a certain speed (In field oriented mode) '''
+        self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                speed, 0, 0, Rotation2d.fromDegrees(0))
+        moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(self.chassisSpeeds)
+        self.setModuleStates(moduleStates)
+
     def setModuleStates(self,desiredStates):
         ''' Sets swerve system to go in a specific direction and speed '''
         # Calculate the attainable max speed based on the current mode (turbo or not)
-        attainableMaxSpeed = DriveConstants.kPhysicalMaxSpeedMetersPerSecond * (.50 if self.turboMode else 1)
+        attainableMaxSpeed = DriveConstants.kPhysicalMaxSpeedMetersPerSecond * (.25 if self.turboMode else 1)
         
         # Desaturate the wheel speeds to ensure they don't exceed the max speed
         desiredStates = wpimath.kinematics.SwerveDrive4Kinematics.desaturateWheelSpeeds(
@@ -336,7 +346,7 @@ class SwerveSubsystem(Subsystem):
 
     def getChassisSpeed(self):
         ''' Returns the chassis speeds of the robot in Autonomous mode (PathPlanner)'''
-        return ChassisSpeeds(self.getdesiredVelocityX(), self.getdesiredVelocityY(), self.getAngularVelocity())
+        return ChassisSpeeds(self.getDesiredVelocityX(), self.getDesiredVelocityY(), self.getAngularVelocity())
     
     def shouldFlipPath(self):
         ''' Used for Autonomoud mode (PathPlanner) - Boolean supplier that controls when the path will be mirrored for the red alliance.
@@ -346,6 +356,16 @@ class SwerveSubsystem(Subsystem):
     
 ################################################################################################
 ############## Velocity Methods
+    def getInstantVelocity(self):
+        ''' Returns the Instant Velocity of the robot '''
+        currentTime = Timer.getFPGATimestamp()
+        deltaTime = currentTime - self.lastTime # Time between the last two readings
+        currentPosition = self.getPose()        # Current position of the robot
+        deltaPosition = currentPosition - self.lastPosition # Change in position
+        self.lastTime = currentTime             # Update the last time
+        self.lastPosition = currentPosition     # Update the last position
+
+        return deltaPosition/deltaTime if deltaTime != 0 else 0 # Return the instant velocity
 
     def getDesiredVelocityX(self):
         ''' Returns the X desired velocity of the robot '''
@@ -449,7 +469,13 @@ class SwerveSubsystem(Subsystem):
         if self.PoseEstimatorInit == True:
             # Read yaw from limelight's posewpiblue
             self.yaw_lime = self.botpose_wpiblue[5] if self.botpose_wpiblue else 0
-            wpilib.SmartDashboard.putNumber("Yaw", self.yaw_lime)
+            # wpilib.SmartDashboard.putNumber("Yaw", self.yaw_lime)
+            if self.updateLL == True:
+                table.getEntry("robot_orientation_set").setDoubleArray([self.getHeading(),0,0,0,0,0]) # Set the orientation to the Limelight    
+                self.updateLL = False
+            else:
+                self.updateLL = True   
+
         else: # Read yaw and set the gyro offset for calibration
             try:
                 self.yaw_lime = self.botpose[5]
@@ -473,24 +499,24 @@ class SwerveSubsystem(Subsystem):
                     # Sets tghe flag to True to indicate that the PoseEstimator has been initialized
                     self.PoseEstimatorInit = True
                     # Initialize the pose estimator with the current pose from the Limelight
-                    self.poseEstimator = SwerveDrive4PoseEstimator(
-                                DriveConstants.kDriveKinematics, 
-                                self.getRotation2d(), 
-                                self.swerveModulePositions,
-                                Pose2d(
-                                    self.botpose_wpiblue[0], 
-                                    self.botpose_wpiblue[1], 
-                                    Rotation2d.fromDegrees(yaw)))
+                    # self.poseEstimator = SwerveDrive4PoseEstimator(
+                    #             DriveConstants.kDriveKinematics, 
+                    #             self.getRotation2d(), 
+                    #             self.swerveModulePositions,
+                    #             Pose2d(
+                    #                 self.botpose_wpiblue[0], 
+                    #                 self.botpose_wpiblue[1], 
+                    #                 Rotation2d.fromDegrees(yaw)))
                     self.odometer.resetPose( Pose2d(
                                     self.botpose_wpiblue[0], 
                                     self.botpose_wpiblue[1], 
                                     Rotation2d.fromDegrees(yaw)))
-                    self.poseEstimator.setVisionMeasurementStdDevs((0.1,0.1,0.1))
+                    # self.poseEstimator.setVisionMeasurementStdDevs((0.1,0.1,0.1))
                     print(f"{self.botpose_wpiblue[0]} - {self.botpose_wpiblue[1]} - {self.botpose_wpiblue[5]}")
                     # push the yaw to the limelight
                     table.getEntry("robot_orientation_set").setDoubleArray([yaw,0,0,0,0,0]) # Set the orientation to the Limelight    
                     # Set IMU to 2
-                    table.getEntry("imumode").setInteger(2) # Set the camera mode to 2 (robot orientation)
+                    table.getEntry("imumode").setInteger(0) # Set the camera mode to 2 (robot orientation)
             except:
                 pass 
 
@@ -498,7 +524,7 @@ class SwerveSubsystem(Subsystem):
         ''' Update the odometry using the Limelight and the botpose '''
         
         # Update the pose estimator with the latest state
-        self.poseEstimator.update(
+        self.odometer.update(
                                     self.getRotation2d(), 
                                     (
                                         self.frontLeft.getSwerveModulePosition(), 
@@ -508,23 +534,32 @@ class SwerveSubsystem(Subsystem):
                                     )
                                 )
         
-        wpilib.SmartDashboard.putNumber("before X", self.poseEstimator.getEstimatedPosition().X())
-        wpilib.SmartDashboard.putNumber("before Y", self.poseEstimator.getEstimatedPosition().Y())
-        wpilib.SmartDashboard.putNumber("before Theta", self.poseEstimator.getEstimatedPosition().rotation().degrees())
+        try:
+            if self.validity == 1 and self.botpose_wpiblue[0]>0: # add condition to check if distance is less than 2 meters
+                if self.gyro.getRate() < 720: # if the robot is spinning too fast, ignore the vision measurement
+                    # Add the vision measurement to the PoseEstimator
+                    
+                    # self.poseEstimator.addVisionMeasurement(
+                    #                         Pose2d(
+                    #                             self.botpose_wpiblue[0], 
+                    #                             self.botpose_wpiblue[1], 
+                    #                             Rotation2d.fromDegrees(self.botpose_wpiblue[5])
+                    #                             ), 
+                    #                         Timer.getFPGATimestamp() - (self.cl + self.tl) # Time since the vision measurement was taken
+                    #                         )
+                    self.odometer.resetPose(
+                                            Pose2d(
+                                                self.botpose_wpiblue[0], 
+                                                self.botpose_wpiblue[1], 
+                                                Rotation2d.fromDegrees(self.botpose_wpiblue[5])
+                                            )
 
-        if self.validity == 1: # add condition to check if distance is less than 2 meters
-            if self.gyro.getRate() < 720: # if the robot is spinning too fast, ignore the vision measurement
-                # Add the vision measurement to the PoseEstimator
-                self.poseEstimator.addVisionMeasurement(
-                                        Pose2d(
-                                            self.botpose_wpiblue[0], 
-                                            self.botpose_wpiblue[1], 
-                                            Rotation2d.fromDegrees(self.botpose_wpiblue[5])
-                                            ), 
-                                        Timer.getFPGATimestamp() - (self.cl + self.tl), # Time since the vision measurement was taken
-                                        )
+                    )
+        except:
+            pass
             
         wpilib.SmartDashboard.putNumber("Validity",self.validity)
+    
         
         ##############################################################################################
 ############## Driving Modes
@@ -550,58 +585,10 @@ class SwerveSubsystem(Subsystem):
         # Read Limelight
         self.readLimelight()
     
-        # Update Odometry
+        # # Update Odometry
         if self.PoseEstimatorInit == True:
             self.updateOdometry()
-        self.odometer.update(
-                            self.getRotation2d(),
-                            (
-                                self.frontLeft.getSwerveModulePosition(), 
-                                self.frontRight.getSwerveModulePosition(), 
-                                self.backLeft.getSwerveModulePosition(), 
-                                self.backRight.getSwerveModulePosition()
-                            )
-                        )
+        
+        wpilib.SmartDashboard.putNumber("Laser Forward", self.getLaserForward())
             
-        # Sends data to dashboard
-        # wpilib.SmartDashboard.putNumber("Pose X", self.getPose().X())
-        # wpilib.SmartDashboard.putNumber("Pose Y", self.getPose().Y())
-        # wpilib.SmartDashboard.putNumber("Pose Heading", self.getPose().rotation().degrees())
-        wpilib.SmartDashboard.putNumber("PoseBlueX", self.botpose_wpiblue[0])
-        wpilib.SmartDashboard.putNumber("PoseBlueY", self.botpose_wpiblue[1])
-        # wpilib.SmartDashboard.putNumber("Validity LL", self.validity)
-        # wpilib.SmartDashboard.putNumber("AprilTag Number", self.aprilTagNumber)
-        wpilib.SmartDashboard.putNumber("PoseBlueHeading", self.botpose_wpiblue[5])
-        wpilib.SmartDashboard.putNumber("Gen Vel", self.getDesiredVelocity())
-        
-        # Reads Absolute Encoders and sends them to Dashboard
-        # absoluteEncoder = self.readAbsEncoders()
-        # wpilib.SmartDashboard.putNumber("AbsEnc FL", absoluteEncoder[0])
-        # wpilib.SmartDashboard.putNumber("AbsEnc FR", absoluteEncoder[1])
-        # wpilib.SmartDashboard.putNumber("AbsEnc BL", absoluteEncoder[2])
-        # wpilib.SmartDashboard.putNumber("AbsEnc BR", absoluteEncoder[3])
-        
-        # # Reads Encoders and sends them to Dashboard
-        # turnings = self.readTurnEncoders()
-        # wpilib.SmartDashboard.putNumber("Turning FL", turnings[0])
-        # wpilib.SmartDashboard.putNumber("Turning FR", turnings[1])
-        # wpilib.SmartDashboard.putNumber("Turning BL", turnings[2])
-        # wpilib.SmartDashboard.putNumber("Turning BR", turnings[3])
-
-        # # Reads Distance Travelled and sends them to Dashboard
-        # forwards = self.readForwardEncoders()
-        # wpilib.SmartDashboard.putNumber("Forward FL", forwards[0])
-        # wpilib.SmartDashboard.putNumber("Forward FR", forwards[1])
-        # wpilib.SmartDashboard.putNumber("Forward BL", forwards[2])
-        # wpilib.SmartDashboard.putNumber("Forward BR", forwards[3])
-
-        # wpilib.SmartDashboard.putNumber("Heading", self.getHeading())
-        # wpilib.SmartDashboard.putNumber("Continuous Heading", self.getContinuousHeading())
-
-        # wpilib.SmartDashboard.putNumber("OdoX", self.odometer.getPose().X())
-        # wpilib.SmartDashboard.putNumber("OdoY", self.odometer.getPose().Y())
-        # wpilib.SmartDashboard.putNumber("OdoT", self.odometer.getPose().rotation().degrees())
-        wpilib.SmartDashboard.putNumber("VX",self.desiredVelocityX)
-        wpilib.SmartDashboard.putNumber("VY",self.desiredVelocityY)
-        wpilib.SmartDashboard.putNumber("VTheta",self.desiredVelocityHeading)
-        
+       

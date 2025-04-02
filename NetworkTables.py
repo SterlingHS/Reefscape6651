@@ -61,19 +61,19 @@ class NetworkTables:
         # wpilib.SmartDashboard.putNumber("Angle Gyro (radians)", self.container.swerveSubsystem.getHeading()*pi/180)
 
         # Elevator
-        wpilib.SmartDashboard.putNumber("Elevator Encoder", self.container.elevator.readEncoder())
-        wpilib.SmartDashboard.putNumber("Elevator floor", self.container.elevator.readFloor())
-        wpilib.SmartDashboard.putBoolean("Elevator Limit Switch", self.container.elevator.lowerSwitchOn())
+        # wpilib.SmartDashboard.putNumber("Elevator Encoder", self.container.elevator.readEncoder())
+        # wpilib.SmartDashboard.putNumber("Elevator floor", self.container.elevator.readFloor())
+        # wpilib.SmartDashboard.putBoolean("Elevator Limit Switch", self.container.elevator.lowerSwitchOn())
 
-        # Algae Collector
-        wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
-        wpilib.SmartDashboard.putBoolean("Arm Up", self.container.algaeC.isArmUp())
+        # # Algae Collector
+        # wpilib.SmartDashboard.putNumber("Arm Height", self.container.algaeC.readArmEncoder())
+        # wpilib.SmartDashboard.putBoolean("Arm Up", self.container.algaeC.isArmUp())
 
-        # Dropper
-        wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())
-        wpilib.SmartDashboard.putNumber("Bottom sensor", self.container.dropper.getLaserBottom())
-        wpilib.SmartDashboard.putBoolean("Coral Top", self.container.dropper.is_coral_top())
-        wpilib.SmartDashboard.putBoolean("Coral Bottom", self.container.dropper.is_coral_bottom())
+        # # Dropper
+        # wpilib.SmartDashboard.putNumber("Top sensor", self.container.dropper.getLaserTop())
+        # wpilib.SmartDashboard.putNumber("Bottom sensor", self.container.dropper.getLaserBottom())
+        # wpilib.SmartDashboard.putBoolean("Coral Top", self.container.dropper.is_coral_top())
+        # wpilib.SmartDashboard.putBoolean("Coral Bottom", self.container.dropper.is_coral_bottom())
 
         # Drive system
         # Reads Encoders and sends them to Dashboard
@@ -91,13 +91,13 @@ class NetworkTables:
 
         # Pose SmartDashBoard
         field = Field2d()
-        poseEstimator = self.container.swerveSubsystem.getPoseEstimator()
-        field.setRobotPose(poseEstimator)
-        wpilib.SmartDashboard.putData("poseEstimator", field)
-        wpilib.SmartDashboard.putNumber("Estimator X", poseEstimator.X())
-        wpilib.SmartDashboard.putNumber("Estimator Y", poseEstimator.Y())
-        angle = poseEstimator.rotation().degrees()
-        wpilib.SmartDashboard.putNumber("Est Theta", angle)
+        # poseEstimator = self.container.swerveSubsystem.getPoseEstimator()
+        # field.setRobotPose(poseEstimator)
+        # wpilib.SmartDashboard.putData("poseEstimator", field)
+        # wpilib.SmartDashboard.putNumber("Estimator X", poseEstimator.X())
+        # wpilib.SmartDashboard.putNumber("Estimator Y", poseEstimator.Y())
+        # angle = poseEstimator.rotation().degrees()
+        # wpilib.SmartDashboard.putNumber("Est Theta", angle)
 
         odometer = self.container.swerveSubsystem.getPose()
         # field.setRobotPose(odometer)
@@ -109,7 +109,7 @@ class NetworkTables:
 
         wpilib.SmartDashboard.putNumber("Real Velocity X", self.container.swerveSubsystem.getRealVelocityX())
         wpilib.SmartDashboard.putNumber("Real Velocity Y", self.container.swerveSubsystem.getRealVelocityY())
-        wpilib.SmartDashboard.putNumber("Real Velocity", self.container.swerveSubsystem.getVelocity)
+        wpilib.SmartDashboard.putNumber("Real Velocity", self.container.swerveSubsystem.getVelocity())
 
 
 

@@ -99,9 +99,9 @@ class SwerveModule:
             angle = angle - 2*pi
         return angle
     
-    def getDriveVelocity(self): # CHECK IF IT RETURNS THE RIGHT VALUE
+    def getDriveVelocity(self): 
         ''' Returns the velocity of the drive motor in meters per second '''
-        return self.driveMotor.get_velocity().value # * ModuleConstants.kDriveEncoderRPM2MeterPerSec
+        return self.driveMotor.get_velocity().value
     
     def getTurningVelocity(self):
         ''' Returns the velocity of the turning motor in radians per second '''

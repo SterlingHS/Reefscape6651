@@ -95,6 +95,9 @@ class DriveConstants:
     # Drive enabler
     DriveEnabled = True
 
+    # LaserCAN
+    LaserTopCanID = 57
+
 class ModuleConstants:
     kWheelDiameterMeters = 0.1016 # 4 inches into meters
     kDriveMotorGearRatio = 1/6.12 # L3 gearbox
@@ -150,7 +153,7 @@ class DropperConstants:
     kA = 0.00012624
 
     DropSpeed = 400
-    DropIntakeSpeed = 200
+    DropIntakeSpeed = 400
     DropTransitSpeed = 200
 
 class ElevatorConstants:

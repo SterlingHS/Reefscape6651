@@ -82,7 +82,7 @@ class Elevator(Subsystem):
 
         # Init floor
         self.floor = 1
-        self.stopMotorFlag = False
+        self.stopMotorFlag = True
 
         ##############################################################################
         # Trapezoidal PID to control the elevator
@@ -95,7 +95,6 @@ class Elevator(Subsystem):
                                                        dt=self.kDt)
         self.elevatorGoal = TrapezoidProfile.State(position=0,velocity=0)
         self.elevatorSetpoint = TrapezoidProfile.State(position=0,velocity=0)
-        
 
     def lowerSwitchOn(self):
         return self.elevatorMotor1.getReverseLimitSwitch().get()
@@ -133,13 +132,14 @@ class Elevator(Subsystem):
         currentPosition = self.readEncoder()
         # Checks if the elevator is almost at L1 (3 inches above L1)
         if currentPosition < ElevatorConstants.L1+3 and goal == 0 and self.lowerSwitchOn() == False:
-            if self.stopMotorFlag == False: # Stop PID by stopping motors
+            if self.stopMotorFlag == True: # Stop PID by stopping motors
                 self.stopMotor()
-                self.stopMotorFlag = True
+                self.stopMotorFlag = False
             else:
                 self.setMotor(-0.2) # Keep going down until reach limit switch
         elif goal == 0 and self.lowerSwitchOn(): # If the limit switch is pressed, stop the motor
-            self.stopMotorFlag = False
+            self.stopMotorFlag = True
+            self.stopMotor()
         else:
             # Sets and calculates the elevator position using trapezoidal profile
             self.elevatorGoal=TrapezoidProfile.State(goal,0)
