@@ -66,6 +66,8 @@ class SwerveJoystickCmd2(Command):
         self.thetaSpeedLimiter = SlewRateLimiter(DriveConstants.kMaxTurnRateDegPerS) # Max velocity to be checked
 
     def initialize(self) -> None:
+        print("SwerveJoystickCmd2 initialized")
+        self.lastAngle = self.swerveSub.getHeading()
         return super().initialize()
     
     def joystick_attenuator(self, x: float, y: float, rotx: float, roty: float) -> tuple:
@@ -152,8 +154,14 @@ class SwerveJoystickCmd2(Command):
                         self.cyclesAngles = 0
                         self.savingAngle = False
                         self.lastAngle = self.swerveSub.getHeading()
-                    self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                        self.xSpeed, self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+                    if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
+                        self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                            -self.xSpeed, -self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+                    else:
+                        self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                            self.xSpeed, self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+
+
                     self.lastAngle = self.swerveSub.getHeading()
                 else:
                     # Sets and calculates the setpoint for the turning PID
@@ -162,10 +170,18 @@ class SwerveJoystickCmd2(Command):
                     # Apply slew rate limiter to theta speed
                     speedTheta = self.thetaSpeedLimiter.calculate(speedTheta)
                     # Calculate the chassis speeds using field relative speeds
-                    self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                            self.xSpeed, self.ySpeed, speedTheta, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+                    if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
+                        self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                            -self.xSpeed, -self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+                    else:
+                        self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                            self.xSpeed, self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
             else:
-                self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
+                    self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                        -self.xSpeed, -self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
+                else:
+                    self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                         self.xSpeed, self.ySpeed, self.turningSpeedx, Rotation2d(self.swerveSub.getHeading()*pi/180)) # angle in RADIANS!
                 self.lastAngle = self.swerveSub.getHeading()
                 self.savingAngle = True

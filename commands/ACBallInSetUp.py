@@ -16,7 +16,8 @@ class ACBallInSetUp(Command):
     
     def execute(self) -> None:
         if self.algaeC.readArmEncoder() <= AlgaeCollectorConstants.algaeArmCollecting:
-            self.algaeC.stopArmMotor()
+            #self.algaeC.stopArmMotor()
+            self.algaeC.setArmMotor(-.02) # Force to hold the arm from bouncing
             self.algaeC.setMode(1)
         pass
             

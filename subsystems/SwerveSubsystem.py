@@ -6,7 +6,6 @@ import wpimath
 from wpimath.geometry import Rotation2d, Pose2d
 import wpimath.kinematics
 from wpimath.kinematics import SwerveModuleState, ChassisSpeeds
-from wpimath.estimator import SwerveDrive4PoseEstimator
 from ntcore import NetworkTableInstance
 
 from commands2 import Subsystem
@@ -183,7 +182,6 @@ class SwerveSubsystem(Subsystem):
         except:
             return 1000
        
-
 ################################################################################################
 ############## Odometer Methods
 
@@ -194,13 +192,6 @@ class SwerveSubsystem(Subsystem):
     def getPose(self):
         ''' Returns the pose of the robot '''
         return self.odometer.getPose()
-
-    # def getPoseEstimator(self):
-    #     ''' Returns the pose of the robot using PoseEstimator '''
-    #     try:
-    #         return self.poseEstimator.getEstimatedPosition()
-    #     except:
-    #         return Pose2d(0,0,Rotation2d(0))
     
     def resetOdometer(self, pose):
         ''' Resets the odometer to a specific pose '''
@@ -420,7 +411,7 @@ class SwerveSubsystem(Subsystem):
         self.turboMode = not self.turboMode
 
 ###############################################################################################
-############## Reef Oriented Methods
+############## Reef Oriented Methods, odometer and limelight
 
     def angleToAprilTag(self, aprilTag):
         ''' Returns the angle to the April Tag in degrees (0-360)'''
@@ -450,6 +441,7 @@ class SwerveSubsystem(Subsystem):
         table = self.inst.getTable("limelight")
         # Get the latest values from Limelight
         self.botpose = table.getEntry("botpose").getDoubleArray([0,0,0,0,0,0])
+        self.botposeBlue = table.getEntry("botpose_wpiblue").getDoubleArray([0,0,0,0,0,0])
         self.botpose_wpiblue = table.getEntry("botpose_orb_wpiblue").getDoubleArray([0,0,0,0,0,0])
         self.capture_latency = table.getEntry("cl").getDouble(0)
         self.timestamp = table.getEntry("ts").getDouble(0)
@@ -485,19 +477,22 @@ class SwerveSubsystem(Subsystem):
                     if self.yaw_lime != 0:
                         self.listYaw.append(self.yaw_lime)
                     # If we have 10 values, calculate the average and set the gyro offset
-                if len(self.listYaw) == 10:
+                if len(self.listYaw) >= 10:
                     yaw = sum(self.listYaw)/len(self.listYaw) # Average the yaw values
                     print(f"Yaw = {yaw}")
-                    if self.aprilTagNumber in [6, 7, 8, 9, 10, 11]: # If we see red reef
-                        if yaw < 180 :
-                            yaw = yaw + 180
-                        elif yaw >= 180:
-                            yaw = yaw - 180
-                    self.offSetGyro(-yaw) # Set the gyro offset
-
+                    if self.aprilTagNumber in [6, 7, 8, 9, 10, 11] or DriverStation.getAlliance() == DriverStation.Alliance.kRed: # If we see red reef
+                        self.offSetGyro(180)
+                        # print(f"It went in {self.aprilTagNumber in [6, 7, 8, 9, 10, 11]}")
+                        # if yaw < 180 :
+                        #     #yaw = yaw + 180
+                        #     yaw = -180
+                        # elif yaw >= 180:
+                        #     #yaw = yaw - 180
+                        #     yaw = -180
+                    # self.offSetGyro(-yaw) # Set the gyro offset
+                    # print(f"AprilTag = {self.aprilTagNumber}")
                     # Initialize the pose estimator 
                     # Sets tghe flag to True to indicate that the PoseEstimator has been initialized
-                    self.PoseEstimatorInit = True
                     # Initialize the pose estimator with the current pose from the Limelight
                     # self.poseEstimator = SwerveDrive4PoseEstimator(
                     #             DriveConstants.kDriveKinematics, 
@@ -507,10 +502,12 @@ class SwerveSubsystem(Subsystem):
                     #                 self.botpose_wpiblue[0], 
                     #                 self.botpose_wpiblue[1], 
                     #                 Rotation2d.fromDegrees(yaw)))
-                    self.odometer.resetPose( Pose2d(
-                                    self.botpose_wpiblue[0], 
-                                    self.botpose_wpiblue[1], 
-                                    Rotation2d.fromDegrees(yaw)))
+                    if 6<self.botpose_wpiblue[0]<11: 
+                        self.odometer.resetPose( Pose2d(
+                                        self.botpose_wpiblue[0], 
+                                        self.botpose_wpiblue[1], 
+                                        Rotation2d.fromDegrees(yaw)))
+                        self.PoseEstimatorInit = True
                     # self.poseEstimator.setVisionMeasurementStdDevs((0.1,0.1,0.1))
                     print(f"{self.botpose_wpiblue[0]} - {self.botpose_wpiblue[1]} - {self.botpose_wpiblue[5]}")
                     # push the yaw to the limelight
@@ -547,14 +544,14 @@ class SwerveSubsystem(Subsystem):
                     #                             ), 
                     #                         Timer.getFPGATimestamp() - (self.cl + self.tl) # Time since the vision measurement was taken
                     #                         )
-                    self.odometer.resetPose(
-                                            Pose2d(
-                                                self.botpose_wpiblue[0], 
-                                                self.botpose_wpiblue[1], 
-                                                Rotation2d.fromDegrees(self.botpose_wpiblue[5])
-                                            )
-
-                    )
+                    # self.odometer.resetPose(
+                    #                         Pose2d(
+                    #                             self.botpose_wpiblue[0], 
+                    #                             self.botpose_wpiblue[1], 
+                    #                             Rotation2d.fromDegrees(self.botpose_wpiblue[5])
+                    #                           )
+                    pass
+                    
         except:
             pass
             
@@ -562,6 +559,8 @@ class SwerveSubsystem(Subsystem):
     
         
         ##############################################################################################
+
+###############################################################################################
 ############## Driving Modes
 
     def nextDrivingMode(self):

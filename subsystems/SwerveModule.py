@@ -130,8 +130,12 @@ class SwerveModule:
     
     def getSwerveModulePosition(self):
         ''' Returns the position of the swerve module '''
+        if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed:
+            position = self.getDrivePosition()
+        else:
+            position = -self.getDrivePosition()
         return wpimath.kinematics.SwerveModulePosition(
-            -self.getDrivePosition(), 
+            position, 
             Rotation2d(self.getTurningPosition()))
 
     def stop(self):

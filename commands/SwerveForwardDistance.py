@@ -33,7 +33,6 @@ class SwerveForwardDistance(Command):
         return super().initialize()
 
     def execute(self) -> None:        
-        self.encoderPosition = self.swerveSub.readForwardEncoders()
         self.swerveSub.moveStraightZero(.3)
         return super().execute()
 
@@ -47,8 +46,5 @@ class SwerveForwardDistance(Command):
         averageStart = self.encoderStart[0]
         averagePosition = self.encoderPosition[0]
         condition = abs(averagePosition-averageStart)>self.GoalDistance
-        wpilib.SmartDashboard.putNumber("AveragePosition", averagePosition)
-        wpilib.SmartDashboard.putNumber("AverageStart", averageStart)
-
         return condition
     

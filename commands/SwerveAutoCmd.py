@@ -30,7 +30,7 @@ class SwerveAutoCmd(Command):
         # PID to control turning speed of the robot
         self.turningPID = PIDController(.01, 0, 0) # P, I, D to be checked
         self.turningPID.enableContinuousInput(0, 360) 
-        self.turningPID.setTolerance(5) 
+        self.turningPID.setTolerance(1) 
 
         # PID to control the x and y position of the robot
         self.xPID = PIDController(.25, 0, 0) # P, I, D to be checked
@@ -41,15 +41,16 @@ class SwerveAutoCmd(Command):
         self.chassisSpeeds = ChassisSpeeds()
 
         self.transAcc = .75  # 0.75 m/s^2
-        self.maxVel = 1      # 1 m/s
+        self.maxVel = .5      # .5 m/s
         self.rotAcc = 10     # 30 deg/s^2
         self.maxRotRate = 10 # 30 degrees/s
 
-        self.MaxError = 0.03
+        self.MaxError = 0.01
         self.MaxRotError = 1
         self.slowMoveLimit = 0.2
-        self.slowMoveVel = 0.1
-        self.VerySlowMoveVel = 0.05
+        self.slowMoveVel = 0.08
+        self.VerySlowMoveVel = 0.07
+        self.colorDirection = 1
 
         self.addRequirements(swerveSub)
 
@@ -70,6 +71,8 @@ class SwerveAutoCmd(Command):
         self.goalLaser = False
         self.goalReachedY = False
         self.goalReachedHeading = False
+
+        self.colorDirection = -1 if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed else 1
         return super().initialize()
 
     def execute(self) -> None:
@@ -101,9 +104,10 @@ class SwerveAutoCmd(Command):
         ySpeed = self.yPID.calculate(instantVelocitY, self.ySetVelocity)
 
         # PID to control the theta position of the robot
-        self.ProfiledTrapCalcHeading()
-        headingSpeed = self.turningPID.calculate(instantVelocitTheta, self.headingSetVelocity)
-        wpilib.SmartDashboard.putNumber("Setpoint", headingSpeed)
+        #  self.ProfiledTrapCalcHeading()
+
+        headingSpeed = self.turningPID.calculate(self.theta, self.goalReachedHeading)
+        wpilib.SmartDashboard.putNumber("Headin Speed", headingSpeed)
 
         self.chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 -xSpeed, 
@@ -135,6 +139,7 @@ class SwerveAutoCmd(Command):
     def AdvanceWithLaser(self):
         ''' Moves robot forward using laserCAN'''
         direction = 1 if wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed else -1
+        direction = direction * self.colorDirection
         if self.swerveSub.getLaserForward() > 160:
             self.xSetVelocity = direction * self.slowMoveVel
             print(f"Laser Forward - {self.xSetVelocity}")
@@ -146,6 +151,7 @@ class SwerveAutoCmd(Command):
         ''' Calculates the next position and velocity of the robot in the x axis '''
         XMax = self.maxVel**2/self.transAcc # Position to reach max velocity
         direction = -1 if self.x > self.GoalPose.X() else 1
+        direction = direction * self.colorDirection
 
         # Slow motion if error is small
         if self.MaxError < abs(self.x-self.GoalPose.X()) < self.slowMoveLimit or self.goalReachedX == True:
@@ -171,22 +177,25 @@ class SwerveAutoCmd(Command):
             # Fase 1: Acceleration
             elif direction == 1 and self.xSetVelocity < self.maxVel:
                 self.xSetVelocity += self.transAcc * 0.02
+                print(f"Accelerating {self.xSetVelocity} {self.maxVel}")
             elif direction == -1 and self.xSetVelocity > -self.maxVel:
                 self.xSetVelocity -= self.transAcc * 0.02
+                print(f"Accelerating {self.xSetVelocity} {self.maxVel}")
             # Fase 2: Keep Max Velocity
             else:
                 self.xSetVelocity = self.maxVel * direction
-        # wpilib.SmartDashboard.putNumber("x", self.x)
-        # wpilib.SmartDashboard.putNumber("Goal x", self.GoalPose.X())
-        # wpilib.SmartDashboard.putNumber("XMax", XMax)
-        # wpilib.SmartDashboard.putNumber("Direction", direction)
-        # wpilib.SmartDashboard.putNumber("xSetVel", self.xSetVelocity)
-        # wpilib.SmartDashboard.putBoolean("GoalReachedX", self.goalReachedX)
+        wpilib.SmartDashboard.putNumber("x", self.x)
+        wpilib.SmartDashboard.putNumber("Goal x", self.GoalPose.X())
+        wpilib.SmartDashboard.putNumber("XMax", XMax)
+        wpilib.SmartDashboard.putNumber("Direction", direction)
+        wpilib.SmartDashboard.putNumber("xSetVel", self.xSetVelocity)
+        wpilib.SmartDashboard.putBoolean("GoalReachedX", self.goalReachedX)
 
     def ProfiledTrapCalcY(self):
         ''' Calculates the next position and velocity of the robot in the y axis '''
         YMax = self.maxVel**2/self.transAcc
         direction = -1 if self.y > self.GoalPose.Y() else 1
+        direction = direction * self.colorDirection
 
          # Slow motion if error is small
         if self.MaxError < abs(self.y-self.GoalPose.Y()) < self.slowMoveLimit or self.goalReachedY == True:
@@ -215,11 +224,11 @@ class SwerveAutoCmd(Command):
             # Fase 2: Keep Max Velocity
             else:
                 self.ySetVelocity = self.maxVel * direction
-        # wpilib.SmartDashboard.putNumber("y", self.y)
-        # wpilib.SmartDashboard.putNumber("Goal y", self.GoalPose.Y())
-        # wpilib.SmartDashboard.putNumber("YMax", YMax)
-        # wpilib.SmartDashboard.putNumber("Directiony", direction)
-        # wpilib.SmartDashboard.putNumber("YSetVel", self.xSetVelocity)
+        wpilib.SmartDashboard.putNumber("y", self.y)
+        wpilib.SmartDashboard.putNumber("Goal y", self.GoalPose.Y())
+        wpilib.SmartDashboard.putNumber("YMax", YMax)
+        wpilib.SmartDashboard.putNumber("Directiony", direction)
+        wpilib.SmartDashboard.putNumber("YSetVel", self.xSetVelocity)
 
     def ProfiledTrapCalcHeading(self):
         ''' Calculates the next position and velocity of the robot in the y axis '''

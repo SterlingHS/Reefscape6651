@@ -70,48 +70,36 @@ class RobotContainer:
         autocommand0: commands2.cmd.Command = None
 
         #Poses for Autonomous
-        self.Pose21R = Pose2d(5.9, 4.2, Rotation2d.fromDegrees(0)) # Pose for Left 22
+        self.Pose21R = Pose2d(5.9, 4.2, Rotation2d.fromDegrees(0)) # Pose for Right 22
+        self.Pose10R = Pose2d(11, 3.8, Rotation2d.fromDegrees(180)) # Pose for Right 10
+        self.Pose22R = Pose2d(4.8, 2.8, Rotation2d.fromDegrees(0)) # Pose for Right 22
         Pose17L = Pose2d(3.693, 2.972, Rotation2d.fromDegrees(240)) # Pose for Right 17
         Pose17R = Pose2d(3.975, 2.811, Rotation2d.fromDegrees(240)) # Pose for Left 17
         PoseCoralRight = Pose2d(1.629, 0.683, Rotation2d.fromDegrees(234)) # Pose for Right Coral
         
         DropAuto21R =  SwerveAutoCmd(self.swerveSubsystem, self.Pose21R).andThen(
-            ElevatorFloor(self.elevator, 4).andThen(
+            ElevatorFloor(self.elevator, 3).andThen(
             waitcommand.WaitCommand(.5).andThen(
             CoralDrop(self.dropper).andThen(
-            waitcommand.WaitCommand(.5).andThen(
+            waitcommand.WaitCommand(1).andThen(
             ElevatorFloor(self.elevator, 1))))))
-
-        IntakeAuto =  CoralIntake(self.dropper, self.elevator)
-
-        # Autonomous with SwerveAutoCmd
-        # Right22h17 =    SwerveAutoCmd(self.swerveSubsystem, self.Pose22L).andThen(
-        #                 DropAuto.andThen(
-        #                 SwerveAutoCmd(self.swerveSubsystem, PoseCoralRight).andThen(
-        #                 IntakeAuto.andThen(
-        #                 SwerveAutoCmd(self.swerveSubsystem, Pose17L).andThen(
-        #                 DropAuto.andThen(
-        #                 SwerveAutoCmd(self.swerveSubsystem, PoseCoralRight).andThen(
-        #                 IntakeAuto.andThen(
-        #                 SwerveAutoCmd(self.swerveSubsystem, Pose17R).andThen(
-        #                 DropAuto))))))))) # PathPlannerAuto("Right-22-17")
-
-        NewSimpleMid = SwerveForwardDistance(self.swerveSubsystem, 1.45).andThen(
-            ElevatorFloor(self.elevator, 4).andThen(
+        
+        DropAuto10R =  SwerveAutoCmd(self.swerveSubsystem, self.Pose10R).andThen(
+            ElevatorFloor(self.elevator, 3).andThen(
+            waitcommand.WaitCommand(.5).andThen(
             CoralDrop(self.dropper).andThen(
-            waitcommand.WaitCommand(.25).andThen(
-            ElevatorFloor(self.elevator, 1)))))
+            waitcommand.WaitCommand(1).andThen(
+            ElevatorFloor(self.elevator, 1))))))
+        
+        SimpleForward = SwerveForwardDistance(self.swerveSubsystem, 1.45)
 
         self.sendableChooser = SendableChooser()
-        # #self.sendableChooser.addOption("Blue/Red Mid", autocommand1)
-        self.sendableChooser.setDefaultOption("Nothing", autocommand0)
-        try:
-            self.sendableChooser.addOption("TestAutoCMD", DropAuto21R)
-            self.sendableChooser.addOption("NewSimpleMid", NewSimpleMid)
-            # self.sendableChooser.addOption("AutoSwv-Right-22-17", Right22h17)
-        except:
-            print("##########################################################################")
-            print("AutoTest not found")
+        
+        self.sendableChooser.setDefaultOption("Nothing",autocommand0)
+        self.sendableChooser.addOption("Blue Center", DropAuto21R)
+        self.sendableChooser.addOption("Red Center",  DropAuto10R)
+        self.sendableChooser.addOption("Simple Forward", SimpleForward)
+    
         wpilib.SmartDashboard.putData("Auto Chooser", self.sendableChooser)
 
         # Configure the button bindings
@@ -161,6 +149,7 @@ class RobotContainer:
         # Driving
         commands2.button.POVButton(
              self.driverController, 270).onTrue(DriveSwitchMode(self.swerveSubsystem))
+        
         commands2.button.JoystickButton(
             self.driverController, wpilib.PS5Controller.Button.kL2).onTrue(SwerveToggleTurbo(self.swerveSubsystem))    
 
